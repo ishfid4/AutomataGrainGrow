@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ishfid.iml" filepath="$PROJECT_DIR$/.idea/modules/ishfid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ishfid_main.iml" filepath="$PROJECT_DIR$/.idea/modules/ishfid_main.iml" group="ishfid" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ishfid_test.iml" filepath="$PROJECT_DIR$/.idea/modules/ishfid_test.iml" group="ishfid" />
+    </modules>
+  </component>
+</project>
