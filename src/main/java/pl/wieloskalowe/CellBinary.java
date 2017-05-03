@@ -25,4 +25,8 @@ public class CellBinary {
     public void setState(boolean state) {
         this.state = state;
     }
+
+    public void nextState() {
+        this.state = !this.state;
+    }
 }

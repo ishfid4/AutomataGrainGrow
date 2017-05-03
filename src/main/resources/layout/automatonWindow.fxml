@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import pl.wieloskalowe.controls.NumberTextField?>
+
+<SplitPane dividerPositions="0.2491638795986622" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
+  <items>
+    <AnchorPane maxWidth="150.0" minHeight="400.0" minWidth="150.0" prefHeight="400.0" prefWidth="150.0">
+         <children>
+             <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="3" />
+             <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="3" />
+             <NumberTextField fx:id="radiusField" layoutX="1.0" layoutY="115.0" text="1" />
+            <Button fx:id="setButton" layoutY="300.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
+            <Button fx:id="iterateButton" layoutY="330.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
+             <Button fx:id="startStopButton" layoutY="360.0" mnemonicParsing="false" onMouseClicked="#startStopClicked" text="Start/Stop" />
+            <Label layoutY="14.0" text="Width" />
+            <Label layoutY="56.0" text="Height" />
+            <Label layoutY="98.0" text="Radius" />
+            <Label fx:id="errorLabel" layoutX="3.0" layoutY="378.0" prefHeight="17.0" prefWidth="149.0" />
+         </children></AnchorPane>
+    <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <Canvas fx:id="canvas" height="200.0" width="200.0" />
+         </children></AnchorPane>
+  </items>
+</SplitPane>

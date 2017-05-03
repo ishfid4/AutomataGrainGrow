@@ -1,17 +1,31 @@
 package pl.wieloskalowe;
 
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import pl.wieloskalowe.Controllers.AutomatonController;
+
+import java.io.IOException;
+
 /**
  * Created by ishfi on 02.05.2017.
  */
-public class Main {
+public class Main extends Application{
 
     public static void main(String[] args) {
+        launch(args);
+    }
 
-        Board2D board2D = new Board2D(3, 3,new CellBinary(false));
-        MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(1, 3,3, false);
-        GameOfLife gameOfLife = new GameOfLife(board2D, mooreNeighborhood);
-        gameOfLife.oneIteration();
+    @Override
+    public void start(Stage primaryStage) throws IOException {
 
-        System.out.println("Git Gud");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout/automatonWindow.fxml"));
+        Parent root = loader.load();
+
+        primaryStage.setTitle("Automaton");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
     }
 }
