@@ -9,8 +9,8 @@ import java.util.Set;
  */
 public class GameOfLife extends Automaton {
 
-    public GameOfLife(Board2D board2D, MooreNeighborhood mooreNeighborhood) {
-        super(board2D, mooreNeighborhood);
+    public GameOfLife(Board2D board2D, Neighborhood neighborhood) {
+        super(board2D, neighborhood);
     }
 
     @Override

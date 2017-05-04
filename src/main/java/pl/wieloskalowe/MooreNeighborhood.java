@@ -1,13 +1,12 @@
 package pl.wieloskalowe;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Created by ishfi on 02.05.2017.
  */
-public class MooreNeighborhood {
+public class MooreNeighborhood implements Neighborhood {
     private int radius, width, height;
     private boolean wrap;
 
@@ -18,6 +17,7 @@ public class MooreNeighborhood {
         this.wrap = wrap;
     }
 
+    @Override
     public Set<CellCoordinates> cellNeighbors(CellCoordinates cellCoordinates) {
         Set<CellCoordinates> neighbors = new HashSet<>();
 

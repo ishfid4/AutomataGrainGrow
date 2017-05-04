@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 public abstract class Automaton {
     protected Board2D board2D;
-    protected MooreNeighborhood mooreNeighborhood;
+    protected Neighborhood neighborhood;
 
-    public Automaton(Board2D board2D, MooreNeighborhood mooreNeighborhood) {
+    public Automaton(Board2D board2D, Neighborhood neighborhood) {
         this.board2D = board2D;
-        this.mooreNeighborhood = mooreNeighborhood;
+        this.neighborhood = neighborhood;
     }
 
 
@@ -27,9 +27,9 @@ public abstract class Automaton {
         Board2D nextBoard = new Board2D(board2D);
 
         for (CellCoordinates cellCoordinates : coordinatesSet) {
-            CellBinary currentCell = board2D.getCell(cellCoordinates);
-            Set<CellBinary> neighbours = mooreNeighborhood.cellNeighbors(cellCoordinates).stream()
-                    .map(cord -> board2D.getCell(cord)).collect(Collectors.toSet());
+            CellBinary currentCell = (CellBinary) board2D.getCell(cellCoordinates);
+            Set<CellBinary> neighbours = neighborhood.cellNeighbors(cellCoordinates).stream()
+                    .map(cord -> (CellBinary) board2D.getCell(cord)).collect(Collectors.toSet());
 
             nextBoard.setCell(cellCoordinates, getNextCellState(currentCell, neighbours));
         }

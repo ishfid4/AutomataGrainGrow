@@ -8,18 +8,18 @@ import java.util.Set;
  * Created by ishfi on 02.05.2017.
  */
 public class Board2D {
-    private Map<CellCoordinates, CellBinary> board2D = new HashMap<>();
+    private Map<CellCoordinates, Cell> board2D = new HashMap<>();
     private int width, height;
-    private CellBinary outerCell;
+    private Cell outerCell;
 
-    public Board2D(int width, int height, CellBinary outerCell) {
+    public Board2D(int width, int height, Cell outerCell, Cell initialCell) {
         this.width = width;
         this.height = height;
         this.outerCell = outerCell;
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 CellCoordinates cellCoordinates = new CellCoordinates(x, y);
-                this.board2D.put(cellCoordinates, new CellBinary());
+                this.board2D.put(cellCoordinates, initialCell.copy());
             }
         }
     }
@@ -34,13 +34,13 @@ public class Board2D {
         return board2D.keySet();
     }
 
-    public void setCell(CellCoordinates cellCoordinates, CellBinary cellBinary){
-        board2D.put(cellCoordinates, cellBinary);
+    public void setCell(CellCoordinates cellCoordinates, Cell cell){
+        board2D.put(cellCoordinates, cell);
     }
 
-    public CellBinary getCell(CellCoordinates cellCoordinates) {
-        CellBinary cell = board2D.get(cellCoordinates);
-        if(cell == null) cell = new CellBinary(outerCell);
+    public Cell getCell(CellCoordinates cellCoordinates) {
+        Cell cell = board2D.get(cellCoordinates);
+        if(cell == null) cell = outerCell.copy();
         return cell;
     }
 

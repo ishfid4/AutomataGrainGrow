@@ -3,7 +3,7 @@ package pl.wieloskalowe;
 /**
  * Created by ishfi on 02.05.2017.
  */
-public class CellBinary {
+public class CellBinary implements Cell {
     private boolean state;
 
     public CellBinary() {
@@ -26,7 +26,11 @@ public class CellBinary {
         this.state = state;
     }
 
+    @Override
     public void nextState() {
         this.state = !this.state;
     }
+
+    @Override
+    public CellBinary copy() { return  new CellBinary(this);}
 }

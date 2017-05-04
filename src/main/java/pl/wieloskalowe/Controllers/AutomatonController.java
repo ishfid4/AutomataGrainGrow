@@ -26,8 +26,6 @@ public class AutomatonController {
     @FXML private Canvas canvas;
     private double cellWidth, cellHeight;
     private boolean started = false;
-    private Board2D board2D;
-    private MooreNeighborhood mooreNeighborhood;
     private GameOfLife gameOfLife;
     private GraphicsContext graphicsContext;
     private Ticker ticker;
@@ -69,6 +67,7 @@ public class AutomatonController {
     }
 
     //TODO: Make changes showing in gui when its iterated by ticker
+    //TODO: AutomatonAdapter should be Observable for change feedback??
 
     @FXML public void startStopClicked() {
         this.started = !this.started;
@@ -100,13 +99,14 @@ public class AutomatonController {
         graphicsContext.clearRect(0,0,anchorPaneForCanvas.getWidth(),anchorPaneForCanvas.getHeight());
 
         for (CellCoordinates cellCoordinates: gameOfLife.getBoard().getAllCoordinates()) {
-            drawCell(cellCoordinates.getX(),cellCoordinates.getY(),gameOfLife.getBoard().getCell(cellCoordinates).isAlive());
+            CellBinary cell = (CellBinary) gameOfLife.getBoard().getCell(cellCoordinates);
+            drawCell(cellCoordinates.getX(),cellCoordinates.getY(), cell.isAlive());
         }
     }
 
     private void setUpAutomaton(int width, int height, int radius){
-        board2D = new Board2D(width, height,new CellBinary(false));
-        mooreNeighborhood = new MooreNeighborhood(radius, width,height, false);
+        Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
+        MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(radius, width,height, false);
         gameOfLife = new GameOfLife(board2D, mooreNeighborhood);
     }
 }
