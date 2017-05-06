@@ -11,18 +11,18 @@ import java.util.TimerTask;
 public class Ticker {
     private final Timer timer = new Timer("Ticker-timer");
     private TimerTask task = null;
-    private int rate = 40;
-    private Automaton automaton;
+    private int rate = 100;
+    private AutomatonAdapter automatonAdapter;
 
-    public Ticker(Automaton automaton) {
-        this.automaton = automaton;
+    public Ticker(AutomatonAdapter automatonAdapter) {
+        this.automatonAdapter = automatonAdapter;
     }
 
     private TimerTask createTickTask() {
         return new TimerTask() {
             @Override
             public void run() {
-                automaton.oneIteration();
+                automatonAdapter.nextAutomatonState();
             }
         };
     }

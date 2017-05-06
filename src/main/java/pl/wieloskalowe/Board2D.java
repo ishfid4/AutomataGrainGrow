@@ -43,12 +43,4 @@ public class Board2D {
         if(cell == null) cell = outerCell.copy();
         return cell;
     }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
 }

@@ -1,23 +1,23 @@
 package pl.wieloskalowe.Controllers;
 
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import pl.wieloskalowe.*;
+
+import java.util.Observable;
+import java.util.Observer;
 
 
 /**
  * Created by ishfi on 03.05.2017.
  */
-public class AutomatonController {
+public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
     @FXML private TextField widthField;
     @FXML private TextField heightField;
@@ -26,9 +26,9 @@ public class AutomatonController {
     @FXML private Canvas canvas;
     private double cellWidth, cellHeight;
     private boolean started = false;
-    private GameOfLife gameOfLife;
     private GraphicsContext graphicsContext;
     private Ticker ticker;
+    private AutomatonAdapter automatonAdapter;
 
     @FXML public void initialize() {
         graphicsContext = canvas.getGraphicsContext2D();
@@ -54,7 +54,9 @@ public class AutomatonController {
 
             setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()), Integer.parseInt(radiusField.getText()));
 
-            ticker = new Ticker(gameOfLife);
+            automatonAdapter.addObserver(this);
+
+            ticker = new Ticker(automatonAdapter);
 
             canvas.setWidth(anchorPaneForCanvas.getWidth());
             canvas.setHeight(anchorPaneForCanvas.getHeight());
@@ -66,9 +68,6 @@ public class AutomatonController {
         }
     }
 
-    //TODO: Make changes showing in gui when its iterated by ticker
-    //TODO: AutomatonAdapter should be Observable for change feedback??
-
     @FXML public void startStopClicked() {
         this.started = !this.started;
         if (started)
@@ -78,14 +77,13 @@ public class AutomatonController {
     }
 
     @FXML public void iterateClicked() {
-        gameOfLife.oneIteration();
-        drawBoard();
+        automatonAdapter.nextAutomatonState();
     }
 
     private void changeCellState(double x, double y) {
         CellCoordinates cellCoordinates = new CellCoordinates((int)(x / cellWidth), (int)(y / cellHeight));
 
-        gameOfLife.getBoard().getCell(cellCoordinates).nextState();
+        automatonAdapter.changeCellState(cellCoordinates);
     }
 
     private void drawCell(int x, int y, boolean alive) {
@@ -98,8 +96,8 @@ public class AutomatonController {
     private void drawBoard() {
         graphicsContext.clearRect(0,0,anchorPaneForCanvas.getWidth(),anchorPaneForCanvas.getHeight());
 
-        for (CellCoordinates cellCoordinates: gameOfLife.getBoard().getAllCoordinates()) {
-            CellBinary cell = (CellBinary) gameOfLife.getBoard().getCell(cellCoordinates);
+        for (CellCoordinates cellCoordinates: automatonAdapter.getBoard().getAllCoordinates()) {
+            CellBinary cell = (CellBinary) automatonAdapter.getBoard().getCell(cellCoordinates);
             drawCell(cellCoordinates.getX(),cellCoordinates.getY(), cell.isAlive());
         }
     }
@@ -107,6 +105,13 @@ public class AutomatonController {
     private void setUpAutomaton(int width, int height, int radius){
         Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
         MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(radius, width,height, false);
-        gameOfLife = new GameOfLife(board2D, mooreNeighborhood);
+
+        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood);
+        automatonAdapter = new AutomatonAdapter(automaton, mooreNeighborhood);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        drawBoard();
     }
 }

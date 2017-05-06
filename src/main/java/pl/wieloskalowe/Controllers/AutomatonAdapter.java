@@ -1,8 +1,6 @@
 package pl.wieloskalowe.Controllers;
 
-import pl.wieloskalowe.Automaton;
-import pl.wieloskalowe.GameOfLife;
-import pl.wieloskalowe.Neighborhood;
+import pl.wieloskalowe.*;
 
 import java.util.Observable;
 
@@ -11,11 +9,24 @@ import java.util.Observable;
  */
 public class AutomatonAdapter extends Observable{
     private Automaton automaton;
-    private Neighborhood neighborhood;
-    int width, height;
 
+    public AutomatonAdapter(Automaton automaton, Neighborhood neighborhood) {
+        this.automaton = automaton;
+    }
 
-    public AutomatonAdapter() {
+    public void nextAutomatonState() {
+        automaton.oneIteration();
+        setChanged();
+        notifyObservers();
+    }
 
+    public void changeCellState(CellCoordinates cellCoordinates) {
+        automaton.getBoard().getCell(cellCoordinates).nextState();
+        setChanged();
+        notifyObservers();
+    }
+
+    public Board2D getBoard() {
+        return automaton.getBoard();
     }
 }
