@@ -1,7 +1,7 @@
 package pl.wieloskalowe;
 
-import java.util.ArrayList;
-import java.util.List;
+import pl.wieloskalowe.neighborhoods.Neighborhood;
+
 import java.util.Set;
 
 /**
@@ -11,6 +11,10 @@ public class GameOfLife extends Automaton {
 
     public GameOfLife(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);
+    }
+
+    public GameOfLife(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
+        super(board2D, neighborhood, coordinatesWrapper);
     }
 
     @Override

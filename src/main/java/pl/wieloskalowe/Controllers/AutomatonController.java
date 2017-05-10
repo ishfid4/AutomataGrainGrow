@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import pl.wieloskalowe.*;
+import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -104,10 +105,15 @@ public class AutomatonController implements Observer{
 
     private void setUpAutomaton(int width, int height, int radius){
         Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
-        MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(radius, width,height, false);
 
-        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood);
-        automatonAdapter = new AutomatonAdapter(automaton, mooreNeighborhood);
+//      Cell wrapping
+        CoordinatesWrapper coordinatesWrapper = new CoordinatesWrapper(width,height);
+
+        MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(radius);
+
+//        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood);
+        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood, coordinatesWrapper);
+        automatonAdapter = new AutomatonAdapter(automaton);
     }
 
     @Override

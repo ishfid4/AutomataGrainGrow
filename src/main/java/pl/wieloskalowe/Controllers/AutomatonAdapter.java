@@ -1,6 +1,7 @@
 package pl.wieloskalowe.Controllers;
 
 import pl.wieloskalowe.*;
+import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.Observable;
 
@@ -10,7 +11,7 @@ import java.util.Observable;
 public class AutomatonAdapter extends Observable{
     private Automaton automaton;
 
-    public AutomatonAdapter(Automaton automaton, Neighborhood neighborhood) {
+    public AutomatonAdapter(Automaton automaton) {
         this.automaton = automaton;
     }
 

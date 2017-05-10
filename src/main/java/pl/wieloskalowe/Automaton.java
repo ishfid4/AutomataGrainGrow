@@ -1,7 +1,7 @@
 package pl.wieloskalowe;
 
-import java.util.ArrayList;
-import java.util.List;
+import pl.wieloskalowe.neighborhoods.Neighborhood;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,12 +12,18 @@ import java.util.stream.Collectors;
 public abstract class Automaton {
     protected Board2D board2D;
     protected Neighborhood neighborhood;
+    protected CoordinatesWrapper coordinatesWrapper = null;
 
     public Automaton(Board2D board2D, Neighborhood neighborhood) {
         this.board2D = board2D;
         this.neighborhood = neighborhood;
     }
 
+    public Automaton(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
+        this.board2D = board2D;
+        this.neighborhood = neighborhood;
+        this.coordinatesWrapper = coordinatesWrapper;
+    }
 
     abstract protected CellBinary getNextCellState(CellBinary cell, Set<CellBinary> neighbours);
 
@@ -28,8 +34,16 @@ public abstract class Automaton {
 
         for (CellCoordinates cellCoordinates : coordinatesSet) {
             CellBinary currentCell = (CellBinary) board2D.getCell(cellCoordinates);
-            Set<CellBinary> neighbours = neighborhood.cellNeighbors(cellCoordinates).stream()
+            Set<CellCoordinates> coordinatesNeighbours =  neighborhood.cellNeighbors(cellCoordinates);
+
+            if (coordinatesWrapper != null)
+                coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
+
+            Set<CellBinary> neighbours = coordinatesNeighbours.stream()
                     .map(cord -> (CellBinary) board2D.getCell(cord)).collect(Collectors.toSet());
+//
+//            Set<CellBinary> neighbours = neighborhood.cellNeighbors(cellCoordinates).stream()
+//                    .map(cord -> (CellBinary) board2D.getCell(cord)).collect(Collectors.toSet());
 
             nextBoard.setCell(cellCoordinates, getNextCellState(currentCell, neighbours));
         }

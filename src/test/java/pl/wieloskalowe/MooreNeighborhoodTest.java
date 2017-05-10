@@ -1,6 +1,8 @@
 package pl.wieloskalowe;
 
 import org.junit.Test;
+import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
+
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
@@ -11,8 +13,8 @@ import java.util.Set;
  */
 public class MooreNeighborhoodTest {
     @Test
-    public void dupa() throws Exception {
-        MooreNeighborhood nh = new MooreNeighborhood(0,3,3, false);
+    public void mooreNh() throws Exception {
+        MooreNeighborhood nh = new MooreNeighborhood(0);
         Set<CellCoordinates> neighbors = nh.cellNeighbors(new CellCoordinates(1, 1));
 
         Set<CellCoordinates> expected = new HashSet<>();
