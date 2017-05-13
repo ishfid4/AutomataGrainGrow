@@ -10,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import pl.wieloskalowe.*;
 import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
+import pl.wieloskalowe.neighborhoods.PentagonalNeighborhood;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -111,8 +112,9 @@ public class AutomatonController implements Observer{
 
         MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(radius);
 
+        Automaton automaton = new GameOfLife(board2D, new PentagonalNeighborhood(PentagonalNeighborhood.version.RIGHT));
 //        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood);
-        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood, coordinatesWrapper);
+//        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood, coordinatesWrapper);
         automatonAdapter = new AutomatonAdapter(automaton);
     }
 
