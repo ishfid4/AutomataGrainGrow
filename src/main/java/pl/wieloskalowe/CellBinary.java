@@ -32,5 +32,10 @@ public class CellBinary implements Cell {
     }
 
     @Override
-    public CellBinary copy() { return  new CellBinary(this);}
+    public CellBinary copyBinary() { return  new CellBinary(this);}
+
+    @Override
+    public CellGrain copyGrain() {
+        return null;
+    }
 }

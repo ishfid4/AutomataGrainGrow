@@ -4,13 +4,15 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import pl.wieloskalowe.*;
-import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
-import pl.wieloskalowe.neighborhoods.PentagonalNeighborhood;
+import pl.wieloskalowe.neighborhoods.*;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -26,6 +28,8 @@ public class AutomatonController implements Observer{
     @FXML private TextField radiusField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private Canvas canvas;
+    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox;
+    @FXML private CheckBox wrapCheckBox;
     private double cellWidth, cellHeight;
     private boolean started = false;
     private GraphicsContext graphicsContext;
@@ -34,6 +38,8 @@ public class AutomatonController implements Observer{
 
     @FXML public void initialize() {
         graphicsContext = canvas.getGraphicsContext2D();
+        neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
+        automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,
                 t -> {
@@ -88,35 +94,61 @@ public class AutomatonController implements Observer{
         automatonAdapter.changeCellState(cellCoordinates);
     }
 
-    private void drawCell(int x, int y, boolean alive) {
-        if (alive)
-            graphicsContext.fillRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
-        else
+    private void drawBinaryCell(int x, int y, boolean alive) {
+        if (alive) {
+            graphicsContext.setFill(Color.color(0.4,0,0.3));
+            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+        } else
             graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
     }
 
     private void drawBoard() {
         graphicsContext.clearRect(0,0,anchorPaneForCanvas.getWidth(),anchorPaneForCanvas.getHeight());
 
-        for (CellCoordinates cellCoordinates: automatonAdapter.getBoard().getAllCoordinates()) {
-            CellBinary cell = (CellBinary) automatonAdapter.getBoard().getCell(cellCoordinates);
-            drawCell(cellCoordinates.getX(),cellCoordinates.getY(), cell.isAlive());
+        if (automatonTypeComboBox.getValue().equals("GameOfLife")) {
+            for (CellCoordinates cellCoordinates : automatonAdapter.getBoard().getAllCoordinates()) {
+                CellBinary cell = (CellBinary) automatonAdapter.getBoard().getCell(cellCoordinates);
+                drawBinaryCell(cellCoordinates.getX(), cellCoordinates.getY(), cell.isAlive());
+            }
         }
     }
 
     private void setUpAutomaton(int width, int height, int radius){
-        Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
+        Neighborhood neighborhood = new MooreNeighborhood(radius);
+        CoordinatesWrapper coordinatesWrapper;
 
-//      Cell wrapping
-        CoordinatesWrapper coordinatesWrapper = new CoordinatesWrapper(width,height);
+        if (neighborhoodComboBox.getValue().equals("VonNeuman"))
+            neighborhood = new VonNeumanNeighborhood(radius);
 
-        MooreNeighborhood mooreNeighborhood = new MooreNeighborhood(radius);
+        if (neighborhoodComboBox.getValue().equals("Hexagonal_Left"))
+            neighborhood = new HexagonalNeighborhood(HexagonalNeighborhood.version.LEFT);
 
-        Automaton automaton = new GameOfLife(board2D, new PentagonalNeighborhood(PentagonalNeighborhood.version.RIGHT));
-//        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood);
-//        Automaton automaton = new GameOfLife(board2D, mooreNeighborhood, coordinatesWrapper);
-        automatonAdapter = new AutomatonAdapter(automaton);
-    }
+        if (neighborhoodComboBox.getValue().equals("Hexagonal_Right"))
+            neighborhood = new HexagonalNeighborhood(HexagonalNeighborhood.version.RIGHT);
+
+        if (neighborhoodComboBox.getValue().equals("Hexagonal_Random"))
+            neighborhood = new HexagonalNeighborhood(HexagonalNeighborhood.version.RANDOM);
+
+        if (neighborhoodComboBox.getValue().equals("Pentagonal_Left"))
+            neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.LEFT);
+
+        if (neighborhoodComboBox.getValue().equals("Pentagonal_Right"))
+            neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.RIGHT);
+
+        if (neighborhoodComboBox.getValue().equals("Pentagonal_Random"))
+            neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.RANDOM);
+
+        if (automatonTypeComboBox.getValue().equals("GameOfLife") && wrapCheckBox.isSelected()) {
+            Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
+            coordinatesWrapper = new CoordinatesWrapper(width,height);
+            Automaton automaton = new GameOfLife(board2D, neighborhood, coordinatesWrapper);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        } else {
+            Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
+            Automaton automaton = new GameOfLife(board2D, neighborhood);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+}
 
     @Override
     public void update(Observable o, Object arg) {

@@ -6,5 +6,6 @@ package pl.wieloskalowe;
 public interface Cell {
     void nextState();
 
-    CellBinary copy();
+    CellBinary copyBinary();
+    CellGrain copyGrain();
 }
