@@ -18,9 +18,9 @@ public class GameOfLife extends Automaton {
     }
 
     @Override
-    protected CellBinary getNextCellState(CellBinary cell, Set<CellBinary> neighbours) {
+    protected CellBinary getNextCellState(Cell cell, Set<Cell> neighbours) {
 
-        long neighborsCount = neighbours.stream().filter(CellBinary::isAlive).count();
+        long neighborsCount = neighbours.stream().filter(Cell::isAlive).count();
 
 
         if (!cell.isAlive() && neighborsCount == 3) {

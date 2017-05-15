@@ -18,6 +18,7 @@ public class CellBinary implements Cell {
         this.state = state;
     }
 
+    @Override
     public boolean isAlive() {
         return state;
     }

@@ -11,7 +11,7 @@ import java.util.TimerTask;
 public class Ticker {
     private final Timer timer = new Timer("Ticker-timer");
     private TimerTask task = null;
-    private int rate = 100;
+    private int rate = 300;
     private AutomatonAdapter automatonAdapter;
 
     public Ticker(AutomatonAdapter automatonAdapter) {

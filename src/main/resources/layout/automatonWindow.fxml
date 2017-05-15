@@ -42,7 +42,7 @@
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="GameOfLife" />
-                        <String fx:value="GrainGrow" />
+                        <String fx:value="NaiveGrainGrow" />
                     </FXCollections>
                 </items>
             </ComboBox>

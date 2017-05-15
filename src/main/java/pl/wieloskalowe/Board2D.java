@@ -19,7 +19,10 @@ public class Board2D {
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 CellCoordinates cellCoordinates = new CellCoordinates(x, y);
-                this.board2D.put(cellCoordinates, initialCell.copyBinary());
+                if(initialCell.copyBinary() != null)
+                    this.board2D.put(cellCoordinates, initialCell.copyBinary());
+                if(initialCell.copyGrain() != null)
+                    this.board2D.put(cellCoordinates, initialCell.copyGrain());
             }
         }
     }
@@ -40,7 +43,8 @@ public class Board2D {
 
     public Cell getCell(CellCoordinates cellCoordinates) {
         Cell cell = board2D.get(cellCoordinates);
-        if(cell == null) cell = outerCell.copyBinary();
+        if(cell == null && outerCell.copyBinary() != null) cell = outerCell.copyBinary();
+        if(cell == null && outerCell.copyGrain() != null) cell = outerCell.copyGrain();
         return cell;
     }
 }

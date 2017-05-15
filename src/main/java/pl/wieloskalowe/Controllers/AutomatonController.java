@@ -35,6 +35,7 @@ public class AutomatonController implements Observer{
     private GraphicsContext graphicsContext;
     private Ticker ticker;
     private AutomatonAdapter automatonAdapter;
+    private String automatonChoice;
 
     @FXML public void initialize() {
         graphicsContext = canvas.getGraphicsContext2D();
@@ -45,7 +46,6 @@ public class AutomatonController implements Observer{
                 t -> {
                     if (t.getClickCount() == 1) {
                         changeCellState(t.getX(), t.getY());
-                        drawBoard();
                     }
                 });
     }
@@ -72,6 +72,8 @@ public class AutomatonController implements Observer{
             cellHeight = anchorPaneForCanvas.getHeight() / Integer.parseInt(heightField.getText());
             cellWidth = anchorPaneForCanvas.getWidth() / Integer.parseInt(widthField.getText());
 
+            automatonChoice = automatonTypeComboBox.getValue().toString();
+
             drawBoard();
         }
     }
@@ -96,7 +98,14 @@ public class AutomatonController implements Observer{
 
     private void drawBinaryCell(int x, int y, boolean alive) {
         if (alive) {
-            graphicsContext.setFill(Color.color(0.4,0,0.3));
+            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+        } else
+            graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
+    }
+
+    private void drawGrainCell(int x, int y, boolean alive, Color color) {
+        if (alive) {
+            graphicsContext.setFill(color);
             graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
         } else
             graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
@@ -105,10 +114,17 @@ public class AutomatonController implements Observer{
     private void drawBoard() {
         graphicsContext.clearRect(0,0,anchorPaneForCanvas.getWidth(),anchorPaneForCanvas.getHeight());
 
-        if (automatonTypeComboBox.getValue().equals("GameOfLife")) {
+        if (automatonChoice.equals("GameOfLife")) {
             for (CellCoordinates cellCoordinates : automatonAdapter.getBoard().getAllCoordinates()) {
-                CellBinary cell = (CellBinary) automatonAdapter.getBoard().getCell(cellCoordinates);
+                Cell cell = automatonAdapter.getBoard().getCell(cellCoordinates);
                 drawBinaryCell(cellCoordinates.getX(), cellCoordinates.getY(), cell.isAlive());
+            }
+        }
+
+        if (automatonChoice.equals("NaiveGrainGrow")) {
+            for (CellCoordinates cellCoordinates : automatonAdapter.getBoard().getAllCoordinates()) {
+                CellGrain cell = (CellGrain) automatonAdapter.getBoard().getCell(cellCoordinates);
+                drawGrainCell(cellCoordinates.getX(), cellCoordinates.getY(), cell.isAlive(), cell.getColor());
             }
         }
     }
@@ -139,13 +155,26 @@ public class AutomatonController implements Observer{
             neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.RANDOM);
 
         if (automatonTypeComboBox.getValue().equals("GameOfLife") && wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
+            Board2D board2D = new Board2D(width, height, new CellBinary(false), new CellBinary());
             coordinatesWrapper = new CoordinatesWrapper(width,height);
             Automaton automaton = new GameOfLife(board2D, neighborhood, coordinatesWrapper);
             automatonAdapter = new AutomatonAdapter(automaton);
-        } else {
-            Board2D board2D = new Board2D(width, height,new CellBinary(false), new CellBinary());
+        }
+        if (automatonTypeComboBox.getValue().equals("GameOfLife") && !wrapCheckBox.isSelected()) {
+            Board2D board2D = new Board2D(width, height, new CellBinary(false), new CellBinary());
             Automaton automaton = new GameOfLife(board2D, neighborhood);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
+        if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && wrapCheckBox.isSelected()) {
+            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
+            coordinatesWrapper = new CoordinatesWrapper(width,height);
+            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood, coordinatesWrapper);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+        if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && !wrapCheckBox.isSelected()) {
+            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
+            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 }

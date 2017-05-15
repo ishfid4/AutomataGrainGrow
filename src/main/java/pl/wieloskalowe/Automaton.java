@@ -25,7 +25,7 @@ public abstract class Automaton {
         this.coordinatesWrapper = coordinatesWrapper;
     }
 
-    abstract protected CellBinary getNextCellState(CellBinary cell, Set<CellBinary> neighbours);
+    abstract protected Cell getNextCellState(Cell cell, Set<Cell> neighbours);
 
     public void oneIteration() {
         Set<CellCoordinates> coordinatesSet = board2D.getAllCoordinates();
@@ -33,14 +33,15 @@ public abstract class Automaton {
         Board2D nextBoard = new Board2D(board2D);
 
         for (CellCoordinates cellCoordinates : coordinatesSet) {
-            CellBinary currentCell = (CellBinary) board2D.getCell(cellCoordinates);
+//            CellBinary currentCell = (CellBinary) board2D.getCell(cellCoordinates);
+            Cell currentCell = board2D.getCell(cellCoordinates);
             Set<CellCoordinates> coordinatesNeighbours =  neighborhood.cellNeighbors(cellCoordinates);
 
             if (coordinatesWrapper != null)
                 coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
 
-            Set<CellBinary> neighbours = coordinatesNeighbours.stream()
-                    .map(cord -> (CellBinary) board2D.getCell(cord)).collect(Collectors.toSet());
+            Set<Cell> neighbours = coordinatesNeighbours.stream()
+                    .map(cord -> board2D.getCell(cord)).collect(Collectors.toSet());
 //
 //            Set<CellBinary> neighbours = neighborhood.cellNeighbors(cellCoordinates).stream()
 //                    .map(cord -> (CellBinary) board2D.getCell(cord)).collect(Collectors.toSet());

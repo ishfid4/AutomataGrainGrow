@@ -5,6 +5,7 @@ package pl.wieloskalowe;
  */
 public interface Cell {
     void nextState();
+    boolean isAlive();
 
     CellBinary copyBinary();
     CellGrain copyGrain();
