@@ -8,7 +8,6 @@
 <?import javafx.collections.FXCollections?>
 
 <?import pl.wieloskalowe.controls.NumberTextField?>
-
 <SplitPane dividerPositions="0.2491638795986622" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
   <items>
     <AnchorPane maxWidth="150.0" minHeight="400.0" minWidth="150.0" prefHeight="418.0" prefWidth="150.0">
@@ -16,13 +15,13 @@
             <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="3" />
             <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="3" />
             <NumberTextField fx:id="radiusField" layoutX="1.0" layoutY="160.0" text="1" />
-            <Button fx:id="setButton" layoutY="392.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
-            <Button fx:id="iterateButton" layoutY="417.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
-            <Button fx:id="startStopButton" layoutX="-2.0" layoutY="442.0" mnemonicParsing="false" onMouseClicked="#startStopClicked" text="Start/Stop" />
+            <Button fx:id="setButton" layoutY="249.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
+            <Button fx:id="iterateButton" layoutX="-1.0" layoutY="436.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
+            <Button fx:id="startStopButton" layoutX="-2.0" layoutY="463.0" mnemonicParsing="false" onMouseClicked="#startStopClicked" text="Start/Stop" />
             <Label layoutY="14.0" text="Width" />
             <Label layoutY="56.0" text="Height" />
             <Label layoutX="1.0" layoutY="145.0" text="Radius" />
-            <Label fx:id="errorLabel" layoutX="-4.0" layoutY="467.0" prefHeight="17.0" prefWidth="149.0" />
+            <Label fx:id="errorLabel" layoutX="2.0" layoutY="483.0" prefHeight="17.0" prefWidth="149.0" />
             <ComboBox fx:id="neighborhoodComboBox" layoutY="117.0" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
@@ -46,9 +45,23 @@
                     </FXCollections>
                 </items>
             </ComboBox>
-            <Label layoutX="8.0" layoutY="204.0" text="Automaton type" />
-            <Label layoutX="-2.0" layoutY="246.0" text="TODO: Cell generation" />
+            <Label layoutX="4.0" layoutY="204.0" text="Automaton type" />
+            <Label layoutX="4.0" layoutY="275.0" text="Generate cells " />
             <CheckBox fx:id="wrapCheckBox" layoutY="187.0" mnemonicParsing="false" text="Wrap coordinates" />
+            <ComboBox fx:id="generationComboBox" layoutY="290.0" prefWidth="150.0">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Random" />
+                        <String fx:value="Random with radius" />
+                        <String fx:value="Equally spread" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+            <Button fx:id="generateButton" layoutY="400.0" mnemonicParsing="false" onMouseClicked="#generateClicked" text="Generate Cells" />
+            <NumberTextField fx:id="cellCountField" layoutX="1.0" layoutY="333.0" />
+            <NumberTextField fx:id="generateRadiusField" layoutX="1.0" layoutY="373.0" />
+            <Label layoutX="5.0" layoutY="315.0" text="Cell count to generate" />
+            <Label layoutX="3.0" layoutY="357.0" text="Radius" />
          </children></AnchorPane>
     <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="432.0" prefWidth="442.0">
          <children>

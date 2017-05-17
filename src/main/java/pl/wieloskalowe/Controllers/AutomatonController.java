@@ -11,11 +11,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import pl.wieloskalowe.*;
 import pl.wieloskalowe.neighborhoods.*;
 
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 
 /**
@@ -23,12 +26,10 @@ import java.util.Observer;
  */
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
-    @FXML private TextField widthField;
-    @FXML private TextField heightField;
-    @FXML private TextField radiusField;
+    @FXML private TextField widthField, heightField, radiusField, generateRadiusField, cellCountField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private Canvas canvas;
-    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox;
+    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, generationComboBox;
     @FXML private CheckBox wrapCheckBox;
     private double cellWidth, cellHeight;
     private boolean started = false;
@@ -41,6 +42,7 @@ public class AutomatonController implements Observer{
         graphicsContext = canvas.getGraphicsContext2D();
         neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
+        generationComboBox.setValue(generationComboBox.getItems().get(0));
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,
                 t -> {
@@ -48,6 +50,83 @@ public class AutomatonController implements Observer{
                         changeCellState(t.getX(), t.getY());
                     }
                 });
+    }
+
+    @FXML public void generateClicked() {
+        if (cellCountField.getText().isEmpty())
+            Platform.runLater(() -> errorLabel.setText("Invalid cell count!"));
+        else {
+            Platform.runLater(() -> errorLabel.setText(""));
+
+            Random random = new Random();
+
+            if (generationComboBox.getValue().equals("Random")) {
+                for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
+                    changeCellState(random.nextInt(Integer.parseInt(widthField.getText())) * cellWidth,
+                            random.nextInt(Integer.parseInt(heightField.getText())) * cellHeight);
+                }
+            }
+
+            // TODO: Probably not work as expected
+            if (generationComboBox.getValue().equals("Random with radius")){
+                int radius = Integer.parseInt(generateRadiusField.getText());
+                boolean wrongRange = false;
+                List<Pair<Integer,Integer>> checkList = new ArrayList<>();
+                List<Pair<Integer,Integer>> cordsToChangeState = new ArrayList<>();
+
+                for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
+                    int tX = random.nextInt(Integer.parseInt(widthField.getText()));
+                    int tY = random.nextInt(Integer.parseInt(heightField.getText()));
+
+                    for (Pair<Integer,Integer> p: checkList) {
+                        if (tX == p.getKey() && tY == p.getValue())
+                            wrongRange = true;
+                    }
+                    for (Pair<Integer,Integer> p: cordsToChangeState) {
+                        if (tX == p.getKey() && tY == p.getValue())
+                            wrongRange = true;
+                    }
+
+                    if (!wrongRange) {
+
+                        for (int x = 0; x <= radius; x++) {
+                            int y = -radius + x;
+
+                            for (; y <= radius - x; y++) {
+                                if (tX == x && tY == y) continue;
+
+                                checkList.add(new Pair<>(tX + x, tY + y));
+                                if (x != 0) {
+                                    checkList.add(new Pair<>(tX - x, tY + y));
+                                }
+                            }
+                        }
+
+                        cordsToChangeState.add(new Pair<>(tX,tY));
+                    } else {
+                        i--;
+                        wrongRange = false;
+                    }
+                }
+
+                for (Pair<Integer,Integer> p: cordsToChangeState) {
+                    changeCellState(p.getKey() * cellWidth, p.getValue() * cellHeight);
+                }
+            }
+
+            if (generationComboBox.getValue().equals("Equally spread")){
+                int sqCellCount = (int) Math.floor(sqrt(Double.parseDouble(cellCountField.getText())));
+
+                int x = Integer.parseInt(widthField.getText()) / sqCellCount;
+                int y = Integer.parseInt(heightField.getText()) / sqCellCount;
+
+                for (int i = 0; i < sqCellCount; i++) {
+                    for (int j = 0; j < sqCellCount; j++) {
+                        changeCellState(x * i * cellWidth, y * j * cellHeight);
+                    }
+                }
+            }
+        }
     }
 
     @FXML public void setClicked(){
@@ -60,7 +139,8 @@ public class AutomatonController implements Observer{
         else {
             Platform.runLater(() -> errorLabel.setText(""));
 
-            setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()), Integer.parseInt(radiusField.getText()));
+            setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()),
+                    Integer.parseInt(radiusField.getText()));
 
             automatonAdapter.addObserver(this);
 

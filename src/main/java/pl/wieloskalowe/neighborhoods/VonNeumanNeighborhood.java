@@ -20,17 +20,14 @@ public class VonNeumanNeighborhood implements Neighborhood{
         Set<CellCoordinates> neighbours = new HashSet<>();
 
         for (int x = 0; x <= radius; x++) {
-            int tmpX = cellCoordinates.getY() + x;
             int y = -radius + x;
 
             for (; y <= radius - x; y++) {
-                int tmpY = cellCoordinates.getY() + y;
+                if (cellCoordinates.getX() == x && cellCoordinates.getY() == y) continue;
 
-                if (tmpX == 0 && tmpY == 0) continue;
-
-                neighbours.add(new CellCoordinates(tmpX, tmpY));
+                neighbours.add(new CellCoordinates(cellCoordinates.getX() + x, cellCoordinates.getY() + y));
                 if (x != 0) {
-                    neighbours.add(new CellCoordinates(-tmpX, tmpY));
+                    neighbours.add(new CellCoordinates(cellCoordinates.getX() - x, cellCoordinates.getY() + y));
                 }
             }
         }
