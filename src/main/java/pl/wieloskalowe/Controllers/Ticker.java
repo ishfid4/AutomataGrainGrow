@@ -1,7 +1,5 @@
 package pl.wieloskalowe.Controllers;
 
-import pl.wieloskalowe.Automaton;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,7 +9,7 @@ import java.util.TimerTask;
 public class Ticker {
     private final Timer timer = new Timer("Ticker-timer");
     private TimerTask task = null;
-    private int rate = 300;
+    private int rate = 10;
     private AutomatonAdapter automatonAdapter;
 
     public Ticker(AutomatonAdapter automatonAdapter) {
@@ -34,7 +32,6 @@ public class Ticker {
             task.cancel();
         task = createTickTask(timer);
         timer.schedule(task, rate);
-//        timer.scheduleAtFixedRate(task, rate, rate);
     }
 
     public synchronized void stop() {

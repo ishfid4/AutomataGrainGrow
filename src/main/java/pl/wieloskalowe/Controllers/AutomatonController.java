@@ -2,22 +2,19 @@ package pl.wieloskalowe.Controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import pl.wieloskalowe.*;
+import pl.wieloskalowe.controls.MCanvas;
 import pl.wieloskalowe.neighborhoods.*;
 
 import java.util.*;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 
@@ -28,19 +25,15 @@ public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
     @FXML private TextField widthField, heightField, radiusField, generateRadiusField, cellCountField;
     @FXML private AnchorPane anchorPaneForCanvas;
-    @FXML private Canvas canvas;
+    @FXML private MCanvas canvas;
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, generationComboBox;
     @FXML private CheckBox wrapCheckBox;
     private double cellWidth, cellHeight;
     private boolean started = false;
-    private GraphicsContext graphicsContext;
     private Ticker ticker;
     private AutomatonAdapter automatonAdapter;
-    private String automatonChoice;
-    private GraphicsContext spierodlenie;
 
     @FXML public void initialize() {
-        graphicsContext = canvas.getGraphicsContext2D();
         neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
         generationComboBox.setValue(generationComboBox.getItems().get(0));
@@ -140,6 +133,16 @@ public class AutomatonController implements Observer{
         else {
             Platform.runLater(() -> errorLabel.setText(""));
 
+            canvas.setWidth(anchorPaneForCanvas.getWidth());
+            canvas.setHeight(anchorPaneForCanvas.getHeight());
+
+            cellHeight = anchorPaneForCanvas.getHeight() / Integer.parseInt(heightField.getText());
+            cellWidth = anchorPaneForCanvas.getWidth() / Integer.parseInt(widthField.getText());
+
+            canvas.setAutomatonType(automatonTypeComboBox.getValue().toString());
+            canvas.setCellHeight(cellHeight);
+            canvas.setCellWidth(cellWidth);
+
             setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()),
                     Integer.parseInt(radiusField.getText()));
 
@@ -147,16 +150,7 @@ public class AutomatonController implements Observer{
 
             ticker = new Ticker(automatonAdapter);
 
-            canvas.setWidth(anchorPaneForCanvas.getWidth());
-            canvas.setHeight(anchorPaneForCanvas.getHeight());
-
-            cellHeight = anchorPaneForCanvas.getHeight() / Integer.parseInt(heightField.getText());
-            cellWidth = anchorPaneForCanvas.getWidth() / Integer.parseInt(widthField.getText());
-
-            automatonChoice = automatonTypeComboBox.getValue().toString();
-
-            //drawBoard();
-            Platform.runLater(() -> automatonAdapter.getGraphicsContext());
+            canvas.onDataRecived(automatonAdapter.getBoard());
         }
     }
 
@@ -207,31 +201,29 @@ public class AutomatonController implements Observer{
             Board2D board2D = new Board2D(width, height, new CellBinary(false), new CellBinary());
             coordinatesWrapper = new CoordinatesWrapper(width,height);
             Automaton automaton = new GameOfLife(board2D, neighborhood, coordinatesWrapper);
-            automatonAdapter = new AutomatonAdapter(automaton, canvas, cellHeight, cellWidth, automatonTypeComboBox.getValue().toString());
+            automatonAdapter = new AutomatonAdapter(automaton);
         }
         if (automatonTypeComboBox.getValue().equals("GameOfLife") && !wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellBinary(false), new CellBinary());
             Automaton automaton = new GameOfLife(board2D, neighborhood);
-            automatonAdapter = new AutomatonAdapter(automaton, canvas, cellHeight, cellWidth, automatonTypeComboBox.getValue().toString());
+            automatonAdapter = new AutomatonAdapter(automaton);
         }
 
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             coordinatesWrapper = new CoordinatesWrapper(width,height);
             Automaton automaton = new NaiveGrainGrow(board2D, neighborhood, coordinatesWrapper);
-            automatonAdapter = new AutomatonAdapter(automaton, canvas, cellHeight, cellWidth, automatonTypeComboBox.getValue().toString());
+            automatonAdapter = new AutomatonAdapter(automaton);
         }
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && !wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
-            automatonAdapter = new AutomatonAdapter(automaton, canvas, cellHeight, cellWidth, automatonTypeComboBox.getValue().toString());
+            automatonAdapter = new AutomatonAdapter(automaton);
         }
 }
 
     @Override
     public synchronized void update(Observable o, Object arg) {
-        //drawBoard();
-        //this.graphicsContext = automatonAdapter.getGraphicsContext();
-//        Platform.runLater(() -> automatonAdapter.getGraphicsContext());
+        canvas.onDataRecived(automatonAdapter.getBoard());
     }
 }

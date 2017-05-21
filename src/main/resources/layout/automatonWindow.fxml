@@ -8,6 +8,7 @@
 <?import javafx.collections.FXCollections?>
 
 <?import pl.wieloskalowe.controls.NumberTextField?>
+<?import pl.wieloskalowe.controls.MCanvas?>
 <SplitPane dividerPositions="0.2491638795986622" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
   <items>
     <AnchorPane maxWidth="150.0" minHeight="400.0" minWidth="150.0" prefHeight="418.0" prefWidth="150.0">
@@ -65,7 +66,7 @@
          </children></AnchorPane>
     <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="432.0" prefWidth="442.0">
          <children>
-            <Canvas fx:id="canvas" height="200.0" width="200.0" />
+            <MCanvas fx:id="canvas" height="200.0" width="200.0" />
          </children></AnchorPane>
   </items>
 </SplitPane>

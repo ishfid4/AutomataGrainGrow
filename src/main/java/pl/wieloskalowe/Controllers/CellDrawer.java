@@ -1,66 +1,47 @@
 package pl.wieloskalowe.Controllers;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.Cell;
-import pl.wieloskalowe.CellCoordinates;
-import pl.wieloskalowe.CellGrain;
+import pl.wieloskalowe.*;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by ishfi on 21.05.2017.
  */
-public class CellDrawer {
-    private GraphicsContext graphicsContext;
+public abstract class CellDrawer extends AnimationTimer {
+    private final Canvas canvas;
     private double cellWidth, cellHeight;
     private String automatonType;
-    private double canvasWidth, canvasHeight;
+    private final AtomicReference<Board2D> board2DAtomicReferenc = new AtomicReference<Board2D>(null);
 
-    public CellDrawer(Canvas canvas, double cellWidth, double cellHeight, String automatonType) {
-        this.graphicsContext = canvas.getGraphicsContext2D();
-        this.canvasWidth = canvas.getWidth();
-        this.canvasHeight = canvas.getHeight();
+    public CellDrawer(Canvas canvas) {
+        this.canvas = canvas;
+    }
+
+    public void setUpData(double cellWidth, double cellHeight, String automatonType) {
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
         this.automatonType = automatonType;
     }
 
-    private void drawBinaryCell(int x, int y, boolean alive) {
-        if (alive) {
-            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-        } else
-            graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
+    public void requestRedraw(Board2D board2D) {
+        board2DAtomicReferenc.set(board2D);
+        start();
     }
 
-    private void drawGrainCell(int x, int y, boolean alive, Color color) {
-        if (alive) {
-            graphicsContext.setFill(color);
-            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-        } else
-            graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
+
+    @Override
+    public void handle(long now) {
+        Board2D boardToDraw = board2DAtomicReferenc.getAndSet(null);
+        if (boardToDraw != null)
+            redraw(canvas.getGraphicsContext2D(), boardToDraw, automatonType, cellWidth, cellHeight, canvas.getHeight(), canvas.getWidth());
     }
 
-    public synchronized void drawBoard(Board2D board2D) {
-        graphicsContext.clearRect(0,0,canvasWidth,canvasHeight);
+    protected abstract void redraw(GraphicsContext graphicsContext, Board2D board2D, String automatonType,
+                                   double cellWidth, double cellHeight, double canvasHeight, double canvasWidth);
 
-        if (automatonType.equals("GameOfLife")) {
-            for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
-                Cell cell = board2D.getCell(cellCoordinates);
-                drawBinaryCell(cellCoordinates.getX(), cellCoordinates.getY(), cell.isAlive());
-            }
-//            return graphicsContext;
-        }
-
-        if (automatonType.equals("NaiveGrainGrow")) {
-            for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
-                CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
-                drawGrainCell(cellCoordinates.getX(), cellCoordinates.getY(), cell.isAlive(), cell.getColor());
-            }
-//            return graphicsContext;
-        }
-
-//        return null;
-    }
 }
 
