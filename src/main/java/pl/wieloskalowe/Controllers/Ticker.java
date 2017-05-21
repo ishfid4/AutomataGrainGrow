@@ -18,12 +18,13 @@ public class Ticker {
         this.automatonAdapter = automatonAdapter;
     }
 
-    private TimerTask createTickTask(Timer t) {
+    private synchronized TimerTask createTickTask(Timer t) {
         return new TimerTask() {
             @Override
             public void run() {
                 automatonAdapter.nextAutomatonState();
-                timer.schedule(createTickTask(timer), rate);
+                task = createTickTask(timer);
+                timer.schedule(task, rate);
             }
         };
     }
