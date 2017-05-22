@@ -1,5 +1,7 @@
 package pl.wieloskalowe;
 
+import pl.wieloskalowe.cell.CellCoordinates;
+
 import java.util.Set;
 
 /**

@@ -1,6 +1,6 @@
 package pl.wieloskalowe.neighborhoods;
 
-import pl.wieloskalowe.CellCoordinates;
+import pl.wieloskalowe.cell.CellCoordinates;
 
 import java.util.Set;
 

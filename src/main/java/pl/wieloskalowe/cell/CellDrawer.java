@@ -1,9 +1,8 @@
-package pl.wieloskalowe.Controllers;
+package pl.wieloskalowe.cell;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import pl.wieloskalowe.*;
 
 import java.util.concurrent.atomic.AtomicReference;

@@ -1,6 +1,7 @@
 package pl.wieloskalowe;
 
 import org.junit.Test;
+import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 
 import java.util.HashSet;

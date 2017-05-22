@@ -1,4 +1,4 @@
-package pl.wieloskalowe;
+package pl.wieloskalowe.cell;
 
 /**
  * Created by ishfi on 05.05.2017.

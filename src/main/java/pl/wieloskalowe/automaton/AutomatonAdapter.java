@@ -1,6 +1,7 @@
-package pl.wieloskalowe.Controllers;
+package pl.wieloskalowe.automaton;
 
 import pl.wieloskalowe.*;
+import pl.wieloskalowe.cell.CellCoordinates;
 
 import java.util.Observable;
 

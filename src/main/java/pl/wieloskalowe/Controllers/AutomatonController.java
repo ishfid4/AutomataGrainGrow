@@ -10,6 +10,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import pl.wieloskalowe.*;
+import pl.wieloskalowe.automaton.Automaton;
+import pl.wieloskalowe.automaton.AutomatonAdapter;
+import pl.wieloskalowe.automaton.GameOfLife;
+import pl.wieloskalowe.automaton.NaiveGrainGrow;
+import pl.wieloskalowe.cell.CellBinary;
+import pl.wieloskalowe.cell.CellCoordinates;
+import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.controls.MCanvas;
 import pl.wieloskalowe.neighborhoods.*;
 

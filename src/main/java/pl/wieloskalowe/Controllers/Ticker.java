@@ -1,5 +1,7 @@
 package pl.wieloskalowe.Controllers;
 
+import pl.wieloskalowe.automaton.AutomatonAdapter;
+
 import java.util.Timer;
 import java.util.TimerTask;
 

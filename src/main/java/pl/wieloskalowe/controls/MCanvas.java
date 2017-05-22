@@ -4,7 +4,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import pl.wieloskalowe.*;
-import pl.wieloskalowe.Controllers.CellDrawer;
+import pl.wieloskalowe.cell.CellDrawer;
+import pl.wieloskalowe.cell.Cell;
+import pl.wieloskalowe.cell.CellCoordinates;
+import pl.wieloskalowe.cell.CellGrain;
 
 /**
  * Created by ishfi on 21.05.2017.

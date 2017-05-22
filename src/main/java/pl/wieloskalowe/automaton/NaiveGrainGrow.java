@@ -1,6 +1,10 @@
-package pl.wieloskalowe;
+package pl.wieloskalowe.automaton;
 
 import javafx.scene.paint.Color;
+import pl.wieloskalowe.Board2D;
+import pl.wieloskalowe.cell.Cell;
+import pl.wieloskalowe.cell.CellGrain;
+import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;

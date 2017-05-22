@@ -1,4 +1,4 @@
-package pl.wieloskalowe;
+package pl.wieloskalowe.cell;
 
 
 import javafx.scene.paint.Color;
@@ -9,11 +9,13 @@ import java.util.Random;
  * Created by ishfi on 13.05.2017.
  */
 public class CellGrain implements Cell {
-    private boolean state;
+    private boolean state, newFromRecrystallization;
     private Color color;
+    private double ro, sumOfCellsRoDividedByK;
 
     public CellGrain() {
         this.state = false;
+        this.newFromRecrystallization = false;
         this.color = Color.color(1, 1, 1);
     }
 
@@ -38,6 +40,30 @@ public class CellGrain implements Cell {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public boolean isNewFromRecrystallization() {
+        return newFromRecrystallization;
+    }
+
+    public void setNewFromRecrystallization(boolean newFromRecrystallization) {
+        this.newFromRecrystallization = newFromRecrystallization;
+    }
+
+    public double getRo() {
+        return ro;
+    }
+
+    public void setRo(double ro) {
+        this.ro = ro;
+    }
+
+    public double getSumOfCellsRoDividedByK() {
+        return sumOfCellsRoDividedByK;
+    }
+
+    public void setSumOfCellsRoDividedByK(double sumOfCellsRoDividedByK) {
+        this.sumOfCellsRoDividedByK = sumOfCellsRoDividedByK;
     }
 
     @Override

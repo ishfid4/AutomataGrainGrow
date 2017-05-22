@@ -1,5 +1,8 @@
 package pl.wieloskalowe;
 
+import pl.wieloskalowe.cell.Cell;
+import pl.wieloskalowe.cell.CellCoordinates;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

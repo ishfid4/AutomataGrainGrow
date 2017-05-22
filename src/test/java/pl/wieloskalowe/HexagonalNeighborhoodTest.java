@@ -1,8 +1,8 @@
 package pl.wieloskalowe;
 
 import org.junit.Test;
+import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.neighborhoods.HexagonalNeighborhood;
-import pl.wieloskalowe.neighborhoods.PentagonalNeighborhood;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,6 +1,7 @@
 package pl.wieloskalowe;
 
 import org.junit.Test;
+import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
 
 import static org.junit.Assert.*;
