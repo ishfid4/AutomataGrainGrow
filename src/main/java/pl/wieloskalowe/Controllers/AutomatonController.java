@@ -10,10 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import pl.wieloskalowe.*;
-import pl.wieloskalowe.automaton.Automaton;
-import pl.wieloskalowe.automaton.AutomatonAdapter;
-import pl.wieloskalowe.automaton.GameOfLife;
-import pl.wieloskalowe.automaton.NaiveGrainGrow;
+import pl.wieloskalowe.automaton.*;
 import pl.wieloskalowe.cell.CellBinary;
 import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.cell.CellGrain;
@@ -224,7 +221,8 @@ public class AutomatonController implements Observer{
         }
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && !wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
+//            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
+            Automaton automaton = new Recrystallization(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 }

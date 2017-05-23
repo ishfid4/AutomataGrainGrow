@@ -46,7 +46,7 @@ public class MCanvas extends Canvas {
                 for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
                     CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
                     drawGrainCell(graphicsContext, cellWidth, cellHeight, cellCoordinates.getX(),
-                            cellCoordinates.getY(), cell.isAlive(), cell.getColor());
+                            cellCoordinates.getY(), cell.isAlive(), cell.getColor(), cell.isOnEdge());
                 }
             }
         }
@@ -61,12 +61,18 @@ public class MCanvas extends Canvas {
     }
 
     private void drawGrainCell(GraphicsContext graphicsContext, double cellWidth, double cellHeight,
-                              int x, int y, boolean alive, Color color) {
+                              int x, int y, boolean alive, Color color, boolean onEdge) {
         if (alive) {
             graphicsContext.setFill(color);
             graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
         } else
             graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
+
+        //TODO: need to be removed
+        if(onEdge){
+            graphicsContext.setFill(Color.color(0,0,0));
+            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+        }
     }
 
     public void onDataRecived(Board2D board2D) {
