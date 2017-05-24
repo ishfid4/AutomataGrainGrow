@@ -216,7 +216,8 @@ public class AutomatonController implements Observer{
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             coordinatesWrapper = new CoordinatesWrapper(width,height);
-            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood, coordinatesWrapper);
+//            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood, coordinatesWrapper);
+            Automaton automaton = new Recrystallization(board2D, neighborhood, coordinatesWrapper);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && !wrapCheckBox.isSelected()) {

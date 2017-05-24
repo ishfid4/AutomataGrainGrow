@@ -53,7 +53,7 @@ public class Recrystallization extends Automaton {
             Color cellColor = cell.copyGrain().getColor();
             boolean onEdge = false;
             for (Cell c : neighbours) {
-                if (!cellColor.equals(c.copyGrain().getColor()) && !cellColor.equals(Color.color(1,1,1)))
+                if (!cellColor.equals(c.copyGrain().getColor()) && !c.copyGrain().getColor().equals(Color.color(1,1,1)))
                     onEdge = true;
             }
             CellGrain cellGrain = cell.copyGrain();
