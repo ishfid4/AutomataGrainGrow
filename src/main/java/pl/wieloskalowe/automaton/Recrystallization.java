@@ -9,7 +9,6 @@ import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by ishfi on 22.05.2017.
@@ -34,26 +33,41 @@ public class Recrystallization extends Automaton {
     @Override
     protected Cell getNextCellState(Cell cell, Set<Cell> neighbours) {
         if (cell.copyGrain().isNewFromRecrystallization()) {
-            return cell.copyGrain();
+           return cell.copyGrain();
         } else {
             for (Cell c : neighbours) {
                 CellGrain cellGrain = c.copyGrain();
                 if (cellGrain.isNewFromRecrystallization()) {
-                    return new CellGrain(true, cellGrain.getColor());
+                    cellGrain = new CellGrain(true, cellGrain.getColor());
+                    cellGrain.setNewFromRecrystallization(true);
+                    return cellGrain;
                 }
             }
         }
 
         if (cell.isAlive()) {
+            Color recrystalizedColor = cell.copyGrain().getColor();
             Color cellColor = cell.copyGrain().getColor();
             boolean onEdge = false;
+            boolean recrystalized = false;
             for (Cell c : neighbours) {
                 if (!cellColor.equals(c.copyGrain().getColor()) && !c.copyGrain().getColor().equals(Color.color(1,1,1)))
                     onEdge = true;
+                if (c.copyGrain().isNewFromRecrystallization()) {
+                    recrystalizedColor = c.copyGrain().getColor();
+                    recrystalized = true;
+                }
             }
-            CellGrain cellGrain = cell.copyGrain();
-            cellGrain.setOnEdge(onEdge);
-            return cellGrain;
+            if (recrystalized){
+                CellGrain cellGrain = new CellGrain(true,recrystalizedColor);
+                cellGrain.setOnEdge(onEdge);
+                cellGrain.setNewFromRecrystallization(true);
+                return cellGrain;
+            } else {
+                CellGrain cellGrain = cell.copyGrain();
+                cellGrain.setOnEdge(onEdge);
+                return cellGrain;
+            }
         } else {
             Color cellColor = Color.color(1, 1, 1);
 
@@ -88,11 +102,12 @@ public class Recrystallization extends Automaton {
                     return new CellGrain(true,cellColor,true);
 
                 return new CellGrain(true,cellColor);
-            }
-            else
+            } else
                 return new CellGrain();
         }
     }
+
+
 
     //TODO: Its probably bad way of implementing this
     @Override
@@ -118,12 +133,9 @@ public class Recrystallization extends Automaton {
         for (CellCoordinates cellCoordinates : coordinatesSet) {
             CellGrain currentCell = super.board2D.getCell(cellCoordinates).copyGrain();
 
-            if (currentCell.isNewFromRecrystallization()) {
-                currentCell = new CellGrain(true, currentCell.getColor());
-            }
-
             if (currentCell.isOnEdge()) {
-                if (random.nextInt(1000000) % 4000 == 0){
+                //TODO: This random should be implemented in different way
+                if (random.nextInt(100000) % 200 == 0){
                     double currentRo = currentCell.getRo();
                     currentCell.setRo(currentRo + sumDevidedByK);
                 }
@@ -151,23 +163,19 @@ public class Recrystallization extends Automaton {
         for (CellCoordinates cellCoordinates : coordinatesSet) {
             CellGrain currentCell = super.board2D.getCell(cellCoordinates).copyGrain();
 
-            if (currentCell.isNewFromRecrystallization())
-                currentCell = new CellGrain(true, currentCell.getColor());
-            else {
-                if (currentCell.isAlive()) {
-                    double currentIteration = currentCell.getIteration();
-                    currentCell.setIteration(currentIteration + 1);
+            if (currentCell.isAlive()) {
+                double currentIteration = currentCell.getIteration();
+                currentCell.setIteration(currentIteration + 1);
 
-                    double cellsRo = roFunction(currentIteration) - roFunction(currentIteration - 1);
-                    cellsRo = cellsRo / (300 * 300);
+                double cellsRo = roFunction(currentIteration) - roFunction(currentIteration - 1);
+                cellsRo = cellsRo / (300 * 300);
 
-                    if (currentCell.isOnEdge()) {
-                        currentCell.setRo(0.8 * cellsRo);
-                        sumOfLeftoversFromRos += 0.2 * cellsRo;
-                    } else {
-                        currentCell.setRo(0.2 * cellsRo);
-                        sumOfLeftoversFromRos += 0.8 * cellsRo;
-                    }
+                if (currentCell.isOnEdge()) {
+                    currentCell.setRo(0.8 * cellsRo);
+                    sumOfLeftoversFromRos += 0.2 * cellsRo;
+                } else {
+                    currentCell.setRo(0.2 * cellsRo);
+                    sumOfLeftoversFromRos += 0.8 * cellsRo;
                 }
             }
 
