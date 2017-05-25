@@ -42,7 +42,7 @@ public class MCanvas extends Canvas {
                 }
             }
 
-            if (automatonType.equals("NaiveGrainGrow")) {
+            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("Recrystalization")) {
                 for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
                     CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
                     drawGrainCell(graphicsContext, cellWidth, cellHeight, cellCoordinates.getX(),
@@ -69,10 +69,10 @@ public class MCanvas extends Canvas {
             graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
 
         //TODO: need to be removed
-        if(onEdge){
-            graphicsContext.setFill(Color.color(0,0,0));
-            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-        }
+//        if(onEdge){
+//            graphicsContext.setFill(Color.color(0,0,0));
+//            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+//        }
     }
 
     public void onDataRecived(Board2D board2D) {

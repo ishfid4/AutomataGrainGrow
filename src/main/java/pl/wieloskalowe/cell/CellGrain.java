@@ -114,8 +114,6 @@ public class CellGrain implements Cell {
         else
             this.color = Color.color(1, 1, 1);
         this.state  = !this.state;
-        if (this.newFromRecrystallization)
-            this.newFromRecrystallization = !this.newFromRecrystallization;
     }
 
     @Override

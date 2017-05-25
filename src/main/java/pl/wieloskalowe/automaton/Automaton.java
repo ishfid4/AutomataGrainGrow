@@ -31,7 +31,7 @@ public abstract class Automaton {
 
     abstract protected Cell getNextCellState(Cell cell, Set<Cell> neighbours);
 
-    public void oneIteration() {
+    public synchronized void oneIteration() {
         Set<CellCoordinates> coordinatesSet = board2D.getAllCoordinates();
 
         Board2D nextBoard = new Board2D(board2D);
