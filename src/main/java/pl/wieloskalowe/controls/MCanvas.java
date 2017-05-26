@@ -42,7 +42,8 @@ public class MCanvas extends Canvas {
                 }
             }
 
-            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("Recrystalization")) {
+            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("Recrystalization")
+                    || automatonType.equals("MonteCarlo")) {
                 for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
                     CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
                     drawGrainCell(graphicsContext, cellWidth, cellHeight, cellCoordinates.getX(),

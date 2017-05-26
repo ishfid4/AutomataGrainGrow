@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import pl.wieloskalowe.*;
 import pl.wieloskalowe.automaton.*;
@@ -27,7 +28,7 @@ import static java.lang.Math.sqrt;
  */
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
-    @FXML private TextField widthField, heightField, radiusField, generateRadiusField, cellCountField;
+    @FXML private TextField widthField, heightField, radiusField, generateRadiusField, cellCountField, stateCountField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MCanvas canvas;
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, generationComboBox;
@@ -51,7 +52,42 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void generateClicked() {
-        if (cellCountField.getText().isEmpty())
+        if (generationComboBox.getValue().equals("Randomly populate board")){
+            if (stateCountField.getText().isEmpty())
+                Platform.runLater(() -> errorLabel.setText("Invalid state count!"));
+            else {
+                Platform.runLater(() -> errorLabel.setText(""));
+                List<Color> colorList = new ArrayList<>();
+                Random random = new Random();
+
+                for (int i = 0; i < Integer.parseInt(stateCountField.getText()); i++){
+                    boolean wrongColor = false;
+                    Color color = Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble());
+                    if (color.equals(Color.color(1,1,1)))
+                        wrongColor = true;
+
+                    for (Color aColor : colorList) {
+                        if (color.equals(aColor))
+                            wrongColor = true;
+                    }
+
+                    if (wrongColor)
+                        i--;
+                    else
+                        colorList.add(color);
+                }
+
+                int x = Integer.parseInt(widthField.getText());
+                int y = Integer.parseInt(heightField.getText());
+
+                for (int i = 0; i < x; i++) {
+                    for (int j = 0; j < y; j++) {
+                        setGrainState(i, j,
+                                colorList.get(random.nextInt(colorList.size())));
+                    }
+                }
+            }
+        } else if (cellCountField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid cell count!"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
@@ -65,7 +101,7 @@ public class AutomatonController implements Observer{
                 }
             }
 
-            // TODO: Probably not work as expected
+            // TODO: Probably not work as expected should be circe radius
             if (generationComboBox.getValue().equals("Random with radius")){
                 int radius = Integer.parseInt(generateRadiusField.getText());
                 boolean wrongRange = false;
@@ -112,6 +148,7 @@ public class AutomatonController implements Observer{
                 }
             }
 
+            //TODO: too large offset on right and bottom edge
             if (generationComboBox.getValue().equals("Equally spread")){
                 int sqCellCount = (int) Math.floor(sqrt(Double.parseDouble(cellCountField.getText())));
 
@@ -120,7 +157,7 @@ public class AutomatonController implements Observer{
 
                 for (int i = 0; i < sqCellCount; i++) {
                     for (int j = 0; j < sqCellCount; j++) {
-                        changeCellState(x * i * cellWidth, y * j * cellHeight);
+                        changeCellState(x * i, y * j);
                     }
                 }
             }
@@ -171,9 +208,15 @@ public class AutomatonController implements Observer{
     }
 
     private void changeCellState(double x, double y) {
-        CellCoordinates cellCoordinates = new CellCoordinates((int)(x / cellWidth), (int)(y / cellHeight));
+        CellCoordinates cellCoordinates = new CellCoordinates((int)x,(int)y);
 
         automatonAdapter.changeCellState(cellCoordinates);
+    }
+
+    private void setGrainState(double x, double y, Color color) {
+        CellCoordinates cellCoordinates = new CellCoordinates((int)x, (int)y);
+
+        automatonAdapter.setCellState(cellCoordinates, color);
     }
 
     private void setUpAutomaton(int width, int height, int radius){
@@ -232,6 +275,18 @@ public class AutomatonController implements Observer{
             automatonAdapter = new AutomatonAdapter(automaton);
         }
         if (automatonTypeComboBox.getValue().equals("Recrystalization") && !wrapCheckBox.isSelected()) {
+            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
+            Automaton automaton = new Recrystallization(board2D, neighborhood);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
+        if (automatonTypeComboBox.getValue().equals("MonteCarlo") && wrapCheckBox.isSelected()) {
+            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
+            coordinatesWrapper = new CoordinatesWrapper(width,height);
+            Automaton automaton = new Recrystallization(board2D, neighborhood, coordinatesWrapper);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+        if (automatonTypeComboBox.getValue().equals("MonteCarlo") && !wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             Automaton automaton = new Recrystallization(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
