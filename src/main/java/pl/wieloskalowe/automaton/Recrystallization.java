@@ -9,18 +9,19 @@ import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by ishfi on 22.05.2017.
  */
-public class Recrystallization extends Automaton {
+public class Recrystallization extends NaiveGrainGrow {
     private double iteration = 0;
     private double criticalIteration = 65; //for 300x300 board
-    double criticalRo = roFunction(65) / (300 * 300);  //for 300x300 board
+    double criticalRo = roFunction(65) / (100 * 100);  //for 300x300 board
     private final double a = 86710969050178.5;
     private final double b = 9.41268203527779;
+    //it should be: If bigger k -> faster new crystal grow
     private final double k = 100; //WTF coefficient
-    private Set<CellCoordinates> cellsOnEdge = new HashSet<>();
 
     public Recrystallization(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);
@@ -30,8 +31,7 @@ public class Recrystallization extends Automaton {
         super(board2D, neighborhood, coordinatesWrapper);
     }
 
-    @Override
-    protected Cell getNextCellState(Cell cell, Set<Cell> neighbours) {
+    private Cell getNextCellStateRec(Cell cell, Set<Cell> neighbours) {
         if (cell.copyGrain().isNewFromRecrystallization()) {
            return cell.copyGrain();
         } else {
@@ -68,61 +68,60 @@ public class Recrystallization extends Automaton {
                 cellGrain.setOnEdge(onEdge);
                 return cellGrain;
             }
-        } else {
-            Color cellColor = Color.color(1, 1, 1);
-
-            Map<Color, Integer> listOfColors = new HashMap<>();
-            int maxCount = 0;
-            int colorCount = 0;
-
-            for (Cell c : neighbours) {
-                CellGrain cellGrain = c.copyGrain();
-                cellColor = cellGrain.getColor();
-                if (!cellColor.equals(Color.color(1, 1, 1))) {
-                    if (listOfColors.containsKey(cellColor)) {
-                        int tmp = listOfColors.get(cellColor);
-                        tmp++;
-                        listOfColors.replace(cellColor, tmp);
-                    } else {
-                        listOfColors.put(cellColor, 1);
-                        colorCount++;
-                    }
-                }
-            }
-
-            for (Color col : listOfColors.keySet()) {
-                if (listOfColors.get(col) >= maxCount) {
-                    maxCount = listOfColors.get(col);
-                    cellColor = col;
-                }
-            }
-
-            if (maxCount > 0) {
-                if (colorCount > 1)
-                    return new CellGrain(true,cellColor,true);
-
-                return new CellGrain(true,cellColor);
-            } else
-                return new CellGrain();
         }
+        return cell.copyGrain();
     }
 
+    private synchronized void oneIteretionRecryst() {
+        Set<CellCoordinates> coordinatesSet = board2D.getAllCoordinates();
+        Board2D nextBoard = new Board2D(board2D);
 
+        for (CellCoordinates cellCoordinates : coordinatesSet) {
+            Cell currentCell = super.board2D.getCell(cellCoordinates);
+
+            Set<CellCoordinates> coordinatesNeighbours =  super.neighborhood.cellNeighbors(cellCoordinates);
+
+            if (super.coordinatesWrapper != null)
+                coordinatesNeighbours = super.coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
+
+            Set<Cell> neighbours = coordinatesNeighbours.stream()
+                    .map(cord -> super.board2D.getCell(cord)).collect(Collectors.toSet());
+
+            nextBoard.setCell(cellCoordinates, getNextCellStateRec(currentCell, neighbours));
+        }
+
+        super.board2D = nextBoard;
+    }
+
+    private synchronized boolean isAnyCellDead(){
+        Set<CellCoordinates> coordinatesSet = super.board2D.getAllCoordinates();
+        boolean anyDead = false;
+        for (CellCoordinates cellCoordinates : coordinatesSet) {
+            CellGrain currentCell = super.board2D.getCell(cellCoordinates).copyGrain();
+            if (!currentCell.isAlive())
+                anyDead = true;
+        }
+        return anyDead;
+    }
 
     //TODO: Its probably bad way of implementing this
     @Override
     public synchronized void oneIteration() {
-        super.oneIteration();
+        boolean anyDead = isAnyCellDead();
 
-        //Searching for alive -> incrementing cell iterator var
-        //Also calc for each cell ro and sum leftovers
-        double sumOfLeftoversFromRos = propagateRoValuesAndReturnSumOfLeftovers();
+        if (!anyDead) {
+            oneIteretionRecryst();
+            //Searching for alive -> incrementing cell iterator var
+            //Also calc for each cell ro and sum leftovers
+            double sumOfLeftoversFromRos = propagateRoValuesAndReturnSumOfLeftovers();
 
-        // randomly sum of leftovers add? to ro in cells on edge
-        //Searching for edges ->if newFromRecryst -> set it false and reset ro and iterator
-        // if ro > critical -> set newFromRecryst true
-        sumOfLeftoversFromRos = sumOfLeftoversFromRos / k;
-        randomlySpreadLeftoversAndHandleCellsIntendentToRecrystalization(sumOfLeftoversFromRos);
+            // randomly sum of leftovers add? to ro in cells on edge
+            //Searching for edges ->if newFromRecryst -> set it false and reset ro and iterator
+            // if ro > critical -> set newFromRecryst true
+            sumOfLeftoversFromRos = sumOfLeftoversFromRos / k;
+            randomlySpreadLeftoversAndHandleCellsIntendentToRecrystalization(sumOfLeftoversFromRos);
+        }else
+            super.oneIteration();
     }
 
     private synchronized void randomlySpreadLeftoversAndHandleCellsIntendentToRecrystalization(double sumDevidedByK) {
@@ -135,7 +134,7 @@ public class Recrystallization extends Automaton {
 
             if (currentCell.isOnEdge()) {
                 //TODO: This random should be implemented in different way
-                if (random.nextInt(100000) % 200 == 0){
+                if (random.nextInt(1000) % (int)k == 0){
                     double currentRo = currentCell.getRo();
                     currentCell.setRo(currentRo + sumDevidedByK);
                 }
@@ -168,7 +167,7 @@ public class Recrystallization extends Automaton {
                 currentCell.setIteration(currentIteration + 1);
 
                 double cellsRo = roFunction(currentIteration) - roFunction(currentIteration - 1);
-                cellsRo = cellsRo / (300 * 300);
+                cellsRo = cellsRo / (100 * 100);
 
                 if (currentCell.isOnEdge()) {
                     currentCell.setRo(0.8 * cellsRo);
