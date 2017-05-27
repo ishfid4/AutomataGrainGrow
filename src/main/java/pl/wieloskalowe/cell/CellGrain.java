@@ -12,6 +12,7 @@ public class CellGrain implements Cell {
     private boolean state, newFromRecrystallization, onEdge;
     private Color color;
     private double iteration, ro, sumOfCellsRoDividedByK;
+    private int energy;
 
     public CellGrain() {
         this.state = false;
@@ -21,6 +22,7 @@ public class CellGrain implements Cell {
         this.sumOfCellsRoDividedByK = 0;
         this.ro = 1;
         this.onEdge = false;
+        this.energy = 0;
     }
 
     public CellGrain(CellGrain cellGrain) {
@@ -31,6 +33,7 @@ public class CellGrain implements Cell {
         this.ro = cellGrain.ro;
         this.sumOfCellsRoDividedByK = cellGrain.sumOfCellsRoDividedByK;
         this.onEdge = cellGrain.onEdge;
+        this.energy = 0;
     }
 
     public CellGrain(boolean state, Color color) {
@@ -41,6 +44,7 @@ public class CellGrain implements Cell {
         this.sumOfCellsRoDividedByK = 0;
         this.ro = 1;
         this.onEdge = false;
+        this.energy = 0;
     }
 
     public CellGrain(boolean state, Color color, boolean onEdge) {
@@ -51,6 +55,7 @@ public class CellGrain implements Cell {
         this.iteration = 0;
         this.sumOfCellsRoDividedByK = 0;
         this.ro = 1;
+        this.energy = 0;
     }
 
     @Override
@@ -104,6 +109,14 @@ public class CellGrain implements Cell {
 
     public void setOnEdge(boolean onEdge) {
         this.onEdge = onEdge;
+    }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
     }
 
     @Override
