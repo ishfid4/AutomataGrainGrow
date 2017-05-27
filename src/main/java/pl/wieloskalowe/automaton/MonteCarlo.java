@@ -17,19 +17,22 @@ import java.util.stream.Collectors;
 /**
  * Created by ishfi on 26.05.2017.
  */
-public class MonteCarlo extends Automaton {
-    public MonteCarlo(Board2D board2D, Neighborhood neighborhood) {
+public class MonteCarlo extends NaiveGrainGrow {
+    boolean afterNaiveGrow;
+
+    public MonteCarlo(Board2D board2D, Neighborhood neighborhood, boolean afterNaiveGrow) {
         super(board2D, neighborhood);
+        this.afterNaiveGrow = afterNaiveGrow;
     }
 
-    public MonteCarlo(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
+    public MonteCarlo(Board2D board2D, Neighborhood neighborhood, boolean afterNaiveGrow, CoordinatesWrapper coordinatesWrapper) {
         super(board2D, neighborhood, coordinatesWrapper);
+        this.afterNaiveGrow = afterNaiveGrow;
     }
 
     //TODO: make possible to start from naive grain grow
 
-    @Override
-    protected Cell getNextCellState(Cell cell, Set<Cell> neighbours) {
+    protected Cell getNextCellStateMC(Cell cell, Set<Cell> neighbours) {
         int sameCellCount = 0, energyCurrentCell = 0, energyNewCell = 0, deltaEnergy = cell.copyGrain().getEnergy();
         List<Cell> neighboursCellList = new ArrayList<>();
         boolean onEdge = false;
@@ -80,15 +83,28 @@ public class MonteCarlo extends Automaton {
 
     @Override
     public synchronized void oneIteration() {
+        if (afterNaiveGrow) {
+            super.oneIteration();
+            boolean anyDead = isAnyCellDead();
+
+            if (!anyDead) {
+                oneIterationMC();
+            }
+        } else {
+            oneIterationMC();
+        }
+    }
+
+    private synchronized void oneIterationMC() {
         List<CellCoordinates> coordinatesList = new ArrayList<>();
         coordinatesList.addAll(super.board2D.getAllCoordinates());
         Collections.shuffle(coordinatesList);
 
         Board2D nextBoard = new Board2D(super.board2D);
 
-        for (CellCoordinates cellCoordinates: coordinatesList) {
+        for (CellCoordinates cellCoordinates : coordinatesList) {
             Cell currentCell = super.board2D.getCell(cellCoordinates);
-            Set<CellCoordinates> coordinatesNeighbours =  super.neighborhood.cellNeighbors(cellCoordinates);
+            Set<CellCoordinates> coordinatesNeighbours = super.neighborhood.cellNeighbors(cellCoordinates);
 
             if (coordinatesWrapper != null)
                 coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
@@ -96,9 +112,20 @@ public class MonteCarlo extends Automaton {
             Set<Cell> neighbours = coordinatesNeighbours.stream()
                     .map(cord -> board2D.getCell(cord)).collect(Collectors.toSet());
 
-            nextBoard.setCell(cellCoordinates, getNextCellState(currentCell, neighbours));
+            nextBoard.setCell(cellCoordinates, getNextCellStateMC(currentCell, neighbours));
         }
 
         super.board2D = nextBoard;
+    }
+
+    private synchronized boolean isAnyCellDead(){
+        Set<CellCoordinates> coordinatesSet = super.board2D.getAllCoordinates();
+        boolean anyDead = false;
+        for (CellCoordinates cellCoordinates : coordinatesSet) {
+            CellGrain currentCell = super.board2D.getCell(cellCoordinates).copyGrain();
+            if (!currentCell.isAlive())
+                anyDead = true;
+        }
+        return anyDead;
     }
 }

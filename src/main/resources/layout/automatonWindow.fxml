@@ -51,6 +51,7 @@
             <Label layoutX="4.0" layoutY="204.0" text="Automaton type" />
             <Label layoutX="4.0" layoutY="275.0" text="Generate cells " />
             <CheckBox fx:id="wrapCheckBox" layoutY="187.0" mnemonicParsing="false" text="Wrap coordinates" />
+             <CheckBox fx:id="afterNaiveGrow" layoutY="249.0" layoutX="40" mnemonicParsing="false" text="Start After Grow" />
             <ComboBox fx:id="generationComboBox" layoutY="290.0" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">

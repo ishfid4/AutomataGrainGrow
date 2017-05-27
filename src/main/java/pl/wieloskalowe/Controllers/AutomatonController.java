@@ -21,6 +21,7 @@ import pl.wieloskalowe.neighborhoods.*;
 import java.util.*;
 
 import static java.lang.Math.sqrt;
+import static java.lang.Math.toRadians;
 
 
 /**
@@ -32,7 +33,7 @@ public class AutomatonController implements Observer{
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MCanvas canvas;
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, generationComboBox;
-    @FXML private CheckBox wrapCheckBox;
+    @FXML private CheckBox wrapCheckBox, afterNaiveGrow;
     private double cellWidth, cellHeight;
     private boolean started = false;
     private Ticker ticker;
@@ -87,7 +88,9 @@ public class AutomatonController implements Observer{
                     }
                 }
             }
-        } else if (cellCountField.getText().isEmpty())
+        }
+
+        if (cellCountField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid cell count!"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
@@ -96,8 +99,8 @@ public class AutomatonController implements Observer{
 
             if (generationComboBox.getValue().equals("Random")) {
                 for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
-                    changeCellState(random.nextInt(Integer.parseInt(widthField.getText())) * cellWidth,
-                            random.nextInt(Integer.parseInt(heightField.getText())) * cellHeight);
+                    changeCellState(random.nextInt(Integer.parseInt(widthField.getText())),
+                            random.nextInt(Integer.parseInt(heightField.getText())));
                 }
             }
 
@@ -144,7 +147,7 @@ public class AutomatonController implements Observer{
                 }
 
                 for (Pair<Integer,Integer> p: cordsToChangeState) {
-                    changeCellState(p.getKey() * cellWidth, p.getValue() * cellHeight);
+                    changeCellState(p.getKey(), p.getValue());
                 }
             }
 
@@ -185,7 +188,7 @@ public class AutomatonController implements Observer{
             canvas.setCellWidth(cellWidth);
 
             setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()),
-                    Integer.parseInt(radiusField.getText()));
+                    Integer.parseInt(radiusField.getText()),afterNaiveGrow.isSelected());
 
             automatonAdapter.addObserver(this);
 
@@ -219,7 +222,7 @@ public class AutomatonController implements Observer{
         automatonAdapter.setCellState(cellCoordinates, color);
     }
 
-    private void setUpAutomaton(int width, int height, int radius){
+    private void setUpAutomaton(int width, int height, int radius, boolean afternaiveGrow){
         Neighborhood neighborhood = new MooreNeighborhood(radius);
         CoordinatesWrapper coordinatesWrapper;
 
@@ -283,12 +286,12 @@ public class AutomatonController implements Observer{
         if (automatonTypeComboBox.getValue().equals("MonteCarlo") && wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             coordinatesWrapper = new CoordinatesWrapper(width,height);
-            Automaton automaton = new MonteCarlo(board2D, neighborhood, coordinatesWrapper);
+            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow, coordinatesWrapper);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
         if (automatonTypeComboBox.getValue().equals("MonteCarlo") && !wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            Automaton automaton = new MonteCarlo(board2D, neighborhood);
+            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 }
