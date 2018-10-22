@@ -9,10 +9,6 @@ import pl.wieloskalowe.neighborhoods.Neighborhood;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Created by ishfi on 03.05.2017.
- */
-
 public abstract class Automaton {
     protected Board2D board2D;
     protected Neighborhood neighborhood;

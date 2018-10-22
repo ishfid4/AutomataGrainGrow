@@ -14,9 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Created by ishfi on 26.05.2017.
- */
 public class MonteCarlo extends NaiveGrainGrow {
     boolean afterNaiveGrow;
 

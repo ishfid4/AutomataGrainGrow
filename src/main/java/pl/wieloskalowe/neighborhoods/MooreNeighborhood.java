@@ -5,9 +5,6 @@ import pl.wieloskalowe.cell.CellCoordinates;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by ishfi on 02.05.2017.
- */
 public class MooreNeighborhood implements Neighborhood {
     private int radius;
 

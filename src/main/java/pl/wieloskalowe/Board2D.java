@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by ishfi on 02.05.2017.
- */
 public class Board2D {
     private Map<CellCoordinates, Cell> board2D = new HashMap<>();
     private int width, height;
@@ -22,8 +19,6 @@ public class Board2D {
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 CellCoordinates cellCoordinates = new CellCoordinates(x, y);
-                if(initialCell.copyBinary() != null)
-                    this.board2D.put(cellCoordinates, initialCell.copyBinary());
                 if(initialCell.copyGrain() != null)
                     this.board2D.put(cellCoordinates, initialCell.copyGrain());
             }
@@ -46,7 +41,6 @@ public class Board2D {
 
     public Cell getCell(CellCoordinates cellCoordinates) {
         Cell cell = board2D.get(cellCoordinates);
-        if(cell == null && outerCell.copyBinary() != null) cell = outerCell.copyBinary();
         if(cell == null && outerCell.copyGrain() != null) cell = outerCell.copyGrain();
         return cell;
     }

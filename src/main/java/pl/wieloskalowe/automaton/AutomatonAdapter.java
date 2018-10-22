@@ -7,9 +7,6 @@ import pl.wieloskalowe.cell.CellGrain;
 
 import java.util.Observable;
 
-/**
- * Created by ishfi on 04.05.2017.
- */
 public class AutomatonAdapter extends Observable{
     private Automaton automaton;
 

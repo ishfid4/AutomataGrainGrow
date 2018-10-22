@@ -24,7 +24,7 @@ public class Main extends Application{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout/automatonWindow.fxml"));
         Parent root = loader.load();
 
-        primaryStage.setTitle("Automaton");
+        primaryStage.setTitle("Multiscale Modeling");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }

@@ -130,11 +130,6 @@ public class CellGrain implements Cell {
     }
 
     @Override
-    public CellBinary copyBinary() {
-        return null;
-    }
-
-    @Override
     public CellGrain copyGrain() {
         return new CellGrain(this);
     }

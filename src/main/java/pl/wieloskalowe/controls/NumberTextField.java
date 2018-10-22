@@ -3,9 +3,6 @@ package pl.wieloskalowe.controls;
 
 import javafx.scene.control.TextField;
 
-/**
- * Created by ishfi on 03.05.2017.
- */
 public class NumberTextField extends TextField{
     public NumberTextField(){
         //It is not necessary

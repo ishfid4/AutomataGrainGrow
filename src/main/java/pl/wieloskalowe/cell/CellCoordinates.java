@@ -1,8 +1,5 @@
 package pl.wieloskalowe.cell;
 
-/**
- * Created by ishfi on 02.05.2017.
- */
 public class CellCoordinates {
     private int x, y;
 

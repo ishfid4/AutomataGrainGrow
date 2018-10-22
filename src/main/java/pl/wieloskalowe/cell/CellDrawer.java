@@ -7,9 +7,6 @@ import pl.wieloskalowe.*;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Created by ishfi on 21.05.2017.
- */
 public abstract class CellDrawer extends AnimationTimer {
     private final Canvas canvas;
     private double cellWidth, cellHeight;

@@ -15,25 +15,16 @@
          <children>
             <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="3" />
             <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="3" />
-            <NumberTextField fx:id="radiusField" layoutX="1.0" layoutY="160.0" text="1" />
             <Button fx:id="setButton" layoutY="249.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
             <Button fx:id="iterateButton" layoutX="-1.0" layoutY="466.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
             <Button fx:id="startStopButton" layoutX="-2.0" layoutY="493.0" mnemonicParsing="false" onMouseClicked="#startStopClicked" text="Start/Stop" />
             <Label layoutY="14.0" text="Width" />
             <Label layoutY="56.0" text="Height" />
-            <Label layoutX="1.0" layoutY="145.0" text="Radius" />
             <Label fx:id="errorLabel" layoutX="2.0" layoutY="483.0" prefHeight="17.0" prefWidth="149.0" />
             <ComboBox fx:id="neighborhoodComboBox" layoutY="117.0" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Moore" />
-                        <String fx:value="VonNeuman" />
-                        <String fx:value="Hexagonal_Left" />
-                        <String fx:value="Hexagonal_Right" />
-                        <String fx:value="Hexagonal_Random" />
-                        <String fx:value="Pentagonal_Left" />
-                        <String fx:value="Pentagonal_Right" />
-                        <String fx:value="Pentagonal_Random" />
                     </FXCollections>
                 </items>
             </ComboBox>
@@ -41,24 +32,20 @@
             <ComboBox fx:id="automatonTypeComboBox" layoutY="221.0" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="GameOfLife" />
                         <String fx:value="NaiveGrainGrow" />
-                        <String fx:value="Recrystalization" />
-                        <String fx:value="MonteCarlo" />
+                        <!--<String fx:value="MonteCarlo" />-->
                     </FXCollections>
                 </items>
             </ComboBox>
             <Label layoutX="4.0" layoutY="204.0" text="Automaton type" />
             <Label layoutX="4.0" layoutY="275.0" text="Generate cells " />
-            <CheckBox fx:id="wrapCheckBox" layoutY="187.0" mnemonicParsing="false" text="Wrap coordinates" />
-             <CheckBox fx:id="afterNaiveGrow" layoutY="249.0" layoutX="40" mnemonicParsing="false" text="Start After Grow" />
+            <CheckBox fx:id="afterNaiveGrow"  layoutY="187.0" mnemonicParsing="false" text="MonteCarlo After Grow" />
             <ComboBox fx:id="generationComboBox" layoutY="290.0" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Random" />
                         <String fx:value="Random with radius" />
                         <String fx:value="Equally spread" />
-                        <String fx:value="Randomly populate board" />
                     </FXCollections>
                 </items>
             </ComboBox>

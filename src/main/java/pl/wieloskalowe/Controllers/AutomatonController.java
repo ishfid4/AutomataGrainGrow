@@ -6,27 +6,18 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import pl.wieloskalowe.*;
 import pl.wieloskalowe.automaton.*;
-import pl.wieloskalowe.cell.CellBinary;
 import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.controls.MCanvas;
 import pl.wieloskalowe.neighborhoods.*;
-
 import java.util.*;
-
 import static java.lang.Math.sqrt;
-import static java.lang.Math.toRadians;
 
-
-/**
- * Created by ishfi on 03.05.2017.
- */
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
     @FXML private TextField widthField, heightField, radiusField, generateRadiusField, cellCountField, stateCountField;
@@ -43,13 +34,6 @@ public class AutomatonController implements Observer{
         neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
         generationComboBox.setValue(generationComboBox.getItems().get(0));
-
-        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,
-                t -> {
-                    if (t.getClickCount() == 1) {
-                        changeCellState(t.getX(), t.getY());
-                    }
-                });
     }
 
     @FXML public void generateClicked() {
@@ -172,8 +156,6 @@ public class AutomatonController implements Observer{
             Platform.runLater(() -> errorLabel.setText("Invalid width!"));
         else if (heightField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid height!"));
-        else if (radiusField.getText().isEmpty())
-            Platform.runLater(() -> errorLabel.setText("Invalid radius!"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
 
@@ -187,8 +169,7 @@ public class AutomatonController implements Observer{
             canvas.setCellHeight(cellHeight);
             canvas.setCellWidth(cellWidth);
 
-            setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()),
-                    Integer.parseInt(radiusField.getText()),afterNaiveGrow.isSelected());
+            setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()),afterNaiveGrow.isSelected());
 
             automatonAdapter.addObserver(this);
 
@@ -222,42 +203,9 @@ public class AutomatonController implements Observer{
         automatonAdapter.setCellState(cellCoordinates, color);
     }
 
-    private void setUpAutomaton(int width, int height, int radius, boolean afternaiveGrow){
-        Neighborhood neighborhood = new MooreNeighborhood(radius);
+    private void setUpAutomaton(int width, int height, boolean afternaiveGrow){
+        Neighborhood neighborhood = new MooreNeighborhood(1);
         CoordinatesWrapper coordinatesWrapper;
-
-        if (neighborhoodComboBox.getValue().equals("VonNeuman"))
-            neighborhood = new VonNeumanNeighborhood(radius);
-
-        if (neighborhoodComboBox.getValue().equals("Hexagonal_Left"))
-            neighborhood = new HexagonalNeighborhood(HexagonalNeighborhood.version.LEFT);
-
-        if (neighborhoodComboBox.getValue().equals("Hexagonal_Right"))
-            neighborhood = new HexagonalNeighborhood(HexagonalNeighborhood.version.RIGHT);
-
-        if (neighborhoodComboBox.getValue().equals("Hexagonal_Random"))
-            neighborhood = new HexagonalNeighborhood(HexagonalNeighborhood.version.RANDOM);
-
-        if (neighborhoodComboBox.getValue().equals("Pentagonal_Left"))
-            neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.LEFT);
-
-        if (neighborhoodComboBox.getValue().equals("Pentagonal_Right"))
-            neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.RIGHT);
-
-        if (neighborhoodComboBox.getValue().equals("Pentagonal_Random"))
-            neighborhood = new PentagonalNeighborhood(PentagonalNeighborhood.version.RANDOM);
-
-        if (automatonTypeComboBox.getValue().equals("GameOfLife") && wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellBinary(false), new CellBinary());
-            coordinatesWrapper = new CoordinatesWrapper(width,height);
-            Automaton automaton = new GameOfLife(board2D, neighborhood, coordinatesWrapper);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
-        if (automatonTypeComboBox.getValue().equals("GameOfLife") && !wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellBinary(false), new CellBinary());
-            Automaton automaton = new GameOfLife(board2D, neighborhood);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
 
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
@@ -270,19 +218,6 @@ public class AutomatonController implements Observer{
             Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
-
-        if (automatonTypeComboBox.getValue().equals("Recrystalization") && wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            coordinatesWrapper = new CoordinatesWrapper(width,height);
-            Automaton automaton = new Recrystallization(board2D, neighborhood, coordinatesWrapper);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
-        if (automatonTypeComboBox.getValue().equals("Recrystalization") && !wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            Automaton automaton = new Recrystallization(board2D, neighborhood);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
-
         if (automatonTypeComboBox.getValue().equals("MonteCarlo") && wrapCheckBox.isSelected()) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             coordinatesWrapper = new CoordinatesWrapper(width,height);

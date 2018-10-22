@@ -9,9 +9,6 @@ import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
 
-/**
- * Created by ishfi on 14.05.2017.
- */
 public class NaiveGrainGrow extends Automaton {
     public NaiveGrainGrow(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);

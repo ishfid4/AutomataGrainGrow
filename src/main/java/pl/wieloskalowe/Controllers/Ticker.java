@@ -5,9 +5,6 @@ import pl.wieloskalowe.automaton.AutomatonAdapter;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by ishfi on 03.05.2017.
- */
 public class Ticker {
     private final Timer timer = new Timer("Ticker-timer");
     private TimerTask task = null;

@@ -9,9 +9,6 @@ import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.cell.CellGrain;
 
-/**
- * Created by ishfi on 21.05.2017.
- */
 public class MCanvas extends Canvas {
     private double cellWidth, cellHeight;
     private String automatonType;
@@ -34,16 +31,7 @@ public class MCanvas extends Canvas {
                               double cellWidth, double cellHeight, double canvasHeight, double canvasWidth) {
             graphicsContext.clearRect(0,0,canvasWidth, canvasHeight);
 
-            if (automatonType.equals("GameOfLife")) {
-                for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
-                    Cell cell = board2D.getCell(cellCoordinates);
-                    drawBinaryCell(graphicsContext, cellWidth, cellHeight, cellCoordinates.getX(),
-                            cellCoordinates.getY(), cell.isAlive());
-                }
-            }
-
-            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("Recrystalization")
-                    || automatonType.equals("MonteCarlo")) {
+            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("MonteCarlo")) {
                 for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
                     CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
                     drawGrainCell(graphicsContext, cellWidth, cellHeight, cellCoordinates.getX(),
@@ -52,14 +40,6 @@ public class MCanvas extends Canvas {
             }
         }
     };
-
-    private void drawBinaryCell(GraphicsContext graphicsContext, double cellWidth, double cellHeight,
-                                int x, int y, boolean alive) {
-        if (alive) {
-            graphicsContext.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-        } else
-            graphicsContext.strokeRect(x * cellWidth,y * cellHeight,cellWidth,cellHeight);
-    }
 
     private void drawGrainCell(GraphicsContext graphicsContext, double cellWidth, double cellHeight,
                               int x, int y, boolean alive, Color color, boolean onEdge) {
