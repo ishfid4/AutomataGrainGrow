@@ -8,7 +8,9 @@ import java.util.TimerTask;
 public class Ticker {
     private final Timer timer = new Timer("Ticker-timer");
     private TimerTask task = null;
-    private int rate = 10;
+    private int rate = 1;
+    private int iterations = 0;
+    private boolean shouldStop = false;
     private AutomatonAdapter automatonAdapter;
 
     public Ticker(AutomatonAdapter automatonAdapter) {
@@ -19,9 +21,15 @@ public class Ticker {
         return new TimerTask() {
             @Override
             public void run() {
-                automatonAdapter.nextAutomatonState();
-                task = createTickTask(timer);
-                timer.schedule(task, rate);
+                if (automatonAdapter.boardChanged || iterations == 0){
+                    iterations++;
+                    automatonAdapter.nextAutomatonState();
+                    task = createTickTask(timer);
+                    timer.schedule(task, rate);
+                }else{
+                    System.out.println("Iterations count: " + iterations +" Ende");
+                    stop();
+                }
             }
         };
     }

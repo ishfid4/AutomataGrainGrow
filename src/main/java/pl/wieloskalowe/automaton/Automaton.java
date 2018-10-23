@@ -13,6 +13,7 @@ public abstract class Automaton {
     protected Board2D board2D;
     protected Neighborhood neighborhood;
     protected CoordinatesWrapper coordinatesWrapper = null;
+    protected boolean boardChanged;
 
     public Automaton(Board2D board2D, Neighborhood neighborhood) {
         this.board2D = board2D;
@@ -28,6 +29,7 @@ public abstract class Automaton {
     abstract protected Cell getNextCellState(Cell cell, Set<Cell> neighbours);
 
     public synchronized void oneIteration() {
+        boardChanged = false;
         Set<CellCoordinates> coordinatesSet = board2D.getAllCoordinates();
 
         Board2D nextBoard = new Board2D(board2D);
@@ -43,6 +45,13 @@ public abstract class Automaton {
                     .map(cord -> board2D.getCell(cord)).collect(Collectors.toSet());
 
             nextBoard.setCell(cellCoordinates, getNextCellState(currentCell, neighbours));
+        }
+
+        for (CellCoordinates cellCoordinates : coordinatesSet) {
+            Cell currentCellB1 = board2D.getCell(cellCoordinates);
+            Cell currentCellB2 = nextBoard.getCell(cellCoordinates);
+            if (!currentCellB1.getColor().equals(currentCellB2.getColor()))
+                boardChanged = true;
         }
 
         board2D = nextBoard;

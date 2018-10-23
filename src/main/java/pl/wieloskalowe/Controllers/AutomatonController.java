@@ -13,19 +13,20 @@ import pl.wieloskalowe.*;
 import pl.wieloskalowe.automaton.*;
 import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.cell.CellGrain;
-import pl.wieloskalowe.controls.MCanvas;
+import pl.wieloskalowe.controls.MImageView;
 import pl.wieloskalowe.neighborhoods.*;
+
 import java.util.*;
 import static java.lang.Math.sqrt;
 
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
-    @FXML private TextField widthField, heightField, radiusField, generateRadiusField, cellCountField, stateCountField;
+    @FXML private TextField widthField, heightField, generateRadiusField, cellCountField;
     @FXML private AnchorPane anchorPaneForCanvas;
-    @FXML private MCanvas canvas;
+    @FXML private MImageView imageView;
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, generationComboBox;
-    @FXML private CheckBox wrapCheckBox, afterNaiveGrow;
-    private double cellWidth, cellHeight;
+    @FXML private CheckBox afterNaiveGrow;
+    private int cellsWidth, cellsHeight;
     private boolean started = false;
     private Ticker ticker;
     private AutomatonAdapter automatonAdapter;
@@ -37,43 +38,6 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void generateClicked() {
-        if (generationComboBox.getValue().equals("Randomly populate board")){
-            if (stateCountField.getText().isEmpty())
-                Platform.runLater(() -> errorLabel.setText("Invalid state count!"));
-            else {
-                Platform.runLater(() -> errorLabel.setText(""));
-                List<Color> colorList = new ArrayList<>();
-                Random random = new Random();
-
-                for (int i = 0; i < Integer.parseInt(stateCountField.getText()); i++){
-                    boolean wrongColor = false;
-                    Color color = Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble());
-                    if (color.equals(Color.color(1,1,1)))
-                        wrongColor = true;
-
-                    for (Color aColor : colorList) {
-                        if (color.equals(aColor))
-                            wrongColor = true;
-                    }
-
-                    if (wrongColor)
-                        i--;
-                    else
-                        colorList.add(color);
-                }
-
-                int x = Integer.parseInt(widthField.getText());
-                int y = Integer.parseInt(heightField.getText());
-
-                for (int i = 0; i < x; i++) {
-                    for (int j = 0; j < y; j++) {
-                        setGrainState(i, j,
-                                colorList.get(random.nextInt(colorList.size())));
-                    }
-                }
-            }
-        }
-
         if (cellCountField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid cell count!"));
         else {
@@ -158,33 +122,26 @@ public class AutomatonController implements Observer{
             Platform.runLater(() -> errorLabel.setText("Invalid height!"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
+            cellsHeight = Integer.parseInt(heightField.getText());
+            cellsWidth = Integer.parseInt(widthField.getText());
+            imageView.setAutomatonType(automatonTypeComboBox.getValue().toString());
+            imageView.setBoardParameters(cellsWidth, cellsHeight);
+            imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
 
-            canvas.setWidth(anchorPaneForCanvas.getWidth());
-            canvas.setHeight(anchorPaneForCanvas.getHeight());
-
-            cellHeight = anchorPaneForCanvas.getHeight() / Integer.parseInt(heightField.getText());
-            cellWidth = anchorPaneForCanvas.getWidth() / Integer.parseInt(widthField.getText());
-
-            canvas.setAutomatonType(automatonTypeComboBox.getValue().toString());
-            canvas.setCellHeight(cellHeight);
-            canvas.setCellWidth(cellWidth);
-
-            setUpAutomaton(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()),afterNaiveGrow.isSelected());
+            setUpAutomaton(cellsWidth, cellsHeight,afterNaiveGrow.isSelected());
 
             automatonAdapter.addObserver(this);
 
             ticker = new Ticker(automatonAdapter);
 
-            canvas.onDataRecived(automatonAdapter.getBoard());
+            imageView.onDataRecived(automatonAdapter.getBoard());
         }
     }
 
-    @FXML public void startStopClicked() {
+    @FXML public void startClicked() {
         this.started = !this.started;
         if (started)
             ticker.start();
-        else
-            ticker.stop();
     }
 
     @FXML public void iterateClicked() {
@@ -205,34 +162,22 @@ public class AutomatonController implements Observer{
 
     private void setUpAutomaton(int width, int height, boolean afternaiveGrow){
         Neighborhood neighborhood = new MooreNeighborhood(1);
-        CoordinatesWrapper coordinatesWrapper;
 
-        if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            coordinatesWrapper = new CoordinatesWrapper(width,height);
-            Automaton automaton = new NaiveGrainGrow(board2D, neighborhood, coordinatesWrapper);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
-        if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow") && !wrapCheckBox.isSelected()) {
+        if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow")) {
             Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
             Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
-        if (automatonTypeComboBox.getValue().equals("MonteCarlo") && wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            coordinatesWrapper = new CoordinatesWrapper(width,height);
-            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow, coordinatesWrapper);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
-        if (automatonTypeComboBox.getValue().equals("MonteCarlo") && !wrapCheckBox.isSelected()) {
-            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
+
+//        if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {
+//            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
+//            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow);
+//            automatonAdapter = new AutomatonAdapter(automaton);
+//        }
 }
 
     @Override
     public synchronized void update(Observable o, Object arg) {
-        canvas.onDataRecived(automatonAdapter.getBoard());
+        imageView.onDataRecived(automatonAdapter.getBoard());
     }
 }

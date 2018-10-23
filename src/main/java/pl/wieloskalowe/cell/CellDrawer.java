@@ -3,23 +3,24 @@ package pl.wieloskalowe.cell;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.ImageView;
 import pl.wieloskalowe.*;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class CellDrawer extends AnimationTimer {
-    private final Canvas canvas;
-    private double cellWidth, cellHeight;
+    private final ImageView imageView;
+    private int cellsWidth, cellsHeight;
     private String automatonType;
     private final AtomicReference<Board2D> board2DAtomicReferenc = new AtomicReference<Board2D>(null);
 
-    public CellDrawer(Canvas canvas) {
-        this.canvas = canvas;
+    public CellDrawer(ImageView imageView) {
+        this.imageView = imageView;
     }
 
-    public void setUpData(double cellWidth, double cellHeight, String automatonType) {
-        this.cellWidth = cellWidth;
-        this.cellHeight = cellHeight;
+    public void setUpData(int cellsWidth, int cellsHeight, String automatonType) {
+        this.cellsWidth = cellsWidth;
+        this.cellsHeight = cellsHeight;
         this.automatonType = automatonType;
     }
 
@@ -33,11 +34,11 @@ public abstract class CellDrawer extends AnimationTimer {
     public void handle(long now) {
         Board2D boardToDraw = board2DAtomicReferenc.getAndSet(null);
         if (boardToDraw != null)
-            redraw(canvas.getGraphicsContext2D(), boardToDraw, automatonType, cellWidth, cellHeight, canvas.getHeight(), canvas.getWidth());
+            redraw(imageView, boardToDraw, automatonType, cellsWidth, cellsHeight);
     }
 
-    protected abstract void redraw(GraphicsContext graphicsContext, Board2D board2D, String automatonType,
-                                   double cellWidth, double cellHeight, double canvasHeight, double canvasWidth);
+    protected abstract void redraw(ImageView imageView, Board2D board2D, String automatonType,
+                                   int cellsWidth, int cellsHeight);
 
 }
 

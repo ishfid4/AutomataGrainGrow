@@ -30,7 +30,8 @@ public class MonteCarlo extends NaiveGrainGrow {
     //TODO: make possible to start from naive grain grow
 
     protected Cell getNextCellStateMC(Cell cell, Set<Cell> neighbours) {
-        int sameCellCount = 0, energyCurrentCell = 0, energyNewCell = 0, deltaEnergy = cell.copyGrain().getEnergy();
+        //TODO Broken
+//        int sameCellCount = 0, energyCurrentCell = 0, energyNewCell = 0, deltaEnergy = cell.copyGrain().getEnergy();
         List<Cell> neighboursCellList = new ArrayList<>();
         boolean onEdge = false;
 
@@ -46,32 +47,32 @@ public class MonteCarlo extends NaiveGrainGrow {
                     neighboursCellList.add(c);
             }
 
-            for (Cell c : neighboursCellList) {
-                if (c.copyGrain().getColor().equals(cell.copyGrain().getColor()))
-                    sameCellCount++;
-            }
-            energyCurrentCell = neighbours.size() - sameCellCount;
+//            for (Cell c : neighboursCellList) {
+//                if (c.copyGrain().getColor().equals(cell.copyGrain().getColor()))
+//                    sameCellCount++;
+//            }
+//            energyCurrentCell = neighbours.size() - sameCellCount;
 
             Collections.shuffle(neighboursCellList);
             CellGrain newCellGrain = neighboursCellList.get(0).copyGrain();
 
-            sameCellCount = 0;
-            for (Cell c : neighboursCellList) {
-                if (c.copyGrain().getColor().equals(newCellGrain.copyGrain().getColor()))
-                    sameCellCount++;
-            }
-            energyNewCell = neighbours.size() - sameCellCount;
+//            sameCellCount = 0;
+//            for (Cell c : neighboursCellList) {
+//                if (c.copyGrain().getColor().equals(newCellGrain.copyGrain().getColor()))
+//                    sameCellCount++;
+//            }
+//            energyNewCell = neighbours.size() - sameCellCount;
 
-            deltaEnergy = energyNewCell - energyCurrentCell;
+//            deltaEnergy = energyNewCell - energyCurrentCell;
 
-            if (deltaEnergy <= 0) {
-                newCellGrain.setOnEdge(false);
-                return newCellGrain;
-            } else {
-                CellGrain cellGrain = cell.copyGrain();
-                cellGrain.setOnEdge(false);
-                return cellGrain;
-            }
+//            if (deltaEnergy <= 0) {
+//                newCellGrain.setOnEdge(false);
+//                return newCellGrain;
+//            } else {
+//                CellGrain cellGrain = cell.copyGrain();
+//                cellGrain.setOnEdge(false);
+//                return cellGrain;
+//            }
         }
         CellGrain cellGrain = cell.copyGrain();
         cellGrain.setOnEdge(false);

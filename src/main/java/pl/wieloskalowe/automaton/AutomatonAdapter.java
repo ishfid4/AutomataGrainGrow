@@ -9,13 +9,17 @@ import java.util.Observable;
 
 public class AutomatonAdapter extends Observable{
     private Automaton automaton;
+    public boolean boardChanged;
 
     public AutomatonAdapter(Automaton automaton) {
         this.automaton = automaton;
     }
 
     public synchronized void nextAutomatonState() {
+        boardChanged = false;
         automaton.oneIteration();
+        if (automaton.boardChanged)
+            boardChanged = true;
         setChanged();
         notifyObservers();
     }
