@@ -18,8 +18,8 @@
             <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="3" />
             <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="3" />
             <Button fx:id="setButton" layoutX="1.0" layoutY="204.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
-            <Button fx:id="iterateButton" layoutX="8.0" layoutY="444.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
-            <Button fx:id="startButton" layoutX="69.0" layoutY="444.0" mnemonicParsing="false" onMouseClicked="#startClicked" text="Start" />
+            <Button fx:id="iterateButton" layoutX="3.0" layoutY="434.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
+            <Button fx:id="startButton" layoutX="61.0" layoutY="434.0" mnemonicParsing="false" onMouseClicked="#startClicked" text="Start" />
             <Label layoutY="14.0" text="Width" />
             <Label layoutY="56.0" text="Height" />
             <Label fx:id="errorLabel" layoutX="2.0" layoutY="483.0" prefHeight="17.0" prefWidth="149.0" />
@@ -58,9 +58,10 @@
             <Label layoutX="5.0" layoutY="274.0" text="Cell count to generate" />
             <Label layoutX="3.0" layoutY="317.0" text="Radius" />
             <Label layoutX="3.0" layoutY="361.0" text="States count" />
-            <Button layoutX="90.0" layoutY="479.0" mnemonicParsing="false" text="Button" />
-            <Button layoutX="90.0" layoutY="509.0" mnemonicParsing="false" text="Button" />
-            <Button layoutX="10.0" layoutY="509.0" mnemonicParsing="false" text="Button" />
+            <Button layoutX="3.0" layoutY="459.0" mnemonicParsing="false" onMouseClicked="#saveToBMPClicked" text="Save to BMP" />
+            <Button layoutX="3.0" layoutY="484.0" mnemonicParsing="false" onMouseClicked="#saveToCSVClicked" text="Save to CSV" />
+            <Button layoutX="3.0" layoutY="509.0" mnemonicParsing="false" onMouseClicked="#importFromCSVClicekd" text="Improt from CSV" />
+            <Button layoutX="3.0" layoutY="534.0" mnemonicParsing="false" onMouseClicked="#importFromBMPClicekd" text="Improt from BMP" />
          </children></AnchorPane>
     <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="500.0">
          <children>

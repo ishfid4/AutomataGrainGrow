@@ -18,6 +18,7 @@ public class NaiveGrainGrow extends Automaton {
         super(board2D, neighborhood, coordinatesWrapper);
     }
 
+    //TODO Only on edge cells should be processed?
     @Override
     protected CellGrain getNextCellState(Cell cell, Set<Cell> neighbours) {
         if (cell.isAlive()) {

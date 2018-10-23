@@ -27,6 +27,10 @@ public class MImageView extends ImageView {
         this.viewWidth = viewWidth;
     }
 
+    public static BufferedImage getBuffImg() {
+        return buffImg;
+    }
+
     private void setCellsWidth(int cellsWidth) {
         this.cellsWidth = cellsWidth;
     }
@@ -53,12 +57,6 @@ public class MImageView extends ImageView {
                             cellCoordinates.getY(), cell.isAlive(), cell.getColor(), cell.isOnEdge());
                 }
             }
-//            String IMAGE_FILE = "MyImage.bmp";
-//            try {
-//                ImageIO.write(buffImg, "BMP", new File(IMAGE_FILE));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
 
             imageView.setImage(SwingFXUtils.toFXImage(buffImg, null));
             imageView.setFitHeight(viewHeight);

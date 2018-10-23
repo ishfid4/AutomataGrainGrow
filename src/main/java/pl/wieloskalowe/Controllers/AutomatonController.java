@@ -1,11 +1,13 @@
 package pl.wieloskalowe.Controllers;
 
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
@@ -16,6 +18,9 @@ import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.controls.MImageView;
 import pl.wieloskalowe.neighborhoods.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 import static java.lang.Math.sqrt;
 
@@ -146,6 +151,62 @@ public class AutomatonController implements Observer{
 
     @FXML public void iterateClicked() {
         automatonAdapter.nextAutomatonState();
+    }
+
+    @FXML public void saveToBMPClicked(){
+        if (imageView.getImage() == null) {
+            Platform.runLater(() -> errorLabel.setText("No image created!"));
+        } else {
+            String IMAGE_FILE = "Board.bmp";
+            try {
+                ImageIO.write(imageView.getBuffImg(), "BMP", new File(IMAGE_FILE));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML public void saveToCSVClicked() throws IOException {
+        File file = new File("Board.csv");
+        file.createNewFile();
+        FileWriter writer = new FileWriter(file);
+
+        Board2D board2D = automatonAdapter.getBoard();
+        writer.write(cellsWidth + " " + cellsHeight + "\n");
+        for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
+            CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
+            writer.write(cellCoordinates.getX() + " " + cellCoordinates.getY() + " " + cell.isAlive() + " " + cell.getColor() + "\n");
+        }
+
+        writer.flush();
+        writer.close();
+    }
+
+    @FXML public void importFromCSVClicekd() throws IOException {
+        File file = new File("Board.csv");
+        Scanner scanner = new Scanner(file);
+        String[] dimensions = scanner.nextLine().split(" ");
+        setUpAutomaton(Integer.parseInt(dimensions[0]),Integer.parseInt(dimensions[1]), false);
+
+        imageView.setAutomatonType(automatonTypeComboBox.getValue().toString());
+        imageView.setBoardParameters(Integer.parseInt(dimensions[0]), Integer.parseInt(dimensions[1]));
+        imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
+        automatonAdapter.addObserver(this);
+        ticker = new Ticker(automatonAdapter);
+        imageView.onDataRecived(automatonAdapter.getBoard());
+
+        while (scanner.hasNext()) {
+            String[] cell = scanner.nextLine().split(" ");
+            automatonAdapter.setCellState(new CellCoordinates(Integer.parseInt(cell[0]),Integer.parseInt(cell[1])),
+                    Color.web(cell[3]));
+        }
+    }
+
+    @FXML public void importFromBMPClicekd() {
+        Image image = new Image("Board.bmp");
+        imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
+        imageView.setImage(image);
+        imageView.setFitHeight(anchorPaneForCanvas.getHeight());
     }
 
     private void changeCellState(double x, double y) {

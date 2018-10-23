@@ -8,7 +8,7 @@ import java.util.TimerTask;
 public class Ticker {
     private final Timer timer = new Timer("Ticker-timer");
     private TimerTask task = null;
-    private int rate = 1;
+    private int rate = 0;
     private int iterations = 0;
     private boolean shouldStop = false;
     private AutomatonAdapter automatonAdapter;
