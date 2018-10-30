@@ -1,9 +1,8 @@
 package pl.wieloskalowe.neighborhoods;
 
-import pl.wieloskalowe.cell.CellCoordinates;
+import javafx.util.Pair;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class VonNeumanNeighborhood implements Neighborhood{
     private int radius;
@@ -13,18 +12,18 @@ public class VonNeumanNeighborhood implements Neighborhood{
     }
 
     @Override
-    public Set<CellCoordinates> cellNeighbors(CellCoordinates cellCoordinates) {
-        Set<CellCoordinates> neighbours = new HashSet<>();
+    public ArrayList<Pair<Integer, Integer>> cellNeighbors(int cellsX, int cellsY) {
+        ArrayList<Pair<Integer, Integer>> neighbours = new ArrayList<>();
 
         for (int x = 0; x <= radius; x++) {
             int y = -radius + x;
 
             for (; y <= radius - x; y++) {
-                if (cellCoordinates.getX() == x && cellCoordinates.getY() == y) continue;
+                if (cellsX == x && cellsY == y) continue;
 
-                neighbours.add(new CellCoordinates(cellCoordinates.getX() + x, cellCoordinates.getY() + y));
+                neighbours.add(new Pair<>(cellsX + x, cellsY + y));
                 if (x != 0) {
-                    neighbours.add(new CellCoordinates(cellCoordinates.getX() - x, cellCoordinates.getY() + y));
+                    neighbours.add(new Pair<>(cellsX - x, cellsY + y));
                 }
             }
         }

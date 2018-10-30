@@ -1,9 +1,8 @@
 package pl.wieloskalowe.neighborhoods;
 
-import pl.wieloskalowe.cell.CellCoordinates;
+import javafx.util.Pair;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class MooreNeighborhood implements Neighborhood {
     private int radius;
@@ -13,13 +12,13 @@ public class MooreNeighborhood implements Neighborhood {
     }
 
     @Override
-    public Set<CellCoordinates> cellNeighbors(CellCoordinates cellCoordinates) {
-        Set<CellCoordinates> neighbors = new HashSet<>();
+    public ArrayList<Pair<Integer, Integer>> cellNeighbors(int cellsX, int cellsY) {
+        ArrayList<Pair<Integer, Integer>> neighbors = new ArrayList<>();
 
-        for (int x = cellCoordinates.getX() - radius; x <= cellCoordinates.getX() + radius; x++) {
-            for (int y = cellCoordinates.getY() - radius; y <= cellCoordinates.getY() + radius; y++) {
-                if (!(y == cellCoordinates.getY() && x == cellCoordinates.getX()))
-                    neighbors.add(new CellCoordinates(x,y));
+        for (int x = cellsX - radius; x <= cellsX + radius; x++) {
+            for (int y = cellsY - radius; y <= cellsY + radius; y++) {
+                if (!(y == cellsY && x == cellsX))
+                    neighbors.add(new Pair<>(x,y));
             }
         }
 

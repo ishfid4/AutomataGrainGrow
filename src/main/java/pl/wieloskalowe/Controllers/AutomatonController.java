@@ -1,7 +1,6 @@
 package pl.wieloskalowe.Controllers;
 
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -14,12 +13,10 @@ import javafx.util.Pair;
 import pl.wieloskalowe.*;
 import pl.wieloskalowe.automaton.*;
 import pl.wieloskalowe.cell.Cell;
-import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.controls.MImageView;
 import pl.wieloskalowe.neighborhoods.*;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import static java.lang.Math.sqrt;
@@ -174,9 +171,11 @@ public class AutomatonController implements Observer{
 
         Board2D board2D = automatonAdapter.getBoard();
         writer.write(cellsWidth + " " + cellsHeight + "\n");
-        for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
-            Cell cell = board2D.getCell(cellCoordinates);
-            writer.write(cellCoordinates.getX() + " " + cellCoordinates.getY() + " " + cell.isAlive() + " " + cell.getColor() + "\n");
+        for (int x = 0; x < board2D.getWidth(); x++) {
+            for (int y = 0; y < board2D.getHeight(); y++) {
+                Cell cell = board2D.getCell(x, y);
+                writer.write(x + " " + y + " " + cell.isAlive() + " " + cell.getColor() + "\n");
+            }
         }
 
         writer.flush();
@@ -198,7 +197,7 @@ public class AutomatonController implements Observer{
 
         while (scanner.hasNext()) {
             String[] cell = scanner.nextLine().split(" ");
-            automatonAdapter.setCellState(new CellCoordinates(Integer.parseInt(cell[0]),Integer.parseInt(cell[1])),
+            automatonAdapter.setCellState(Integer.parseInt(cell[0]),Integer.parseInt(cell[1]),
                     Color.web(cell[3]));
         }
     }
@@ -210,7 +209,7 @@ public class AutomatonController implements Observer{
         imageView.setFitHeight(anchorPaneForCanvas.getHeight());
     }
 
-    @FXML public void addInclusionsPClicekd() {
+    @FXML public void addInclusionsClicekd() {
         if(inclusionsCountField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid inclusion count!"));
         else if (inclusionSizeField.getText().isEmpty())
@@ -218,39 +217,40 @@ public class AutomatonController implements Observer{
         else {
             Platform.runLater(() -> errorLabel.setText(""));
 
-            ArrayList<CellCoordinates> cellCoordinates2 = new ArrayList<>();
+            ArrayList<Pair<Integer, Integer>> cellsOnEdge = new ArrayList<>();
             boolean boardFilled = false;
-            for (CellCoordinates cc: automatonAdapter.getBoard().getAllCoordinates()) {
-                Neighborhood neighborhood = new VonNeumanNeighborhood(1);
-                Set<CellCoordinates> neighbours = neighborhood.cellNeighbors(cc);
-                Color cellColor = Color.color(1, 1, 1);
+            for (int x = 0; x < automatonAdapter.getBoard().getWidth(); x++) {
+                for (int y = 0; y < automatonAdapter.getBoard().getHeight(); y++) {
+                    int maxCount = 0;
+                    Color cellColor;
+                    Map<Color, Integer> listOfColors = new HashMap<>();
+                    Neighborhood neighborhood = new VonNeumanNeighborhood(1);
+                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(x, y);
 
-                Map<Color, Integer> listOfColors = new HashMap<>();
-                int maxCount = 0;
-
-                for (CellCoordinates cellCoordinates : neighbours) {
-                    cellColor = automatonAdapter.getBoard().getCell(cellCoordinates).getColor();
-                     if (!cellColor.equals(Color.color(1, 1, 1))) {
-                        if (listOfColors.containsKey(cellColor)) {
-                            int tmp = listOfColors.get(cellColor);
-                            tmp++;
-                            listOfColors.replace(cellColor, tmp);
-                        } else {
-                            listOfColors.put(cellColor, 1);
+                    for (Pair<Integer, Integer> cellCoordinates : neighbours) {
+                        cellColor = automatonAdapter.getBoard().getCell(cellCoordinates.getKey(), cellCoordinates.getValue()).getColor();
+                        if (!cellColor.equals(Color.WHITE)) {
+                            if (listOfColors.containsKey(cellColor)) {
+                                int tmp = listOfColors.get(cellColor);
+                                tmp++;
+                                listOfColors.replace(cellColor, tmp);
+                            } else {
+                                listOfColors.put(cellColor, 1);
+                            }
                         }
                     }
-                }
 
-                for (Color col : listOfColors.keySet()) {
-                    if (listOfColors.get(col) >= maxCount) {
-                        maxCount = listOfColors.get(col);
+                    for (Color col : listOfColors.keySet()) {
+                        if (listOfColors.get(col) >= maxCount) {
+                            maxCount = listOfColors.get(col);
+                        }
                     }
-                }
 
-                if (listOfColors.size() > 1) {
-                    cellCoordinates2.add(cc);
-                    automatonAdapter.getBoard().getCell(cc).setOnEdge(true);
-                    boardFilled = true;
+                    if (listOfColors.size() > 1) {
+                        cellsOnEdge.add(new Pair<Integer, Integer>(x, y));
+                        automatonAdapter.getBoard().getCell(x, y).setOnEdge(true);
+                        boardFilled = true;
+                    }
                 }
             }
 
@@ -260,58 +260,52 @@ public class AutomatonController implements Observer{
 
             for (int i = 0; i < inclusionCount; i++)
             {
-                CellCoordinates cellCoordinates1;
+                Pair<Integer, Integer> cellCoordinates;
                 if (boardFilled)
                 {
-                    int idx = random.nextInt(cellCoordinates2.size());
-                    cellCoordinates1 = cellCoordinates2.get(idx);
+                    int idx = random.nextInt(cellsOnEdge.size());
+                    cellCoordinates = cellsOnEdge.get(idx);
                 }else {
-                    cellCoordinates1 = new CellCoordinates(random.nextInt(Integer.parseInt(widthField.getText())),
+                    cellCoordinates = new Pair<>(random.nextInt(Integer.parseInt(widthField.getText())),
                             random.nextInt(Integer.parseInt(heightField.getText())));
                 }
 
                 if (inclusionsComboBox.getValue().equals("Square"))
                 {
                     Neighborhood neighborhood = new MooreNeighborhood(radius);
-                    Set<CellCoordinates> neighbours = neighborhood.cellNeighbors(cellCoordinates1);
-                    for (CellCoordinates cc: neighbours) {
-
-                        createInclusion(cc.getX(),cc.getY());
+                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(cellCoordinates.getKey(), cellCoordinates.getValue());
+                    for (Pair<Integer, Integer> cellCoords: neighbours) {
+                        createInclusion(cellCoords.getKey(),cellCoords.getValue());
                     }
                 }
 
                 if (inclusionsComboBox.getValue().equals("Circular")) //Todo circle not square
                 {
                     Neighborhood neighborhood = new VonNeumanNeighborhood(radius);
-                    Set<CellCoordinates> neighbours = neighborhood.cellNeighbors(cellCoordinates1);
-                    for (CellCoordinates cc: neighbours) {
-                        createInclusion(cc.getX(),cc.getY());
+                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(cellCoordinates.getKey(), cellCoordinates.getValue());
+                    for (Pair<Integer, Integer> cellCoords: neighbours) {
+                        createInclusion(cellCoords.getKey(),cellCoords.getValue());
                     }
                 }
 
-                createInclusion(cellCoordinates1.getX(), cellCoordinates1.getY());
+                createInclusion(cellCoordinates.getKey(), cellCoordinates.getValue());
             }
         }
     }
+    //TODO Check if whole board is populated after seeding with inclusions and running grain grow
 
-    private void createInclusion(double x, double y){
+    private void createInclusion(int x, int y){
         if ((x >= 0 && x < Integer.parseInt(widthField.getText())) && (y >= 0 && y < Integer.parseInt(heightField.getText()))){
-            CellCoordinates cellCoordinates = new CellCoordinates((int)x,(int)y);
-
-            automatonAdapter.setCellState(cellCoordinates, true);
+            automatonAdapter.setCellState(x, y, true);
         }
     }
 
-    private void changeCellState(double x, double y) {
-        CellCoordinates cellCoordinates = new CellCoordinates((int)x,(int)y);
-
-        automatonAdapter.changeCellState(cellCoordinates);
+    private void changeCellState(int x, int y) {
+        automatonAdapter.changeCellState(x, y);
     }
 
-    private void setGrainState(double x, double y, Color color) {
-        CellCoordinates cellCoordinates = new CellCoordinates((int)x, (int)y);
-
-        automatonAdapter.setCellState(cellCoordinates, color);
+    private void setGrainState(int x, int y, Color color) {
+        automatonAdapter.setCellState(x, y, color);
     }
 
     private void setUpAutomaton(int width, int height, boolean afternaiveGrow){

@@ -1,7 +1,8 @@
 package pl.wieloskalowe;
 
-import pl.wieloskalowe.cell.CellCoordinates;
+import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -15,21 +16,25 @@ public class CoordinatesWrapper {
         this.height = height;
     }
 
-    public Set<CellCoordinates> wrapCellCoordinates (Set<CellCoordinates> cellCoordinatesSet) {
-        for (CellCoordinates cellCoordinates: cellCoordinatesSet) {
-            if (cellCoordinates.getX() < 0)
-                cellCoordinates.setX(width + cellCoordinates.getX());
+    public ArrayList<Pair<Integer, Integer>> wrapCellCoordinates (ArrayList<Pair<Integer, Integer>> cellCoordinatesList) {
+        ArrayList<Pair<Integer, Integer>> wrappedCellCoordinatesList = new ArrayList<>();
+        for (Pair<Integer, Integer> cellCoordinates: cellCoordinatesList) {
+            int x = cellCoordinates.getKey(), y = cellCoordinates.getValue();
+            if (cellCoordinates.getKey() < 0)
+                x = width + cellCoordinates.getKey();
 
-            if (cellCoordinates.getY() < 0)
-                cellCoordinates.setY(height + cellCoordinates.getY());
+            if (cellCoordinates.getValue() < 0)
+                y =(height + cellCoordinates.getValue());
 
-            if (cellCoordinates.getX() >= width)
-                cellCoordinates.setX(cellCoordinates.getX() - width);
+            if (cellCoordinates.getKey() >= width)
+                x = (cellCoordinates.getKey() - width);
 
-            if (cellCoordinates.getY() >= height)
-                cellCoordinates.setY(cellCoordinates.getY() - height);
+            if (cellCoordinates.getValue() >= height)
+                y = (cellCoordinates.getValue() - height);
+
+            wrappedCellCoordinatesList.add(new Pair<>(x, y));
         }
 
-        return cellCoordinatesSet;
+        return wrappedCellCoordinatesList;
     }
 }

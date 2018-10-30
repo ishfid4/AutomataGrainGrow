@@ -1,9 +1,9 @@
 package pl.wieloskalowe.neighborhoods;
 
-import pl.wieloskalowe.cell.CellCoordinates;
+import javafx.util.Pair;
 
-import java.util.Set;
+import java.util.ArrayList;
 
 public interface Neighborhood {
-    Set<CellCoordinates> cellNeighbors(CellCoordinates cellCoordinates);
+    ArrayList<Pair<Integer, Integer>> cellNeighbors(int cellsX, int cellsY);
 }

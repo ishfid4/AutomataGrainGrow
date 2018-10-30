@@ -1,11 +1,12 @@
 package pl.wieloskalowe.automaton;
 
+import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.cell.Cell;
-import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,28 +31,32 @@ public abstract class Automaton {
 
     public synchronized void oneIteration() {
         boardChanged = false;
-        Set<CellCoordinates> coordinatesSet = board2D.getAllCoordinates();
 
         Board2D nextBoard = new Board2D(board2D);
 
-        for (CellCoordinates cellCoordinates : coordinatesSet) {
-            Cell currentCell = board2D.getCell(cellCoordinates);
-            Set<CellCoordinates> coordinatesNeighbours =  neighborhood.cellNeighbors(cellCoordinates);
+        for (int x = 0; x < board2D.getWidth(); x++) {
+            for (int y = 0; y < board2D.getHeight(); y++) {
+                Cell currentCell = board2D.getCell(x, y);
+                ArrayList<Pair<Integer, Integer>> coordinatesNeighbours =  neighborhood.cellNeighbors(x, y);
 
-            if (coordinatesWrapper != null)
-                coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
+                if (coordinatesWrapper != null)
+                    coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
 
-            Set<Cell> neighbours = coordinatesNeighbours.stream()
-                    .map(cord -> board2D.getCell(cord)).collect(Collectors.toSet());
 
-            nextBoard.setCell(cellCoordinates, getNextCellState(currentCell, neighbours));
+                Set<Cell> neighbours = coordinatesNeighbours.stream()
+                        .map(cord -> board2D.getCell(cord.getKey(), cord.getValue())).collect(Collectors.toSet());
+
+                nextBoard.setCell(x, y, getNextCellState(currentCell, neighbours));
+            }
         }
 
-        for (CellCoordinates cellCoordinates : coordinatesSet) {
-            Cell currentCellB1 = board2D.getCell(cellCoordinates);
-            Cell currentCellB2 = nextBoard.getCell(cellCoordinates);
-            if (!currentCellB1.getColor().equals(currentCellB2.getColor()))
-                boardChanged = true;
+        for (int x = 0; x < board2D.getWidth(); x++) {
+            for (int y = 0; y < board2D.getHeight(); y++) {
+                Cell currentCellB1 = board2D.getCell(x, y);
+                Cell currentCellB2 = nextBoard.getCell(x, y);
+                if (!currentCellB1.getColor().equals(currentCellB2.getColor()))
+                    boardChanged = true;
+            }
         }
 
         board2D = nextBoard;
