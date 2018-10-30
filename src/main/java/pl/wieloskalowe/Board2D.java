@@ -22,8 +22,8 @@ public class Board2D {
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 CellCoordinates cellCoordinates = new CellCoordinates(x, y);
-                if(initialCell.copyGrain() != null)
-                    this.board2D.put(cellCoordinates, initialCell.copyGrain());
+                if(initialCell != null)
+                    this.board2D.put(cellCoordinates, new Cell(initialCell));
             }
         }
     }
@@ -44,7 +44,7 @@ public class Board2D {
 
     public Cell getCell(CellCoordinates cellCoordinates) {
         Cell cell = board2D.get(cellCoordinates);
-        if(cell == null && outerCell.copyGrain() != null) cell = outerCell.copyGrain();
+        if(cell == null && outerCell != null) cell = new Cell(outerCell);
         return cell;
     }
 }

@@ -4,9 +4,9 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import pl.wieloskalowe.Board2D;
+import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.cell.CellCoordinates;
 import pl.wieloskalowe.cell.CellDrawer;
-import pl.wieloskalowe.cell.CellGrain;
 
 import java.awt.image.BufferedImage;
 
@@ -52,7 +52,7 @@ public class MImageView extends ImageView {
 
             if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("MonteCarlo")) {
                 for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
-                    CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
+                    Cell cell =  board2D.getCell(cellCoordinates);
                     drawGrainCell(buffImg, cellCoordinates.getX(),
                             cellCoordinates.getY(), cell.isAlive(), cell.getColor(), cell.isOnEdge());
                 }

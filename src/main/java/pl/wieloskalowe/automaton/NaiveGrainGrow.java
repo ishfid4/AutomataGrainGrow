@@ -3,7 +3,6 @@ package pl.wieloskalowe.automaton;
 import javafx.scene.paint.Color;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.cell.Cell;
-import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
@@ -21,13 +20,13 @@ public class NaiveGrainGrow extends Automaton {
     //TODO Only on edge cells should be processed?/or cell dead
     //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
     @Override
-    protected CellGrain getNextCellState(Cell cell, Set<Cell> neighbours) {
+    protected Cell getNextCellState(Cell cell, Set<Cell> neighbours) {
         if (cell.isAlive()) {
-            return cell.copyGrain();
+            return new Cell(cell);
         }
 
-        if (((CellGrain)cell).isInclusion()) {
-            return cell.copyGrain();
+        if ((cell).isInclusion()) {
+            return new Cell(cell);
         }
 
         Color cellColor = Color.color(1, 1, 1);
@@ -36,8 +35,7 @@ public class NaiveGrainGrow extends Automaton {
         int maxCount = 0;
 
         for (Cell c : neighbours) {
-            CellGrain cellGrain = c.copyGrain();
-            cellColor = cellGrain.getColor();
+            cellColor = c.getColor();
             if (!cellColor.equals(Color.color(1, 1, 1))) {
                 if (listOfColors.containsKey(cellColor)) {
                     int tmp = listOfColors.get(cellColor);
@@ -58,8 +56,8 @@ public class NaiveGrainGrow extends Automaton {
 
         //TODO zmienić stan komórki zamiast tworzenia: current state -> next state: -> update(thisstate = nextstate) -> rerender
         if (maxCount > 0 && !cellColor.equals(Color.BLACK))
-            return new CellGrain(true, cellColor);
+            return new Cell(true, cellColor);
         else
-            return new CellGrain();
+            return new Cell();
     }
 }

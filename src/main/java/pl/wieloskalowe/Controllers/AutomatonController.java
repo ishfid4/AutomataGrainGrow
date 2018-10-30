@@ -15,7 +15,6 @@ import pl.wieloskalowe.*;
 import pl.wieloskalowe.automaton.*;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.cell.CellCoordinates;
-import pl.wieloskalowe.cell.CellGrain;
 import pl.wieloskalowe.controls.MImageView;
 import pl.wieloskalowe.neighborhoods.*;
 
@@ -176,7 +175,7 @@ public class AutomatonController implements Observer{
         Board2D board2D = automatonAdapter.getBoard();
         writer.write(cellsWidth + " " + cellsHeight + "\n");
         for (CellCoordinates cellCoordinates : board2D.getAllCoordinates()) {
-            CellGrain cell = (CellGrain) board2D.getCell(cellCoordinates);
+            Cell cell = board2D.getCell(cellCoordinates);
             writer.write(cellCoordinates.getX() + " " + cellCoordinates.getY() + " " + cell.isAlive() + " " + cell.getColor() + "\n");
         }
 
@@ -230,10 +229,8 @@ public class AutomatonController implements Observer{
                 int maxCount = 0;
 
                 for (CellCoordinates cellCoordinates : neighbours) {
-                    Cell c = automatonAdapter.getBoard().getCell(cellCoordinates);
-                    CellGrain cellGrain = c.copyGrain();
-                    cellColor = cellGrain.getColor();
-                    if (!cellColor.equals(Color.color(1, 1, 1))) {
+                    cellColor = automatonAdapter.getBoard().getCell(cellCoordinates).getColor();
+                     if (!cellColor.equals(Color.color(1, 1, 1))) {
                         if (listOfColors.containsKey(cellColor)) {
                             int tmp = listOfColors.get(cellColor);
                             tmp++;
@@ -252,7 +249,7 @@ public class AutomatonController implements Observer{
 
                 if (listOfColors.size() > 1) {
                     cellCoordinates2.add(cc);
-                    ((CellGrain) automatonAdapter.getBoard().getCell(cc)).setOnEdge(true);
+                    automatonAdapter.getBoard().getCell(cc).setOnEdge(true);
                     boardFilled = true;
                 }
             }
@@ -271,8 +268,6 @@ public class AutomatonController implements Observer{
                 }else {
                     cellCoordinates1 = new CellCoordinates(random.nextInt(Integer.parseInt(widthField.getText())),
                             random.nextInt(Integer.parseInt(heightField.getText())));
-//                    int tX = random.nextInt(Integer.parseInt(widthField.getText()));
-//                    int tY = random.nextInt(Integer.parseInt(heightField.getText()));
                 }
 
                 if (inclusionsComboBox.getValue().equals("Square"))
@@ -323,7 +318,7 @@ public class AutomatonController implements Observer{
         Neighborhood neighborhood = new MooreNeighborhood(1);
 
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow")) {
-            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
             Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
