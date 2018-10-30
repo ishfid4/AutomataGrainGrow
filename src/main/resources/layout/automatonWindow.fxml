@@ -11,7 +11,7 @@
 
 <?import pl.wieloskalowe.controls.NumberTextField?>
 <?import pl.wieloskalowe.controls.MImageView?>
-<SplitPane dividerPositions="0.2491638795986622" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
+<SplitPane dividerPositions="0.2491638795986622" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
   <items>
     <AnchorPane maxWidth="150.0" minHeight="500.0" minWidth="150.0" prefHeight="418.0" prefWidth="150.0">
          <children>
@@ -62,6 +62,19 @@
             <Button layoutX="3.0" layoutY="484.0" mnemonicParsing="false" onMouseClicked="#saveToCSVClicked" text="Save to CSV" />
             <Button layoutX="3.0" layoutY="509.0" mnemonicParsing="false" onMouseClicked="#importFromCSVClicekd" text="Improt from CSV" />
             <Button layoutX="3.0" layoutY="534.0" mnemonicParsing="false" onMouseClicked="#importFromBMPClicekd" text="Improt from BMP" />
+            <Label layoutY="559.0" text="Number of inclusions" />
+            <NumberTextField fx:id="inclusionsCountField" layoutX="1.0" layoutY="579.0"/>
+            <Label layoutY="604.0" text="Inclusion size" />
+            <NumberTextField fx:id="inclusionSizeField" layoutX="1.0" layoutY="620.0"/>
+            <Button layoutX="3.0" layoutY="650.0" mnemonicParsing="false" onMouseClicked="#addInclusionsPClicekd" text="Insert inclusions" />
+            <ComboBox fx:id="inclusionsComboBox" layoutY="670.0" prefWidth="150.0">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Square" />
+                        <String fx:value="Circular" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
          </children></AnchorPane>
     <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="500.0">
          <children>

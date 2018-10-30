@@ -36,6 +36,12 @@ public class AutomatonAdapter extends Observable{
         notifyObservers();
     }
 
+    public synchronized void setCellState(CellCoordinates cellCoordinates, boolean inclusion){
+        automaton.getBoard().setCell(cellCoordinates, new CellGrain(true,inclusion));
+        setChanged();
+        notifyObservers();
+    }
+
     public Board2D getBoard() {
         return automaton.getBoard();
     }

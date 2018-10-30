@@ -18,10 +18,8 @@ public class MooreNeighborhood implements Neighborhood {
 
         for (int x = cellCoordinates.getX() - radius; x <= cellCoordinates.getX() + radius; x++) {
             for (int y = cellCoordinates.getY() - radius; y <= cellCoordinates.getY() + radius; y++) {
-                if (y == cellCoordinates.getY() && x == cellCoordinates.getX())
-                    continue;
-
-                neighbors.add(new CellCoordinates(x,y));
+                if (!(y == cellCoordinates.getY() && x == cellCoordinates.getX()))
+                    neighbors.add(new CellCoordinates(x,y));
             }
         }
 

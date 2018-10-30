@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Board2D {
+
+    //TODO zmienić na arraylist koordynaty jako klasa są niepotrzebne
+    @Deprecated
     private Map<CellCoordinates, Cell> board2D = new HashMap<>();
     private int width, height;
     private Cell outerCell;

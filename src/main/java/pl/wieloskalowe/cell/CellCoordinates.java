@@ -1,5 +1,6 @@
 package pl.wieloskalowe.cell;
 
+@Deprecated
 public class CellCoordinates {
     private int x, y;
 
@@ -37,8 +38,7 @@ public class CellCoordinates {
 
     @Override
     public int hashCode() {
-        int result = x % 0x7FFF + (y % 0x7FFF) * 0x7FFF;
-        return result;
+        return x % 0x7FFF + (y % 0x7FFF) * 0x7FFF;
     }
 
     @Override
