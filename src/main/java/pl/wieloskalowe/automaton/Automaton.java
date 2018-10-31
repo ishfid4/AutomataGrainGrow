@@ -6,8 +6,8 @@ import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
-import java.util.ArrayList;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Automaton {
@@ -27,12 +27,13 @@ public abstract class Automaton {
         this.coordinatesWrapper = coordinatesWrapper;
     }
 
-    abstract protected Cell getNextCellState(Cell cell, Set<Cell> neighbours);
+    abstract protected Cell getNextCellState(Cell cell, ArrayList<Cell> neighbours);
 
     public synchronized void oneIteration() {
         boardChanged = false;
 
         Board2D nextBoard = new Board2D(board2D);
+
 
         for (int x = 0; x < board2D.getWidth(); x++) {
             for (int y = 0; y < board2D.getHeight(); y++) {
@@ -43,10 +44,12 @@ public abstract class Automaton {
                     coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
 
 
-                Set<Cell> neighbours = coordinatesNeighbours.stream()
-                        .map(cord -> board2D.getCell(cord.getKey(), cord.getValue())).collect(Collectors.toSet());
+                ArrayList<Cell> cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
+                for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
+                    cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
+                }
 
-                nextBoard.setCell(x, y, getNextCellState(currentCell, neighbours));
+                nextBoard.setCell(x, y, getNextCellState(currentCell, cellsNeighbors));
             }
         }
 

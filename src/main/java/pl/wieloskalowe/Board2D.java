@@ -4,7 +4,7 @@ import pl.wieloskalowe.cell.Cell;
 import java.util.ArrayList;
 
 public class Board2D {
-    private ArrayList<Cell> cellBoard2D = new ArrayList<>();
+    private ArrayList<Cell> cellBoard2D;
     private int width, height;
     private Cell outerCell;
 
@@ -12,6 +12,7 @@ public class Board2D {
         this.width = width;
         this.height = height;
         this.outerCell = outerCell;
+        this.cellBoard2D = new ArrayList<>(width * height);
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 if(initialCell != null)
@@ -43,10 +44,10 @@ public class Board2D {
     public Cell getCell(int x, int y) {
         if (x >=0 && x < width && y >=0 && y < height) { //TODO reconsider this if
             Cell cell = cellBoard2D.get(x * width + y);
-            if(cell == null && outerCell != null) cell = new Cell(outerCell);
+//            if(cell == null && outerCell != null) cell = new Cell(outerCell);
             return cell;
         }
 
-        return new Cell(outerCell); //TODO Reduce ammount of new in algorithm
+        return outerCell; //TODO Reduce ammount of new in algorithm
     }
 }

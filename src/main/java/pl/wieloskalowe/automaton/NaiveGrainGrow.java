@@ -20,13 +20,13 @@ public class NaiveGrainGrow extends Automaton {
     //TODO Only on edge cells should be processed?/or cell dead
     //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
     @Override
-    protected Cell getNextCellState(Cell cell, Set<Cell> neighbours) {
+    protected Cell getNextCellState(Cell cell, ArrayList<Cell> neighbours) {
         if (cell.isAlive()) {
-            return new Cell(cell);
+            return cell;
         }
 
         if ((cell).isInclusion()) {
-            return new Cell(cell);
+            return cell;
         }
 
         Color cellColor = Color.color(1, 1, 1);
@@ -58,6 +58,6 @@ public class NaiveGrainGrow extends Automaton {
         if (maxCount > 0 && !cellColor.equals(Color.BLACK))
             return new Cell(true, cellColor);
         else
-            return new Cell();
+            return cell;
     }
 }

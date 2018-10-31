@@ -74,4 +74,9 @@ public class Cell  {
             this.color = Color.color(1, 1, 1);
         this.state  = !this.state;
     }
+
+    public void changeState(Color color) {
+        this.state = !this.state;
+        this.color = color;
+    }
 }
