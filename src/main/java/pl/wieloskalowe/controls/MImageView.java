@@ -49,7 +49,7 @@ public class MImageView extends ImageView {
             setCellsHeight(cellsHeight);
             setCellsWidth(cellsWidth);
 
-            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("MonteCarlo")) {
+            if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("FourRulesGrainGrow")) {
                 for (int x = 0; x < cellsWidth; x++){
                     for (int y = 0; y < cellsHeight; y++) {
                         Cell cell =  board2D.getCell(x,y);

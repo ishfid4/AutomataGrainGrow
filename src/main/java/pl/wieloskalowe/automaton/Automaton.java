@@ -15,6 +15,7 @@ public abstract class Automaton {
     protected Neighborhood neighborhood;
     protected CoordinatesWrapper coordinatesWrapper = null;
     protected boolean boardChanged;
+    int currentX, currentY;
 
     public Automaton(Board2D board2D, Neighborhood neighborhood) {
         this.board2D = board2D;
@@ -49,6 +50,8 @@ public abstract class Automaton {
                     cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
                 }
 
+                currentX = x;
+                currentY = y;
                 nextBoard.setCell(x, y, getNextCellState(currentCell, cellsNeighbors));
             }
         }

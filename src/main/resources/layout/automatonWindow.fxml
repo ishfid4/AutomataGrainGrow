@@ -35,6 +35,7 @@
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="NaiveGrainGrow" />
+                        <String fx:value="FourRulesGrainGrow" />
                         <!--<String fx:value="MonteCarlo" />-->
                     </FXCollections>
                 </items>

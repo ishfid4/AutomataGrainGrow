@@ -317,6 +317,12 @@ public class AutomatonController implements Observer{
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
+        if (automatonTypeComboBox.getValue().equals("FourRulesGrainGrow")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new FourRulesGrainGrow(board2D, neighborhood);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
 //        if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {
 //            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
 //            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow);
