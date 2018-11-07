@@ -7,12 +7,16 @@ import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public abstract class Automaton {
     protected Board2D board2D;
     protected Neighborhood neighborhood;
     protected CoordinatesWrapper coordinatesWrapper = null;
-    protected boolean boardChanged;
+    protected boolean boardChanged = true;
     int currentX, currentY;
     Board2D nextBoard;
 
@@ -32,18 +36,16 @@ public abstract class Automaton {
 
     abstract protected Cell getNextCellState(Cell cell, ArrayList<Cell> neighbours);
 
-    public synchronized boolean oneIteration() {
-        boardChanged = false;
+    void kurwa(int wateczek) {
+        ArrayList<Cell> cellsNeighbors = new ArrayList<>(8);
 
-        nextBoard.clear();
-
-        for (int x = 0; x < board2D.getWidth(); ++x) {
-            for (int y = 0; y < board2D.getHeight(); ++y) {
+        for (int x = wateczek; x < board2D.width; x += 3) {
+            for (int y = 0; y < board2D.height; ++y) {
                 Cell currentCell = board2D.getCell(x, y);
-                ArrayList<Pair<Integer, Integer>> coordinatesNeighbours =  neighborhood.cellNeighbors(x, y);
+                ArrayList<Pair<Integer, Integer>> coordinatesNeighbours = neighborhood.cellNeighbors(x, y);
 
-                if (coordinatesWrapper != null)
-                    coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
+//                if (coordinatesWrapper != null)
+//                    coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
 
 
                 cellsNeighbors.clear();
@@ -51,16 +53,37 @@ public abstract class Automaton {
                     cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
                 }
 
-                currentX = x;
-                currentY = y;
+//                currentX = x;
+//                currentY = y;
 
                 Cell nextCellState = getNextCellState(currentCell, cellsNeighbors);
 
                 nextBoard.setCell(x, y, nextCellState);
 
-                if(!boardChanged && !nextCellState.equals(currentCell))
-                    boardChanged = true;
+//                if(!boardChanged && !nextCellState.equals(currentCell))
+//                    boardChanged = true;
             }
+        }
+    }
+
+    public synchronized boolean oneIteration() {
+        boardChanged = false;
+
+        //nextBoard.clear();
+
+        ForkJoinPool tpe = new ForkJoinPool(3);
+
+        tpe.execute(() -> kurwa(0));
+        tpe.execute(() -> kurwa(1));
+        tpe.execute(() -> kurwa(2));
+//        tpe.execute(() -> kurwa(3));
+
+        tpe.shutdown();
+
+        try {
+            tpe.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         Board2D swapBoardTmp = board2D;
@@ -68,7 +91,7 @@ public abstract class Automaton {
         board2D = nextBoard;
         nextBoard = swapBoardTmp;
 
-        return boardChanged;
+        return true;
     }
 
     public Board2D getBoard() {

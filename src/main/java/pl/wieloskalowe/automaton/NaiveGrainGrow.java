@@ -31,16 +31,16 @@ public class NaiveGrainGrow extends Automaton {
 
         Color cellColor = Color.WHITE;
 
-        if(!cell.getColor().equals(cellColor) || neighbours.stream().allMatch(c -> c.getColor().equals(cell.getColor()))) {
+        if(neighbours.stream().allMatch(c -> c.getColor() == Color.WHITE || c.getColor().equals(cell.getColor()))) {
             return cell;
         }
 
         Map<Color, Integer> listOfColors = new HashMap<>();
         int maxCount = 0;
 
-        for (Cell c : neighbours) {
+        for (Cell c : neighbours) { // TODO jeżeli wszystkie kolory sa równej ilości to jest zawsze nieżywa
             cellColor = c.getColor();
-            if (!cellColor.equals(Color.WHITE)) {
+            if (cellColor != Color.WHITE) {
                 if (listOfColors.containsKey(cellColor)) {
                     int tmp = listOfColors.get(cellColor);
                     tmp++;
@@ -59,7 +59,7 @@ public class NaiveGrainGrow extends Automaton {
         }
 
         //TODO zmienić stan komórki zamiast tworzenia: current state -> next state: -> update(thisstate = nextstate) -> rerender
-        if (maxCount > 0 && !cellColor.equals(Color.BLACK))
+        if (maxCount > 0 && cellColor != Color.BLACK)
             return new Cell(true, cellColor);
         else
             return cell;

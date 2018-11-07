@@ -21,13 +21,13 @@ public class Ticker {
         return new TimerTask() {
             @Override
             public void run() {
-                while(automatonAdapter.boardChanged || iterations == 0) {
-                    ++iterations;
+                while(true) {
+//                    ++iterations;
                     automatonAdapter.nextAutomatonState();
                 }
 
-                System.out.println("Iterations count: " + iterations +" Ende");
-                stop();
+//                System.out.println("Iterations count: " + iterations +" Ende");
+//                stop();
             }
         };
     }
