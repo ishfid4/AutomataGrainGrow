@@ -15,12 +15,11 @@ public class AutomatonAdapter extends Observable{
     }
 
     public synchronized void nextAutomatonState() {
-        boardChanged = false;
-        automaton.oneIteration();
-        if (automaton.boardChanged)
-            boardChanged = true;
-        setChanged();
-        notifyObservers();
+        boardChanged = automaton.oneIteration();
+        if (boardChanged) {
+            setChanged();
+            notifyObservers();
+        }
     }
 
     public synchronized void changeCellState(int x, int y) {

@@ -15,8 +15,8 @@
   <items>
     <AnchorPane maxWidth="150.0" minHeight="500.0" minWidth="150.0" prefHeight="418.0" prefWidth="150.0">
          <children>
-            <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="3" />
-            <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="3" />
+            <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="300" />
+            <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="300" />
             <Button fx:id="setButton" layoutX="1.0" layoutY="204.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
             <Button fx:id="iterateButton" layoutX="3.0" layoutY="434.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
             <Button fx:id="startButton" layoutX="61.0" layoutY="434.0" mnemonicParsing="false" onMouseClicked="#startClicked" text="Start" />
@@ -53,9 +53,9 @@
                 </items>
             </ComboBox>
             <Button fx:id="generateButton" layoutY="405.0" mnemonicParsing="false" onMouseClicked="#generateClicked" text="Generate Cells" />
-            <NumberTextField fx:id="cellCountField" layoutX="3.0" layoutY="291.0" />
+            <NumberTextField fx:id="cellCountField" layoutX="3.0" layoutY="291.0" text="100"/>
             <NumberTextField fx:id="generateRadiusField" layoutX="3.0" layoutY="334.0" />
-            <NumberTextField fx:id="stateCountField" layoutY="378.0" />
+            <NumberTextField fx:id="stateCountField" layoutY="378.0" text="100"/>
             <Label layoutX="5.0" layoutY="274.0" text="Cell count to generate" />
             <Label layoutX="3.0" layoutY="317.0" text="Radius" />
             <Label layoutX="3.0" layoutY="361.0" text="States count" />

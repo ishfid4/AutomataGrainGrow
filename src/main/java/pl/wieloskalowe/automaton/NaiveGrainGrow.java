@@ -29,14 +29,18 @@ public class NaiveGrainGrow extends Automaton {
             return cell;
         }
 
-        Color cellColor = Color.color(1, 1, 1);
+        Color cellColor = Color.WHITE;
+
+        if(!cell.getColor().equals(cellColor) || neighbours.stream().allMatch(c -> c.getColor().equals(cell.getColor()))) {
+            return cell;
+        }
 
         Map<Color, Integer> listOfColors = new HashMap<>();
         int maxCount = 0;
 
         for (Cell c : neighbours) {
             cellColor = c.getColor();
-            if (!cellColor.equals(Color.color(1, 1, 1))) {
+            if (!cellColor.equals(Color.WHITE)) {
                 if (listOfColors.containsKey(cellColor)) {
                     int tmp = listOfColors.get(cellColor);
                     tmp++;

@@ -21,15 +21,13 @@ public class Ticker {
         return new TimerTask() {
             @Override
             public void run() {
-                if (automatonAdapter.boardChanged || iterations == 0){
-                    iterations++;
+                while(automatonAdapter.boardChanged || iterations == 0) {
+                    ++iterations;
                     automatonAdapter.nextAutomatonState();
-                    task = createTickTask(timer);
-                    timer.schedule(task, rate);
-                }else{
-                    System.out.println("Iterations count: " + iterations +" Ende");
-                    stop();
                 }
+
+                System.out.println("Iterations count: " + iterations +" Ende");
+                stop();
             }
         };
     }

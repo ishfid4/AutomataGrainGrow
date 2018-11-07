@@ -10,7 +10,7 @@ public class Cell  {
 
     public Cell() {
         this.state = false;
-        this.color = Color.color(1, 1, 1);
+        this.color = Color.WHITE;
         this.onEdge = false;
         this.inclusion = false;
     }
@@ -68,10 +68,10 @@ public class Cell  {
 
     public void nextState() {
         Random random = new Random();
-        if (this.color.equals(Color.color(1, 1, 1)))
+        if (this.color == Color.WHITE)
             this.color = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
         else
-            this.color = Color.color(1, 1, 1);
+            this.color = Color.WHITE;
         this.state  = !this.state;
     }
 

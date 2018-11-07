@@ -38,7 +38,7 @@ public class FourRulesGrainGrow extends Automaton {
 
         Color rndColorFromMoore;
 
-        Color cellColor = Color.color(1, 1, 1);
+        Color cellColor = Color.WHITE;
 
         Map<Color, Integer> listOfColors = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class FourRulesGrainGrow extends Automaton {
         Map<Color, Integer> listOfMooreColors = new HashMap<>();
         for (Cell c : neighbours) {
             cellColor = c.getColor();
-            if (!cellColor.equals(Color.color(1, 1, 1))) {
+            if (cellColor != Color.WHITE) {
                 if (listOfMooreColors.containsKey(cellColor)) {
                     int tmp = listOfMooreColors.get(cellColor);
                     tmp++;
@@ -76,7 +76,7 @@ public class FourRulesGrainGrow extends Automaton {
         listOfColors = new HashMap<>();
         for (Cell c : neighbours) {
             cellColor = c.getColor();
-            if (!cellColor.equals(Color.color(1, 1, 1))) {
+            if (cellColor != Color.WHITE) {
                 if (listOfColors.containsKey(cellColor)) {
                     int tmp = listOfColors.get(cellColor);
                     tmp++;
@@ -90,7 +90,7 @@ public class FourRulesGrainGrow extends Automaton {
         for (Color col : listOfColors.keySet()) {
             if (listOfColors.get(col) == 3) {
                 cellColor = col;
-                new Cell(true, cellColor);
+                return new Cell(true, cellColor);
             }
         }
 
@@ -106,7 +106,7 @@ public class FourRulesGrainGrow extends Automaton {
         listOfColors = new HashMap<>();
         for (Cell c : neighbours) {
             cellColor = c.getColor();
-            if (!cellColor.equals(Color.color(1, 1, 1))) {
+            if (cellColor != Color.WHITE) {
                 if (listOfColors.containsKey(cellColor)) {
                     int tmp = listOfColors.get(cellColor);
                     tmp++;
