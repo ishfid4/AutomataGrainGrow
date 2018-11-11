@@ -17,7 +17,6 @@ public class AutomatonAdapter extends Observable{
     public synchronized void nextAutomatonState() {
         boardChanged = automaton.oneIteration();
         if (boardChanged) {
-            boardChanged = true;
             setChanged();
             notifyObservers();
         }

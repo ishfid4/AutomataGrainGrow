@@ -225,10 +225,10 @@ public class AutomatonController implements Observer{
                     Color cellColor;
                     Map<Color, Integer> listOfColors = new HashMap<>();
                     Neighborhood neighborhood = new VonNeumanNeighborhood(1);
-                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(x, y);
+                    ArrayList<int[]> neighbours = neighborhood.cellNeighbors(x, y);
 
-                    for (Pair<Integer, Integer> cellCoordinates : neighbours) {
-                        cellColor = automatonAdapter.getBoard().getCell(cellCoordinates.getKey(), cellCoordinates.getValue()).getColor();
+                    for (int[] cellCoordinates : neighbours) {
+                        cellColor = automatonAdapter.getBoard().getCell(cellCoordinates[0], cellCoordinates[1]).getColor();
                         if (!cellColor.equals(Color.WHITE)) {
                             if (listOfColors.containsKey(cellColor)) {
                                 int tmp = listOfColors.get(cellColor);
@@ -270,23 +270,23 @@ public class AutomatonController implements Observer{
                             random.nextInt(Integer.parseInt(heightField.getText())));
                 }
 
-                if (inclusionsComboBox.getValue().equals("Square"))
-                {
-                    Neighborhood neighborhood = new MooreNeighborhood(radius);
-                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(cellCoordinates.getKey(), cellCoordinates.getValue());
-                    for (Pair<Integer, Integer> cellCoords: neighbours) {
-                        createInclusion(cellCoords.getKey(),cellCoords.getValue());
-                    }
-                }
-
-                if (inclusionsComboBox.getValue().equals("Circular")) //Todo circle not square
-                {
-                    Neighborhood neighborhood = new VonNeumanNeighborhood(radius);
-                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(cellCoordinates.getKey(), cellCoordinates.getValue());
-                    for (Pair<Integer, Integer> cellCoords: neighbours) {
-                        createInclusion(cellCoords.getKey(),cellCoords.getValue());
-                    }
-                }
+//                if (inclusionsComboBox.getValue().equals("Square"))
+//                {
+//                    Neighborhood neighborhood = new MooreNeighborhood(radius);
+//                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(cellCoordinates.getKey(), cellCoordinates.getValue());
+//                    for (Pair<Integer, Integer> cellCoords: neighbours) {
+//                        createInclusion(cellCoords.getKey(),cellCoords.getValue());
+//                    }
+//                }
+//
+//                if (inclusionsComboBox.getValue().equals("Circular")) //Todo circle not square
+//                {
+//                    Neighborhood neighborhood = new VonNeumanNeighborhood(radius);
+//                    ArrayList<Pair<Integer, Integer>> neighbours = neighborhood.cellNeighbors(cellCoordinates.getKey(), cellCoordinates.getValue());
+//                    for (Pair<Integer, Integer> cellCoords: neighbours) {
+//                        createInclusion(cellCoords.getKey(),cellCoords.getValue());
+//                    }
+//                }
 
                 createInclusion(cellCoordinates.getKey(), cellCoordinates.getValue());
             }

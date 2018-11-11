@@ -19,7 +19,7 @@ public abstract class Automaton {
     protected boolean boardChanged = true;
     int currentX, currentY;
     Board2D nextBoard;
-    List<List<Pair<Integer, Integer>>> neighPos;
+    List<List<int[]>> neighPos;
 
     public Automaton(Board2D board2D, Neighborhood neighborhood) {
         this(board2D, neighborhood, null);
@@ -41,7 +41,7 @@ public abstract class Automaton {
 
     abstract protected Cell getNextCellState(Cell cell, List<Cell> neighbours);
 
-    public synchronized boolean oneIteration() {
+    public boolean oneIteration() {
         boardChanged = false;
 
         //nextBoard.clear();
@@ -57,9 +57,13 @@ public abstract class Automaton {
             }
 
             List<Cell> neighborPos = neighPos.get(i).parallelStream().map(coords ->
-                    board2D.getCell(coords.getKey(), coords.getValue())).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
 
-            nextBoard.setCell(x, y, getNextCellState(board2D.getCell(x, y), neighborPos));
+            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborPos);
+            if(!current.getColor().equals(nextCell.getColor())) {
+                nextBoard.setCell(x, y, nextCell);
+                boardChanged = true;
+            }
         });
 
         Board2D swapBoardTmp = board2D;
@@ -67,7 +71,7 @@ public abstract class Automaton {
         board2D = nextBoard;
         nextBoard = swapBoardTmp;
 
-        return true;
+        return boardChanged;
     }
 
     public Board2D getBoard() {

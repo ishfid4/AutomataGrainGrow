@@ -11,15 +11,17 @@ public class CornersOfMooreNeighborhood implements Neighborhood{
     }
 
     @Override
-    public ArrayList<Pair<Integer, Integer>> cellNeighbors(int cellsX, int cellsY) {
-        ArrayList<Pair<Integer, Integer>> neighbours = new ArrayList<>();
+    public ArrayList<int[]> cellNeighbors(int cellsX, int cellsY) {
+//        ArrayList<Pair<Integer, Integer>> neighbours = new ArrayList<>();
+//
+//        TODO: redo this BS
+//        neighbours.add(new Pair<>(cellsX - 1, cellsY - 1));
+//        neighbours.add(new Pair<>(cellsX + 1, cellsY - 1));
+//        neighbours.add(new Pair<>(cellsX - 1, cellsY + 1));
+//        neighbours.add(new Pair<>(cellsX + 1, cellsY + 1));
 
-        //TODO: redo this BS
-        neighbours.add(new Pair<>(cellsX - 1, cellsY - 1));
-        neighbours.add(new Pair<>(cellsX + 1, cellsY - 1));
-        neighbours.add(new Pair<>(cellsX - 1, cellsY + 1));
-        neighbours.add(new Pair<>(cellsX + 1, cellsY + 1));
+//        return neighbours;
 
-        return  neighbours;
+        return null;
     }
 }

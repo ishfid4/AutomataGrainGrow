@@ -62,77 +62,77 @@ public class FourRulesGrainGrow extends Automaton {
         }
 
         /* Second rule */
-        Neighborhood vonNeuman = new VonNeumanNeighborhood(1);
-        ArrayList<Pair<Integer, Integer>> coordinatesNeighbours =  vonNeuman.cellNeighbors(this.currentX, this.currentY);
-
-        ArrayList<Cell> cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
-        for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
-            cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
-        }
-
-        listOfColors = new HashMap<>();
-        for (Cell c : neighbours) {
-            cellColor = c.getColor();
-            if (cellColor != Color.WHITE) {
-                if (listOfColors.containsKey(cellColor)) {
-                    int tmp = listOfColors.get(cellColor);
-                    tmp++;
-                    listOfColors.replace(cellColor, tmp);
-                } else {
-                    listOfColors.put(cellColor, 1);
-                }
-            }
-        }
-
-        for (Color col : listOfColors.keySet()) {
-            if (listOfColors.get(col) == 3) {
-                cellColor = col;
-                return new Cell(true, cellColor);
-            }
-        }
-
-        /* Third rule */
-        Neighborhood cornersOfMoore = new CornersOfMooreNeighborhood(1);
-        coordinatesNeighbours =  cornersOfMoore.cellNeighbors(this.currentX, this.currentY);
-
-        cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
-        for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
-            cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
-        }
-
-        listOfColors = new HashMap<>();
-        for (Cell c : neighbours) {
-            cellColor = c.getColor();
-            if (cellColor != Color.WHITE) {
-                if (listOfColors.containsKey(cellColor)) {
-                    int tmp = listOfColors.get(cellColor);
-                    tmp++;
-                    listOfColors.replace(cellColor, tmp);
-                } else {
-                    listOfColors.put(cellColor, 1);
-                }
-            }
-        }
-
-        for (Color col : listOfColors.keySet()) {
-            if (listOfColors.get(col) == 3) {
-                cellColor = col;
-                return new Cell(true, cellColor);
-            }
-        }
-
-        /* For Fourth rule */
-        Random rnd = new Random();
-        int rndNum;
-
-        for (Color col : listOfMooreColors.keySet()) {
-            rndNum = rnd.nextInt(100);
-            if (rndNum == 10 || rndNum == 20 || rndNum == 30 || rndNum == 40) { //TODO: change that, we should specify probability
-                rndColorFromMoore = col;
-                return new Cell(true, rndColorFromMoore);
-            }
-        }
-
+//        Neighborhood vonNeuman = new VonNeumanNeighborhood(1);
+//        ArrayList<Pair<Integer, Integer>> coordinatesNeighbours =  vonNeuman.cellNeighbors(this.currentX, this.currentY);
+//
+//        ArrayList<Cell> cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
+//        for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
+//            cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
+//        }
+//
+//        listOfColors = new HashMap<>();
+//        for (Cell c : neighbours) {
+//            cellColor = c.getColor();
+//            if (cellColor != Color.WHITE) {
+//                if (listOfColors.containsKey(cellColor)) {
+//                    int tmp = listOfColors.get(cellColor);
+//                    tmp++;
+//                    listOfColors.replace(cellColor, tmp);
+//                } else {
+//                    listOfColors.put(cellColor, 1);
+//                }
+//            }
+//        }
+//
+//        for (Color col : listOfColors.keySet()) {
+//            if (listOfColors.get(col) == 3) {
+//                cellColor = col;
+//                return new Cell(true, cellColor);
+//            }
+//        }
+//
+//        /* Third rule */
+//        Neighborhood cornersOfMoore = new CornersOfMooreNeighborhood(1);
+//        coordinatesNeighbours =  cornersOfMoore.cellNeighbors(this.currentX, this.currentY);
+//
+//        cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
+//        for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
+//            cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
+//        }
+//
+//        listOfColors = new HashMap<>();
+//        for (Cell c : neighbours) {
+//            cellColor = c.getColor();
+//            if (cellColor != Color.WHITE) {
+//                if (listOfColors.containsKey(cellColor)) {
+//                    int tmp = listOfColors.get(cellColor);
+//                    tmp++;
+//                    listOfColors.replace(cellColor, tmp);
+//                } else {
+//                    listOfColors.put(cellColor, 1);
+//                }
+//            }
+//        }
+//
+//        for (Color col : listOfColors.keySet()) {
+//            if (listOfColors.get(col) == 3) {
+//                cellColor = col;
+//                return new Cell(true, cellColor);
+//            }
+//        }
+//
+//        /* For Fourth rule */
+//        Random rnd = new Random();
+//        int rndNum;
+//
+//        for (Color col : listOfMooreColors.keySet()) {
+//            rndNum = rnd.nextInt(100);
+//            if (rndNum == 10 || rndNum == 20 || rndNum == 30 || rndNum == 40) { //TODO: change that, we should specify probability
+//                rndColorFromMoore = col;
+//                return new Cell(true, rndColorFromMoore);
+//            }
+//        }
+//
         return cell;
     }
 }
