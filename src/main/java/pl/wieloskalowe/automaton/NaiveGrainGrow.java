@@ -20,7 +20,7 @@ public class NaiveGrainGrow extends Automaton {
     //TODO Only on edge cells should be processed?/or cell dead
     //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
     @Override
-    protected Cell getNextCellState(Cell cell, ArrayList<Cell> neighbours) {
+    protected Cell getNextCellState(Cell cell, List<Cell> neighbours) {
         if (cell.isAlive()) {
             return cell;
         }

@@ -65,4 +65,8 @@ public class Board2D {
     public void clear() {
         cellBoard2D.clear();
     }
+
+    public ArrayList<Cell> getCellBoard2D() {
+        return cellBoard2D;
+    }
 }

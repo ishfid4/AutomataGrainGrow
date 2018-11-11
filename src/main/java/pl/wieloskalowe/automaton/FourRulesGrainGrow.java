@@ -9,10 +9,7 @@ import pl.wieloskalowe.neighborhoods.CornersOfMooreNeighborhood;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Deprecated
 public class FourRulesGrainGrow extends Automaton {
@@ -27,7 +24,7 @@ public class FourRulesGrainGrow extends Automaton {
     //TODO Only on edge cells should be processed?/or cell dead
     //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
     @Override
-    protected Cell getNextCellState(Cell cell, ArrayList<Cell> neighbours) { //Always starting will be moore
+    protected Cell getNextCellState(Cell cell,  List<Cell> neighbours) { //Always starting will be moore
         if (cell.isAlive()) {
             return cell;
         }
