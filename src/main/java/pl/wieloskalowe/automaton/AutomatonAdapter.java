@@ -3,6 +3,7 @@ package pl.wieloskalowe.automaton;
 import javafx.scene.paint.Color;
 import pl.wieloskalowe.*;
 import pl.wieloskalowe.cell.Cell;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Observable;
 
@@ -22,25 +23,35 @@ public class AutomatonAdapter extends Observable{
         }
     }
 
-    public synchronized void changeCellState(int x, int y) {
-        automaton.getBoard().getCell(x, y).nextState();
-        setChanged();
-        notifyObservers();
-    }
+//    public synchronized void changeCellState(int x, int y) {
+//        automaton.getBoard().getCell(x, y).nextState();
+//        setChanged();
+//        notifyObservers();
+//    }
 
     public synchronized void setCellState(int x, int y, Color color){
-        automaton.getBoard().setCell(x, y , new Cell(true,color));
-        setChanged();
-        notifyObservers();
+//        automaton.getBoard().setCell(x, y , new Cell(true,color)); // tutaj getować z gotowych celek zamiast new
+//        setChanged();
+//        notifyObservers();
+        throw new NotImplementedException();
     }
 
-    public synchronized void setCellState(int x, int y, boolean inclusion){
-        automaton.getBoard().setCell(x, y, new Cell(true,inclusion));
-        setChanged();
-        notifyObservers();
-    }
+//    public synchronized void setCellState(int x, int y, boolean inclusion){
+//        automaton.getBoard().setCell(x, y, new Cell(true,inclusion));
+//        setChanged();
+//        notifyObservers();
+//    }
 
     public Board2D getBoard() {
         return automaton.getBoard();
+    }
+
+    public Automaton getAutomaton() {
+        return automaton;
+    }
+
+    public void refresh() {
+        setChanged();
+        notifyObservers();
     }
 }

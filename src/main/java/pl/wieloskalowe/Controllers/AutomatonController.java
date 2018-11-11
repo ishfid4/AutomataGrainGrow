@@ -49,10 +49,18 @@ public class AutomatonController implements Observer{
             Random random = new Random();
 
             if (generationComboBox.getValue().equals("Random")) {
-                for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
-                    changeCellState(random.nextInt(Integer.parseInt(widthField.getText())),
-                            random.nextInt(Integer.parseInt(heightField.getText())));
+                int stateCount = Integer.parseInt(cellCountField.getText());
+
+                List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
+
+                for(int i = 0; i < stateCount; ++i) {
+                    int x = random.nextInt(Integer.parseInt(widthField.getText()));
+                    int y = random.nextInt(Integer.parseInt(heightField.getText()));
+                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(i));
+                    automatonAdapter.getAutomaton().syncNextBoard();
                 }
+
+                automatonAdapter.refresh();
             }
 
             // TODO: Probably not work as expected should be circe radius
@@ -98,11 +106,11 @@ public class AutomatonController implements Observer{
                 }
 
                 for (Pair<Integer,Integer> p: cordsToChangeState) {
-                    changeCellState(p.getKey(), p.getValue());
+//                    changeCellState(p.getKey(), p.getValue());
                 }
             }
 
-            //TODO: too large offset on right and bottom edge
+            //TODO: too large offset on right and b ottom edge
             if (generationComboBox.getValue().equals("Equally spread")){
                 int sqCellCount = (int) Math.floor(sqrt(Double.parseDouble(cellCountField.getText())));
 
@@ -111,7 +119,7 @@ public class AutomatonController implements Observer{
 
                 for (int i = 0; i < sqCellCount; i++) {
                     for (int j = 0; j < sqCellCount; j++) {
-                        changeCellState(x * i, y * j);
+//                        changeCellState(x * i, y * j);
                     }
                 }
             }
@@ -248,7 +256,7 @@ public class AutomatonController implements Observer{
 
                     if (listOfColors.size() > 1) {
                         cellsOnEdge.add(new Pair<Integer, Integer>(x, y));
-                        automatonAdapter.getBoard().getCell(x, y).setOnEdge(true);
+//                        automatonAdapter.getBoard().getCell(x, y).setOnEdge(true);
                         boardFilled = true;
                     }
                 }
@@ -296,12 +304,8 @@ public class AutomatonController implements Observer{
 
     private void createInclusion(int x, int y){
         if ((x >= 0 && x < Integer.parseInt(widthField.getText())) && (y >= 0 && y < Integer.parseInt(heightField.getText()))){
-            automatonAdapter.setCellState(x, y, true);
+//            automatonAdapter.setCellState(x, y, true);
         }
-    }
-
-    private void changeCellState(int x, int y) {
-        automatonAdapter.changeCellState(x, y);
     }
 
     private void setGrainState(int x, int y, Color color) {

@@ -2,6 +2,7 @@ package pl.wieloskalowe.cell;
 
 import javafx.scene.paint.Color;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class Cell  {
@@ -54,29 +55,32 @@ public class Cell  {
         return inclusion;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     public boolean isOnEdge() {
         return onEdge;
     }
 
-    public void setOnEdge(boolean onEdge) {
-        this.onEdge = onEdge;
+//    public void nextState() {
+//        Random random = new Random();
+//        if (this.color == Color.WHITE)
+//            this.color = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+//        else
+//            this.color = Color.WHITE;
+//        this.state  = !this.state;
+//    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cell cell = (Cell) o;
+        return state == cell.state &&
+                onEdge == cell.onEdge &&
+                inclusion == cell.inclusion &&
+                Objects.equals(color, cell.color);
     }
 
-    public void nextState() {
-        Random random = new Random();
-        if (this.color == Color.WHITE)
-            this.color = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-        else
-            this.color = Color.WHITE;
-        this.state  = !this.state;
-    }
-
-    public void changeState(Color color) {
-        this.state = !this.state;
-        this.color = color;
+    @Override
+    public int hashCode() {
+        return Objects.hash(state, onEdge, inclusion, color);
     }
 }

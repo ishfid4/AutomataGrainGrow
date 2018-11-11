@@ -1,9 +1,9 @@
 package pl.wieloskalowe.automaton;
 
-import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.CoordinatesWrapper;
+import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
@@ -21,47 +21,23 @@ public class NaiveGrainGrow extends Automaton {
     //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
     @Override
     protected Cell getNextCellState(Cell cell, List<Cell> neighbours) {
-        if (cell.isAlive()) {
+        Cell initialCell = board2D.getInitialCell();
+
+        if(cell != initialCell) return cell;
+
+        if(neighbours.stream().allMatch(c -> c == initialCell)) {
             return cell;
         }
 
-        if ((cell).isInclusion()) {
-            return cell;
-        }
+        Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
 
-        Color cellColor = Color.WHITE;
-
-        if(neighbours.stream().allMatch(c -> c.getColor() == Color.WHITE || c.getColor().equals(cell.getColor()))) {
-            return cell;
-        }
-
-        Map<Color, Integer> listOfColors = new HashMap<>();
-        int maxCount = 0;
-
-        for (Cell c : neighbours) { // TODO jeżeli wszystkie kolory sa równej ilości to jest zawsze nieżywa
-            cellColor = c.getColor();
-            if (cellColor != Color.WHITE) {
-                if (listOfColors.containsKey(cellColor)) {
-                    int tmp = listOfColors.get(cellColor);
-                    tmp++;
-                    listOfColors.replace(cellColor, tmp);
-                } else {
-                    listOfColors.put(cellColor, 1);
-                }
+        for (Cell c : neighbours) {
+            if (c != board2D.getInitialCell()) {
+                Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
+                listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
             }
         }
 
-        for (Color col : listOfColors.keySet()) {
-            if (listOfColors.get(col) >= maxCount) {
-                maxCount = listOfColors.get(col);
-                cellColor = col;
-            }
-        }
-
-        //TODO zmienić stan komórki zamiast tworzenia: current state -> next state: -> update(thisstate = nextstate) -> rerender
-        if (maxCount > 0 && cellColor != Color.BLACK)
-            return new Cell(true, cellColor);
-        else
-            return cell;
+        return Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue)).getKey();
     }
 }

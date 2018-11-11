@@ -1,14 +1,12 @@
 package pl.wieloskalowe.automaton;
 
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -17,7 +15,6 @@ public abstract class Automaton {
     protected Neighborhood neighborhood;
     protected CoordinatesWrapper coordinatesWrapper = null;
     protected boolean boardChanged = true;
-    int currentX, currentY;
     Board2D nextBoard;
     List<List<int[]>> neighPos;
 
@@ -41,17 +38,15 @@ public abstract class Automaton {
 
     abstract protected Cell getNextCellState(Cell cell, List<Cell> neighbours);
 
-    public boolean oneIteration() {
+    public synchronized boolean oneIteration() {
         boardChanged = false;
-
-        //nextBoard.clear();
 
         IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
             int x = i % board2D.width;
             int y = i / board2D.width;
 
             Cell current = board2D.getCell(x, y);
-            if(current.getColor() != Color.WHITE) {
+            if(current != board2D.getInitialCell()) {
                 nextBoard.setCell(x, y, current);
                 return;
             }
@@ -60,7 +55,7 @@ public abstract class Automaton {
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
 
             Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborPos);
-            if(!current.getColor().equals(nextCell.getColor())) {
+            if(current != nextCell) {
                 nextBoard.setCell(x, y, nextCell);
                 boardChanged = true;
             }
@@ -74,7 +69,11 @@ public abstract class Automaton {
         return boardChanged;
     }
 
-    public Board2D getBoard() {
+    Board2D getBoard() {
         return board2D;
+    }
+
+    public void syncNextBoard() {
+        nextBoard = new Board2D(board2D);
     }
 }
