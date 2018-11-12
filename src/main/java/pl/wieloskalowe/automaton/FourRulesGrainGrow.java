@@ -1,9 +1,7 @@
 package pl.wieloskalowe.automaton;
 
-import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.CornersOfMooreNeighborhood;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
@@ -11,128 +9,95 @@ import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 
 import java.util.*;
 
-@Deprecated
 public class FourRulesGrainGrow extends Automaton {
     public FourRulesGrainGrow(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);
+        VonNeumanNeighborhood vonNeumanNeighborhood = new VonNeumanNeighborhood(1);
+        CornersOfMooreNeighborhood cornersOfMooreNeighborhood = new CornersOfMooreNeighborhood(1);
+        for(int y = 0; y < board2D.height; ++y) {
+            for(int x = 0; x < board2D.width; ++x) {
+                vonNeumanNeighPos.add(vonNeumanNeighborhood.cellNeighbors(x, y));
+                cornersOfMooreNeighPos.add(cornersOfMooreNeighborhood.cellNeighbors(x, y));
+            }
+        }
     }
 
-    public FourRulesGrainGrow(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
-        super(board2D, neighborhood, coordinatesWrapper);
-    }
-
-    //TODO Only on edge cells should be processed?/or cell dead
-    //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
     @Override
-    protected Cell getNextCellState(Cell cell,  List<Cell> neighbours) { //Always starting will be moore
-        if (cell.isAlive()) {
+    protected Cell getNextCellState(Cell cell,  List<List<Cell>> neighbours) {
+        Cell initialCell = board2D.getInitialCell();
+        Cell inclusionCell = board2D.getInclusionCell();
+        Map<Cell, Pair<Cell, Integer>> listOfColorsMoore = new HashMap<>();
+        Map<Cell, Pair<Cell, Integer>> listOfColors;
+
+        if(cell == inclusionCell) return cell;
+        if(cell != initialCell) return cell;
+
+        if(neighbours.stream().allMatch(c -> c == initialCell || c == inclusionCell)) {
             return cell;
         }
-
-        if ((cell).isInclusion()) {
-            return cell;
-        }
-
-        Color rndColorFromMoore;
-
-        Color cellColor = Color.WHITE;
-
-        Map<Color, Integer> listOfColors = new HashMap<>();
 
         /* First rule */
-        Map<Color, Integer> listOfMooreColors = new HashMap<>();
-        for (Cell c : neighbours) {
-            cellColor = c.getColor();
-            if (cellColor != Color.WHITE) {
-                if (listOfMooreColors.containsKey(cellColor)) {
-                    int tmp = listOfMooreColors.get(cellColor);
-                    tmp++;
-                    listOfMooreColors.replace(cellColor, tmp);
-                } else {
-                    listOfMooreColors.put(cellColor, 1);
-                }
+        neighbours.get(0).forEach(c -> {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
+                Pair<Cell, Integer> currentCount = listOfColorsMoore.getOrDefault(c, new Pair<>(cell, 0));
+                listOfColorsMoore.put(c, new Pair<>(c, currentCount.getValue() + 1));
             }
-        }
+        });
 
-        for (Color col : listOfMooreColors.keySet()) {
-            if (listOfMooreColors.get(col) >= 5) {
-                cellColor = col;
-                return new Cell(true, cellColor);
-            }
+        if (!listOfColorsMoore.isEmpty()){
+            Pair<Cell, Integer> winner = Collections.max(listOfColorsMoore.values(), Comparator.comparingInt(Pair::getValue));
+            if(winner.getValue() >= 5)
+                return winner.getKey();
         }
 
         /* Second rule */
-//        Neighborhood vonNeuman = new VonNeumanNeighborhood(1);
-//        ArrayList<Pair<Integer, Integer>> coordinatesNeighbours =  vonNeuman.cellNeighbors(this.currentX, this.currentY);
-//
-//        ArrayList<Cell> cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
-//        for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
-//            cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
-//        }
-//
-//        listOfColors = new HashMap<>();
-//        for (Cell c : neighbours) {
-//            cellColor = c.getColor();
-//            if (cellColor != Color.WHITE) {
-//                if (listOfColors.containsKey(cellColor)) {
-//                    int tmp = listOfColors.get(cellColor);
-//                    tmp++;
-//                    listOfColors.replace(cellColor, tmp);
-//                } else {
-//                    listOfColors.put(cellColor, 1);
-//                }
-//            }
-//        }
-//
-//        for (Color col : listOfColors.keySet()) {
-//            if (listOfColors.get(col) == 3) {
-//                cellColor = col;
-//                return new Cell(true, cellColor);
-//            }
-//        }
-//
-//        /* Third rule */
-//        Neighborhood cornersOfMoore = new CornersOfMooreNeighborhood(1);
-//        coordinatesNeighbours =  cornersOfMoore.cellNeighbors(this.currentX, this.currentY);
-//
-//        cellsNeighbors = new ArrayList<>(coordinatesNeighbours.size());
-//        for (Pair<Integer, Integer> coordinatesNeighbour : coordinatesNeighbours) {
-//            cellsNeighbors.add(board2D.getCell(coordinatesNeighbour.getKey(), coordinatesNeighbour.getValue()));
-//        }
-//
-//        listOfColors = new HashMap<>();
-//        for (Cell c : neighbours) {
-//            cellColor = c.getColor();
-//            if (cellColor != Color.WHITE) {
-//                if (listOfColors.containsKey(cellColor)) {
-//                    int tmp = listOfColors.get(cellColor);
-//                    tmp++;
-//                    listOfColors.replace(cellColor, tmp);
-//                } else {
-//                    listOfColors.put(cellColor, 1);
-//                }
-//            }
-//        }
-//
-//        for (Color col : listOfColors.keySet()) {
-//            if (listOfColors.get(col) == 3) {
-//                cellColor = col;
-//                return new Cell(true, cellColor);
-//            }
-//        }
-//
-//        /* For Fourth rule */
-//        Random rnd = new Random();
-//        int rndNum;
-//
-//        for (Color col : listOfMooreColors.keySet()) {
-//            rndNum = rnd.nextInt(100);
-//            if (rndNum == 10 || rndNum == 20 || rndNum == 30 || rndNum == 40) { //TODO: change that, we should specify probability
-//                rndColorFromMoore = col;
-//                return new Cell(true, rndColorFromMoore);
-//            }
-//        }
-//
+        listOfColors = new HashMap<>();
+
+        for (Cell c1 : neighbours.get(1)) {
+            if (c1 != board2D.getInitialCell() && c1 != board2D.getInclusionCell()) {
+                Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c1, new Pair<>(cell, 0));
+                listOfColors.put(c1, new Pair<>(c1, currentCount.getValue() + 1));
+            }
+        }
+
+        if (!listOfColors.isEmpty()){
+            Pair<Cell, Integer> winner = Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue));
+            if(winner.getValue() >= 3)
+                return winner.getKey();
+        }
+
+        /* Third rule */
+        listOfColors = new HashMap<>();
+
+        for (Cell c : neighbours.get(2)) {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
+                Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
+                listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
+            }
+        }
+
+        if (!listOfColors.isEmpty()){
+            Pair<Cell, Integer> winner = Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue));
+            if(winner.getValue() >= 3)
+                return winner.getKey();
+        }
+
+        /* For Fourth rule */
+        Random rnd = new Random();
+        int rndNum = rnd.nextInt(101);
+        Set<Cell> cellSet = listOfColorsMoore.keySet();
+        int size = cellSet.size();
+        if (rndNum <= 10 && size > 0) {
+            int item = rnd.nextInt(size);
+            int i = 0;
+            for(Object obj : cellSet)
+            {
+                if (i == item)
+                    return listOfColorsMoore.get(obj).getKey();
+                i++;
+            }
+        }
+
         return cell;
     }
 }

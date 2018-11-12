@@ -1,8 +1,7 @@
 package pl.wieloskalowe.automaton;
 
 import javafx.scene.paint.Color;
-import pl.wieloskalowe.*;
-import pl.wieloskalowe.cell.Cell;
+import pl.wieloskalowe.Board2D;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Observable;
@@ -10,6 +9,7 @@ import java.util.Observable;
 public class AutomatonAdapter extends Observable{
     private Automaton automaton;
     public boolean boardChanged;
+    public int timesNotChanged = 0;
 
     public AutomatonAdapter(Automaton automaton) {
         this.automaton = automaton;
@@ -20,6 +20,9 @@ public class AutomatonAdapter extends Observable{
         if (boardChanged) {
             setChanged();
             notifyObservers();
+            timesNotChanged = 0;
+        } else {
+            ++timesNotChanged;
         }
     }
 

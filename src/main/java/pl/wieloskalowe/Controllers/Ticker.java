@@ -20,7 +20,7 @@ public class Ticker {
         return new TimerTask() {
             @Override
             public void run() {
-                while(automatonAdapter.boardChanged || iterations == 0){
+                while(automatonAdapter.timesNotChanged <= 100 || automatonAdapter.boardChanged || iterations == 0){
                     iterations++;
                     automatonAdapter.nextAutomatonState();
 //                    task = createTickTask(timer);

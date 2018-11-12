@@ -1,6 +1,5 @@
 package pl.wieloskalowe.neighborhoods;
 
-import javafx.util.Pair;
 import java.util.ArrayList;
 
 public class CornersOfMooreNeighborhood implements Neighborhood{
@@ -12,16 +11,15 @@ public class CornersOfMooreNeighborhood implements Neighborhood{
 
     @Override
     public ArrayList<int[]> cellNeighbors(int cellsX, int cellsY) {
-//        ArrayList<Pair<Integer, Integer>> neighbours = new ArrayList<>();
-//
-//        TODO: redo this BS
-//        neighbours.add(new Pair<>(cellsX - 1, cellsY - 1));
-//        neighbours.add(new Pair<>(cellsX + 1, cellsY - 1));
-//        neighbours.add(new Pair<>(cellsX - 1, cellsY + 1));
-//        neighbours.add(new Pair<>(cellsX + 1, cellsY + 1));
+        ArrayList<int[]> neighbours = new ArrayList<>();
+        for (int i = 1; i <= radius; ++i){
+            //TODO is there any other way to do this?
+            neighbours.add(new int[]{cellsX - i, cellsY - i});
+            neighbours.add(new int[]{cellsX + i, cellsY - i});
+            neighbours.add(new int[]{cellsX - i, cellsY + i});
+            neighbours.add(new int[]{cellsX + i, cellsY + i});
+        }
 
-//        return neighbours;
-
-        return null;
+        return neighbours;
     }
 }

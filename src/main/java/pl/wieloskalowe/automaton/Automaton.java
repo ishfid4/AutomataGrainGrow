@@ -16,7 +16,9 @@ public abstract class Automaton {
     protected CoordinatesWrapper coordinatesWrapper = null;
     protected boolean boardChanged = true;
     Board2D nextBoard;
-    List<List<int[]>> neighPos;
+    List<List<int[]>> mooreNeighPos;
+    List<List<int[]>> vonNeumanNeighPos;
+    List<List<int[]>> cornersOfMooreNeighPos;
 
     public Automaton(Board2D board2D, Neighborhood neighborhood) {
         this(board2D, neighborhood, null);
@@ -27,21 +29,24 @@ public abstract class Automaton {
         this.neighborhood = neighborhood;
         this.coordinatesWrapper = coordinatesWrapper;
         nextBoard = new Board2D(board2D);
-        neighPos = new ArrayList<>();
+        mooreNeighPos = new ArrayList<>();
+        vonNeumanNeighPos = new ArrayList<>();
+        cornersOfMooreNeighPos = new ArrayList<>();
 
         for(int y = 0; y < board2D.height; ++y) {
             for(int x = 0; x < board2D.width; ++x) {
-                neighPos.add(neighborhood.cellNeighbors(x, y));
+                mooreNeighPos.add(neighborhood.cellNeighbors(x, y));
             }
         }
     }
 
-    abstract protected Cell getNextCellState(Cell cell, List<Cell> neighbours);
+    abstract protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours);
 
     public synchronized boolean oneIteration() {
         boardChanged = false;
 
         IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
+            List<List<Cell>> neighborhoods = new ArrayList<>();
             int x = i % board2D.width;
             int y = i / board2D.width;
 
@@ -51,10 +56,22 @@ public abstract class Automaton {
                 return;
             }
 
-            List<Cell> neighborPos = neighPos.get(i).parallelStream().map(coords ->
+            List<Cell> neighborPos = mooreNeighPos.get(i).parallelStream().map(coords ->
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+            neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborPos);
+            // Additional two neighborhoods
+            if (!vonNeumanNeighPos.isEmpty() && !cornersOfMooreNeighPos.isEmpty()) {
+                List<Cell> neighborPosVonNeuman = vonNeumanNeighPos.get(i).parallelStream().map(coords ->
+                        board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                List<Cell> neighborPosCornersMoore = cornersOfMooreNeighPos.get(i).parallelStream().map(coords ->
+                            board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+
+                neighborhoods.add(neighborPosVonNeuman);
+                neighborhoods.add(neighborPosCornersMoore);
+            }
+
+            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
             if(current != nextCell) {
                 nextBoard.setCell(x, y, nextCell);
                 boardChanged = true;

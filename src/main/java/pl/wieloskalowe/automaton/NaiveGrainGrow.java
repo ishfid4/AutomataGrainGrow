@@ -19,7 +19,7 @@ public class NaiveGrainGrow extends Automaton {
 
     //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki
     @Override
-    protected Cell getNextCellState(Cell cell, List<Cell> neighbours) {
+    protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours) {
         Cell initialCell = board2D.getInitialCell();
         Cell inclusionCell = board2D.getInclusionCell();
 
@@ -32,7 +32,7 @@ public class NaiveGrainGrow extends Automaton {
 
         Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
 
-        for (Cell c : neighbours) {
+        for (Cell c : neighbours.get(0)) {
             if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
                 Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
                 listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));

@@ -20,6 +20,7 @@ import pl.wieloskalowe.controls.MImageView;
 import pl.wieloskalowe.neighborhoods.CircleNeighborhood;
 import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
+import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 
 import javax.imageio.ImageIO;
 import java.io.File;
