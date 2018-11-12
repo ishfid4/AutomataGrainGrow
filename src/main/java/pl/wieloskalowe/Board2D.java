@@ -83,7 +83,7 @@ public class Board2D {
             return cell;
         }
 
-        return initialCell; //TODO Reduce ammount of new in algorithm
+        return initialCell;
     }
 
     public Cell getCell(int i) {
@@ -131,5 +131,27 @@ public class Board2D {
             setInclusion(integer);
             neighborhood.cellNeighbors(x, y).forEach(c -> setInclusion(c[1] * width + c[0]));
         });
+    }
+
+    public void importCell(int x, int y, Color color) {
+        if (color.equals(Color.BLACK)) {
+            setCell(x, y, inclusionCell);
+            return;
+        }
+        if (color.equals(Color.WHITE)) {
+            setCell(x, y, initialCell);
+            return;
+        }
+
+        for (Cell cell : precomputedCells) {
+            if (cell.getColor().equals(color)) {
+                setCell(x, y, cell);
+                return;
+            }
+        }
+
+        Cell importedCell = new Cell(true, color);
+        precomputedCells.add(importedCell);
+        setCell(x, y, importedCell);
     }
 }

@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.automaton.Automaton;
 import pl.wieloskalowe.automaton.AutomatonAdapter;
@@ -20,15 +19,12 @@ import pl.wieloskalowe.controls.MImageView;
 import pl.wieloskalowe.neighborhoods.CircleNeighborhood;
 import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
-import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
-import static java.lang.Math.sqrt;
 
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
@@ -72,66 +68,67 @@ public class AutomatonController implements Observer{
                 automatonAdapter.refresh();
             }
 
-            // TODO: Probably not work as expected should be circe radius
-            if (generationComboBox.getValue().equals("Random with radius")){
-                int radius = Integer.parseInt(generateRadiusField.getText());
-                boolean wrongRange = false;
-                List<Pair<Integer,Integer>> checkList = new ArrayList<>();
-                List<Pair<Integer,Integer>> cordsToChangeState = new ArrayList<>();
-
-                for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
-                    int tX = random.nextInt(Integer.parseInt(widthField.getText()));
-                    int tY = random.nextInt(Integer.parseInt(heightField.getText()));
-
-                    for (Pair<Integer,Integer> p: checkList) {
-                        if (tX == p.getKey() && tY == p.getValue())
-                            wrongRange = true;
-                    }
-                    for (Pair<Integer,Integer> p: cordsToChangeState) {
-                        if (tX == p.getKey() && tY == p.getValue())
-                            wrongRange = true;
-                    }
-
-                    if (!wrongRange) {
-
-                        for (int x = 0; x <= radius; x++) {
-                            int y = -radius + x;
-
-                            for (; y <= radius - x; y++) {
-                                if (tX == x && tY == y) continue;
-
-                                checkList.add(new Pair<>(tX + x, tY + y));
-                                if (x != 0) {
-                                    checkList.add(new Pair<>(tX - x, tY + y));
-                                }
-                            }
-                        }
-
-                        cordsToChangeState.add(new Pair<>(tX,tY));
-                    } else {
-                        i--;
-                        wrongRange = false;
-                    }
-                }
-
-                for (Pair<Integer,Integer> p: cordsToChangeState) {
-//                    changeCellState(p.getKey(), p.getValue());
-                }
-            }
-
-            //TODO: too large offset on right and b ottom edge
-            if (generationComboBox.getValue().equals("Equally spread")){
-                int sqCellCount = (int) Math.floor(sqrt(Double.parseDouble(cellCountField.getText())));
-
-                int x = Integer.parseInt(widthField.getText()) / sqCellCount;
-                int y = Integer.parseInt(heightField.getText()) / sqCellCount;
-
-                for (int i = 0; i < sqCellCount; i++) {
-                    for (int j = 0; j < sqCellCount; j++) {
-//                        changeCellState(x * i, y * j);
-                    }
-                }
-            }
+// DOES NOT WORK!!!!!!!!!!!
+//            // TODO: Probably not work as expected should be circe radius
+//            if (generationComboBox.getValue().equals("Random with radius")){
+//                int radius = Integer.parseInt(generateRadiusField.getText());
+//                boolean wrongRange = false;
+//                List<Pair<Integer,Integer>> checkList = new ArrayList<>();
+//                List<Pair<Integer,Integer>> cordsToChangeState = new ArrayList<>();
+//
+//                for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
+//                    int tX = random.nextInt(Integer.parseInt(widthField.getText()));
+//                    int tY = random.nextInt(Integer.parseInt(heightField.getText()));
+//
+//                    for (Pair<Integer,Integer> p: checkList) {
+//                        if (tX == p.getKey() && tY == p.getValue())
+//                            wrongRange = true;
+//                    }
+//                    for (Pair<Integer,Integer> p: cordsToChangeState) {
+//                        if (tX == p.getKey() && tY == p.getValue())
+//                            wrongRange = true;
+//                    }
+//
+//                    if (!wrongRange) {
+//
+//                        for (int x = 0; x <= radius; x++) {
+//                            int y = -radius + x;
+//
+//                            for (; y <= radius - x; y++) {
+//                                if (tX == x && tY == y) continue;
+//
+//                                checkList.add(new Pair<>(tX + x, tY + y));
+//                                if (x != 0) {
+//                                    checkList.add(new Pair<>(tX - x, tY + y));
+//                                }
+//                            }
+//                        }
+//
+//                        cordsToChangeState.add(new Pair<>(tX,tY));
+//                    } else {
+//                        i--;
+//                        wrongRange = false;
+//                    }
+//                }
+//
+//                for (Pair<Integer,Integer> p: cordsToChangeState) {
+////                    changeCellState(p.getKey(), p.getValue());
+//                }
+//            }
+//
+//            //TODO: too large offset on right and b ottom edge
+//            if (generationComboBox.getValue().equals("Equally spread")){
+//                int sqCellCount = (int) Math.floor(sqrt(Double.parseDouble(cellCountField.getText())));
+//
+//                int x = Integer.parseInt(widthField.getText()) / sqCellCount;
+//                int y = Integer.parseInt(heightField.getText()) / sqCellCount;
+//
+//                for (int i = 0; i < sqCellCount; i++) {
+//                    for (int j = 0; j < sqCellCount; j++) {
+////                        changeCellState(x * i, y * j);
+//                    }
+//                }
+//            }
         }
     }
 
@@ -214,7 +211,7 @@ public class AutomatonController implements Observer{
 
         while (scanner.hasNext()) {
             String[] cell = scanner.nextLine().split(" ");
-            automatonAdapter.setCellState(Integer.parseInt(cell[0]),Integer.parseInt(cell[1]),
+            automatonAdapter.importCell(Integer.parseInt(cell[0]),Integer.parseInt(cell[1]),
                     Color.web(cell[3]));
         }
     }

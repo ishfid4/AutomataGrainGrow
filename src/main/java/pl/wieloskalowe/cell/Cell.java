@@ -3,7 +3,6 @@ package pl.wieloskalowe.cell;
 import javafx.scene.paint.Color;
 
 import java.util.Objects;
-import java.util.Random;
 
 public class Cell  {
     private boolean state, onEdge, inclusion;
@@ -58,15 +57,6 @@ public class Cell  {
     public boolean isOnEdge() {
         return onEdge;
     }
-
-//    public void nextState() {
-//        Random random = new Random();
-//        if (this.color == Color.WHITE)
-//            this.color = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-//        else
-//            this.color = Color.WHITE;
-//        this.state  = !this.state;
-//    }
 
     @Override
     public boolean equals(Object o) {

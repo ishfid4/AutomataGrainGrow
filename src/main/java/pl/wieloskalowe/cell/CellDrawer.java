@@ -1,10 +1,8 @@
 package pl.wieloskalowe.cell;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.ImageView;
-import pl.wieloskalowe.*;
+import pl.wieloskalowe.Board2D;
 
 import java.util.concurrent.atomic.AtomicReference;
 
