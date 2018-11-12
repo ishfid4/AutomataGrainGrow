@@ -3,7 +3,6 @@ package pl.wieloskalowe.Controllers;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -30,11 +29,10 @@ import java.util.*;
 
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
-    @FXML private TextField widthField, heightField, generateRadiusField, cellCountField, inclusionsCountField, inclusionSizeField;
+    @FXML private TextField widthField, heightField, cellCountField, inclusionsCountField, inclusionSizeField, probability4RuleGrowField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MImageView imageView;
-    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, generationComboBox, inclusionsComboBox;
-    @FXML private CheckBox afterNaiveGrow;
+    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox;
     private int cellsWidth, cellsHeight;
     private boolean started = false;
     private Ticker ticker;
@@ -44,7 +42,6 @@ public class AutomatonController implements Observer{
     @FXML public void initialize() {
         neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
-        generationComboBox.setValue(generationComboBox.getItems().get(0));
         inclusionsComboBox.setValue(inclusionsComboBox.getItems().get(0));
     }
 
@@ -56,7 +53,6 @@ public class AutomatonController implements Observer{
 
             Random random = new Random();
 
-            if (generationComboBox.getValue().equals("Random")) {
                 int stateCount = Integer.parseInt(cellCountField.getText());
 
                 List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
@@ -69,69 +65,6 @@ public class AutomatonController implements Observer{
                 }
 
                 automatonAdapter.refresh();
-            }
-
-// DOES NOT WORK!!!!!!!!!!!
-//            // TODO: Probably not work as expected should be circe radius
-//            if (generationComboBox.getValue().equals("Random with radius")){
-//                int radius = Integer.parseInt(generateRadiusField.getText());
-//                boolean wrongRange = false;
-//                List<Pair<Integer,Integer>> checkList = new ArrayList<>();
-//                List<Pair<Integer,Integer>> cordsToChangeState = new ArrayList<>();
-//
-//                for (int i = 0; i < Integer.parseInt(cellCountField.getText()); i++) {
-//                    int tX = random.nextInt(Integer.parseInt(widthField.getText()));
-//                    int tY = random.nextInt(Integer.parseInt(heightField.getText()));
-//
-//                    for (Pair<Integer,Integer> p: checkList) {
-//                        if (tX == p.getKey() && tY == p.getValue())
-//                            wrongRange = true;
-//                    }
-//                    for (Pair<Integer,Integer> p: cordsToChangeState) {
-//                        if (tX == p.getKey() && tY == p.getValue())
-//                            wrongRange = true;
-//                    }
-//
-//                    if (!wrongRange) {
-//
-//                        for (int x = 0; x <= radius; x++) {
-//                            int y = -radius + x;
-//
-//                            for (; y <= radius - x; y++) {
-//                                if (tX == x && tY == y) continue;
-//
-//                                checkList.add(new Pair<>(tX + x, tY + y));
-//                                if (x != 0) {
-//                                    checkList.add(new Pair<>(tX - x, tY + y));
-//                                }
-//                            }
-//                        }
-//
-//                        cordsToChangeState.add(new Pair<>(tX,tY));
-//                    } else {
-//                        i--;
-//                        wrongRange = false;
-//                    }
-//                }
-//
-//                for (Pair<Integer,Integer> p: cordsToChangeState) {
-////                    changeCellState(p.getKey(), p.getValue());
-//                }
-//            }
-//
-//            //TODO: too large offset on right and b ottom edge
-//            if (generationComboBox.getValue().equals("Equally spread")){
-//                int sqCellCount = (int) Math.floor(sqrt(Double.parseDouble(cellCountField.getText())));
-//
-//                int x = Integer.parseInt(widthField.getText()) / sqCellCount;
-//                int y = Integer.parseInt(heightField.getText()) / sqCellCount;
-//
-//                for (int i = 0; i < sqCellCount; i++) {
-//                    for (int j = 0; j < sqCellCount; j++) {
-////                        changeCellState(x * i, y * j);
-//                    }
-//                }
-//            }
         }
     }
 
@@ -148,7 +81,7 @@ public class AutomatonController implements Observer{
             imageView.setBoardParameters(cellsWidth, cellsHeight);
             imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
 
-            setUpAutomaton(cellsWidth, cellsHeight,afterNaiveGrow.isSelected());
+            setUpAutomaton(cellsWidth, cellsHeight,false);
 
             automatonAdapter.addObserver(this);
 

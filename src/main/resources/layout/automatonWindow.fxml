@@ -3,35 +3,40 @@
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <?import pl.wieloskalowe.controls.NumberTextField?>
 <?import pl.wieloskalowe.controls.MImageView?>
-<SplitPane dividerPositions="0.2491638795986622" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
+<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.wieloskalowe.Controllers.AutomatonController">
   <items>
-    <AnchorPane maxWidth="150.0" minHeight="500.0" minWidth="150.0" prefHeight="418.0" prefWidth="150.0">
+    <AnchorPane maxWidth="210.0" minHeight="500.0" minWidth="150.0" prefHeight="698.0" prefWidth="600.0">
          <children>
-            <NumberTextField fx:id="widthField" layoutX="1.0" layoutY="31.0" text="300" />
-            <NumberTextField fx:id="heightField" layoutX="1.0" layoutY="73.0" text="300" />
-            <Button fx:id="setButton" layoutX="1.0" layoutY="204.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
-            <Button fx:id="iterateButton" layoutX="3.0" layoutY="434.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
-            <Button fx:id="startButton" layoutX="61.0" layoutY="434.0" mnemonicParsing="false" onMouseClicked="#startClicked" text="Start" />
-            <Label layoutY="14.0" text="Width" />
-            <Label layoutY="56.0" text="Height" />
-            <Label fx:id="errorLabel" layoutX="2.0" layoutY="483.0" prefHeight="17.0" prefWidth="149.0" />
-            <ComboBox fx:id="neighborhoodComboBox" layoutY="117.0" prefWidth="150.0">
+            <NumberTextField fx:id="widthField" layoutX="4.0" layoutY="62.0" prefHeight="25.0" prefWidth="83.0" text="300" />
+            <NumberTextField fx:id="heightField" layoutX="102.0" layoutY="62.0" prefHeight="25.0" prefWidth="93.0" text="300" />
+            <Button fx:id="setButton" layoutX="4.0" layoutY="132.0" mnemonicParsing="false" onMouseClicked="#setClicked" text="Set" />
+            <Button fx:id="iterateButton" layoutX="12.0" layoutY="659.0" mnemonicParsing="false" onMouseClicked="#iterateClicked" text="Iterate" />
+            <Button fx:id="startButton" layoutX="71.0" layoutY="659.0" mnemonicParsing="false" onMouseClicked="#startClicked" text="Start" />
+            <Label layoutX="4.0" layoutY="45.0" text="Width" />
+            <Label layoutX="105.0" layoutY="45.0" text="Height" />
+            <Label fx:id="errorLabel" layoutX="12.0" layoutY="642.0" prefHeight="17.0" prefWidth="183.0" />
+            <ComboBox fx:id="neighborhoodComboBox" layoutX="3.0" layoutY="104.0" prefHeight="25.0" prefWidth="87.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Moore" />
                     </FXCollections>
                 </items>
             </ComboBox>
-            <Label layoutX="3.0" layoutY="99.0" text="Neighborhood" />
-            <ComboBox fx:id="automatonTypeComboBox" layoutX="2.0" layoutY="159.0" prefWidth="150.0">
+            <Label layoutX="4.0" layoutY="87.0" text="Neighborhood" />
+            <ComboBox fx:id="automatonTypeComboBox" layoutX="101.0" layoutY="104.0" prefHeight="25.0" prefWidth="93.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="NaiveGrainGrow" />
@@ -40,35 +45,20 @@
                     </FXCollections>
                 </items>
             </ComboBox>
-            <Label layoutX="3.0" layoutY="142.0" text="Automaton type" />
-            <Label layoutX="4.0" layoutY="231.0" text="Generate cells " />
-            <CheckBox fx:id="afterNaiveGrow" layoutX="2.0" layoutY="185.0" mnemonicParsing="false" text="MonteCarlo After Grow" />
-            <ComboBox fx:id="generationComboBox" layoutY="248.0" prefWidth="150.0">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Random" />
-                        <String fx:value="Random with radius" />
-                        <String fx:value="Equally spread" />
-                    </FXCollections>
-                </items>
-            </ComboBox>
-            <Button fx:id="generateButton" layoutY="405.0" mnemonicParsing="false" onMouseClicked="#generateClicked" text="Generate Cells" />
-            <NumberTextField fx:id="cellCountField" layoutX="3.0" layoutY="291.0" text="100"/>
-            <NumberTextField fx:id="generateRadiusField" layoutX="3.0" layoutY="334.0" />
-            <NumberTextField fx:id="stateCountField" layoutY="378.0" text="100"/>
-            <Label layoutX="5.0" layoutY="274.0" text="Cell count to generate" />
-            <Label layoutX="3.0" layoutY="317.0" text="Radius" />
-            <Label layoutX="3.0" layoutY="361.0" text="States count" />
-            <Button layoutX="3.0" layoutY="459.0" mnemonicParsing="false" onMouseClicked="#saveToBMPClicked" text="Save to BMP" />
-            <Button layoutX="3.0" layoutY="484.0" mnemonicParsing="false" onMouseClicked="#saveToCSVClicked" text="Save to CSV" />
-            <Button layoutX="3.0" layoutY="509.0" mnemonicParsing="false" onMouseClicked="#importFromCSVClicekd" text="Improt from CSV" />
-            <Button layoutX="3.0" layoutY="534.0" mnemonicParsing="false" onMouseClicked="#importFromBMPClicekd" text="Improt from BMP" />
-            <Label layoutY="559.0" text="Number of inclusions" />
-            <NumberTextField fx:id="inclusionsCountField" layoutX="1.0" layoutY="579.0"/>
-            <Label layoutY="604.0" text="Inclusion size" />
-            <NumberTextField fx:id="inclusionSizeField" layoutX="1.0" layoutY="620.0"/>
-            <Button layoutX="3.0" layoutY="650.0" mnemonicParsing="false" onMouseClicked="#addInclusionsClicekd" text="Insert inclusions" />
-            <ComboBox fx:id="inclusionsComboBox" layoutY="670.0" prefWidth="150.0">
+            <Label layoutX="104.0" layoutY="87.0" text="Automaton type" />
+            <Label layoutX="63.0" layoutY="249.0" text="Generate cells " />
+            <Button fx:id="generateButton" layoutX="3.0" layoutY="312.0" mnemonicParsing="false" onMouseClicked="#generateClicked" prefHeight="25.0" prefWidth="93.0" text="Generate Cells" />
+            <NumberTextField fx:id="cellCountField" layoutX="2.0" layoutY="283.0" prefHeight="25.0" prefWidth="87.0" text="100" />
+            <NumberTextField fx:id="stateCountField" layoutX="101.0" layoutY="283.0" prefHeight="25.0" prefWidth="93.0" text="100" />
+            <Label layoutX="2.0" layoutY="266.0" text="Cells to generate" />
+            <Label layoutX="11.0" layoutY="28.0" text="Board &amp; Automaton Type Settings" />
+            <Label layoutX="101.0" layoutY="266.0" text="States count" />
+            <Label layoutX="1.0" layoutY="363.0" text="Inclusions Count" />
+            <NumberTextField fx:id="inclusionsCountField" layoutX="2.0" layoutY="380.0" prefHeight="25.0" prefWidth="87.0" text="10" />
+            <Label layoutX="102.0" layoutY="363.0" text="Inclusion size" />
+            <NumberTextField fx:id="inclusionSizeField" layoutX="101.0" layoutY="380.0" prefHeight="25.0" prefWidth="93.0" text="6" />
+            <Button layoutX="97.0" layoutY="424.0" mnemonicParsing="false" onMouseClicked="#addInclusionsClicekd" text="Insert inclusions" />
+            <ComboBox fx:id="inclusionsComboBox" layoutX="3.0" layoutY="424.0" prefHeight="25.0" prefWidth="88.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Square" />
@@ -76,10 +66,32 @@
                     </FXCollections>
                 </items>
             </ComboBox>
-         </children></AnchorPane>
+            <Label layoutX="50.0" layoutY="346.0" text="Generate Inclusions" />
+            <Label layoutX="3.0" layoutY="407.0" text="Inclusion Type" />
+            <MenuBar layoutX="-3.0" prefHeight="25.0" prefWidth="216.0">
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                        <MenuItem id="importFromBMPMenuItem" mnemonicParsing="false" onAction="#importFromBMPClicekd" text="Import From BMP" />
+                        <MenuItem id="importFromCSVMenuItem" mnemonicParsing="false" onAction="#importFromCSVClicekd" text="Import From CSV" />
+                        <MenuItem id="saveToBMPMenuItem" mnemonicParsing="false" onAction="#saveToBMPClicked" text="Save to BMP" />
+                        <MenuItem id="saveToCSVMenuItem" mnemonicParsing="false" onAction="#saveToCSVClicked" text="Save to CSV" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <Separator layoutY="160.0" prefHeight="3.0" prefWidth="216.0" />
+            <Separator layoutX="-1.0" layoutY="343.0" prefHeight="3.0" prefWidth="216.0" />
+            <Label layoutX="21.0" layoutY="163.0" text="Advanced Automaton Settings" />
+            <Label layoutX="9.0" layoutY="189.0" text="Probability 4 Rule Grow" />
+            <NumberTextField fx:id="probability4RuleGrowField" layoutX="137.0" layoutY="185.0" prefHeight="25.0" prefWidth="60.0" />
+            <Separator layoutX="-4.0" layoutY="248.0" prefHeight="3.0" prefWidth="216.0" />
+         </children>
+      </AnchorPane>
     <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="500.0">
          <children>
             <MImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
-         </children></AnchorPane>
+         </children>
+      </AnchorPane>
   </items>
 </SplitPane>
