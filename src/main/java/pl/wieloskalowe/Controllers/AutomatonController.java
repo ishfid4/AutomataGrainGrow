@@ -222,6 +222,10 @@ public class AutomatonController implements Observer{
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
             Automaton automaton = new FourRulesGrainGrow(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
+            if (!probability4RuleGrowField.getText().isEmpty())
+                ((FourRulesGrainGrow) automaton).setPobability(Integer.parseInt(probability4RuleGrowField.getText()));
+            else
+                Platform.runLater(() -> errorLabel.setText("EMPTY PROBABILITY - SET 10%"));
         }
 
 //        if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {

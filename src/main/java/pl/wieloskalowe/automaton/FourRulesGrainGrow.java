@@ -10,8 +10,10 @@ import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 import java.util.*;
 
 public class FourRulesGrainGrow extends Automaton {
+    private int pobability;
     public FourRulesGrainGrow(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);
+        this.pobability = 10;
         VonNeumanNeighborhood vonNeumanNeighborhood = new VonNeumanNeighborhood(1);
         CornersOfMooreNeighborhood cornersOfMooreNeighborhood = new CornersOfMooreNeighborhood(1);
         for(int y = 0; y < board2D.height; ++y) {
@@ -99,5 +101,9 @@ public class FourRulesGrainGrow extends Automaton {
         }
 
         return cell;
+    }
+
+    public void setPobability(int pobability) {
+        this.pobability = pobability;
     }
 }
