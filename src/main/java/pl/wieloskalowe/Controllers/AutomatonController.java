@@ -1,6 +1,7 @@
 package pl.wieloskalowe.Controllers;
 
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -9,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.automaton.Automaton;
 import pl.wieloskalowe.automaton.AutomatonAdapter;
@@ -37,6 +39,7 @@ public class AutomatonController implements Observer{
     private boolean started = false;
     private Ticker ticker;
     private AutomatonAdapter automatonAdapter;
+    private final FileChooser fileChooser = new FileChooser();
 
     @FXML public void initialize() {
         neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
@@ -169,9 +172,10 @@ public class AutomatonController implements Observer{
         if (imageView.getImage() == null) {
             Platform.runLater(() -> errorLabel.setText("No image created!"));
         } else {
-            String IMAGE_FILE = "Board.bmp"; //todo choose save place
+            configureFileChooser(fileChooser);
+            File file = fileChooser.showSaveDialog(null);
             try {
-                ImageIO.write(imageView.getBuffImg(), "BMP", new File(IMAGE_FILE));
+                ImageIO.write(imageView.getBuffImg(), "BMP", file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -179,7 +183,8 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void saveToCSVClicked() throws IOException {
-        File file = new File("Board.csv"); //todo choose save place
+        configureFileChooser(fileChooser);
+        File file = fileChooser.showSaveDialog(null);
         file.createNewFile();
         FileWriter writer = new FileWriter(file);
 
@@ -196,8 +201,9 @@ public class AutomatonController implements Observer{
         writer.close();
     }
 
-    @FXML public void importFromCSVClicekd() throws IOException { //todo choose import file
-        File file = new File("Board.csv");
+    @FXML public void importFromCSVClicekd() throws IOException {
+        configureFileChooser(fileChooser);
+        File file = fileChooser.showOpenDialog(null);
         Scanner scanner = new Scanner(file);
         String[] dimensions = scanner.nextLine().split(" ");
         setUpAutomaton(Integer.parseInt(dimensions[0]),Integer.parseInt(dimensions[1]), false);
@@ -217,7 +223,14 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void importFromBMPClicekd() {
-        Image image = new Image("Board.bmp"); //Todo chose import file
+        configureFileChooser(fileChooser);
+        File file = fileChooser.showOpenDialog(null);
+        Image image = null;
+        try {
+            image = SwingFXUtils.toFXImage(ImageIO.read(file), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
         imageView.setImage(image);
         imageView.setFitHeight(anchorPaneForCanvas.getHeight());
@@ -288,5 +301,18 @@ public class AutomatonController implements Observer{
     @Override
     public synchronized void update(Observable o, Object arg) {
         imageView.onDataRecived(automatonAdapter.getBoard());
+    }
+
+    private static void configureFileChooser(
+            final FileChooser fileChooser) {
+        fileChooser.setTitle("View Files");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home"))
+        );
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("All Filrs", "*.*"),
+                new FileChooser.ExtensionFilter("CSV", "*.csv"),
+                new FileChooser.ExtensionFilter("BMP", "*.bmp")
+        );
     }
 }
