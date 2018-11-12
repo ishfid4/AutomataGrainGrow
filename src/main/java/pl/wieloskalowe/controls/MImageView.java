@@ -50,8 +50,8 @@ public class MImageView extends ImageView {
             setCellsWidth(cellsWidth);
 
             if (automatonType.equals("NaiveGrainGrow") || automatonType.equals("FourRulesGrainGrow")) {
-                for (int x = 0; x < cellsWidth; x++){
-                    for (int y = 0; y < cellsHeight; y++) {
+                for (int y = 0; y < cellsHeight; y++){
+                    for (int x = 0; x < cellsWidth; x++) {
                         Cell cell =  board2D.getCell(x,y);
                         drawGrainCell(buffImg, x, y, cell.isAlive(), cell.getColor(), cell.isOnEdge());
                     }

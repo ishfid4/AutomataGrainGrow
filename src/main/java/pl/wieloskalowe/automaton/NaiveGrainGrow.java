@@ -17,26 +17,30 @@ public class NaiveGrainGrow extends Automaton {
         super(board2D, neighborhood, coordinatesWrapper);
     }
 
-    //TODO Only on edge cells should be processed?/or cell dead
-    //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki ->
+    //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki
     @Override
     protected Cell getNextCellState(Cell cell, List<Cell> neighbours) {
         Cell initialCell = board2D.getInitialCell();
+        Cell inclusionCell = board2D.getInclusionCell();
 
+        if(cell == inclusionCell) return cell;
         if(cell != initialCell) return cell;
 
-        if(neighbours.stream().allMatch(c -> c == initialCell)) {
+        if(neighbours.stream().allMatch(c -> c == initialCell || c == inclusionCell)) {
             return cell;
         }
 
         Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
 
         for (Cell c : neighbours) {
-            if (c != board2D.getInitialCell()) {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
                 Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
                 listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
             }
         }
+
+        if (listOfColors.isEmpty())
+            return cell;
 
         return Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue)).getKey();
     }

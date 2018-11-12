@@ -1,12 +1,12 @@
 package pl.wieloskalowe.automaton;
 
-import javafx.scene.paint.Color;
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.CoordinatesWrapper;
+import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -75,5 +75,9 @@ public abstract class Automaton {
 
     public void syncNextBoard() {
         nextBoard = new Board2D(board2D);
+    }
+
+    public Neighborhood getNeighborhood() {
+        return neighborhood;
     }
 }
