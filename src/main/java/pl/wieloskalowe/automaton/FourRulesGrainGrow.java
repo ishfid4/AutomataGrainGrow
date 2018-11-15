@@ -89,7 +89,7 @@ public class FourRulesGrainGrow extends Automaton {
         int rndNum = rnd.nextInt(101);
         Set<Cell> cellSet = listOfColorsMoore.keySet();
         int size = cellSet.size();
-        if (rndNum <= 10 && size > 0) {
+        if (rndNum <= pobability && size > 0) {
             int item = rnd.nextInt(size);
             int i = 0;
             for(Object obj : cellSet)

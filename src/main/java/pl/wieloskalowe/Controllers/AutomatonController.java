@@ -11,15 +11,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.automaton.Automaton;
-import pl.wieloskalowe.automaton.AutomatonAdapter;
-import pl.wieloskalowe.automaton.FourRulesGrainGrow;
-import pl.wieloskalowe.automaton.NaiveGrainGrow;
+import pl.wieloskalowe.automaton.*;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.controls.MImageView;
-import pl.wieloskalowe.neighborhoods.CircleNeighborhood;
-import pl.wieloskalowe.neighborhoods.MooreNeighborhood;
-import pl.wieloskalowe.neighborhoods.Neighborhood;
+import pl.wieloskalowe.neighborhoods.*;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -29,7 +24,7 @@ import java.util.*;
 
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
-    @FXML private TextField widthField, heightField, cellCountField, inclusionsCountField, inclusionSizeField, probability4RuleGrowField;
+    @FXML private TextField widthField, heightField, cellCountField, stateCountField, inclusionsCountField, inclusionSizeField, probability4RuleGrowField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MImageView imageView;
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox;
@@ -46,22 +41,26 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void generateClicked() {
-        if (cellCountField.getText().isEmpty())
+        if (cellCountField.getText().isEmpty() || stateCountField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid cell count!"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
 
             Random random = new Random();
 
-                int stateCount = Integer.parseInt(cellCountField.getText());
+                int cellCount = Integer.parseInt(cellCountField.getText());
+                int stateCount = Integer.parseInt(stateCountField.getText());
 
                 List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
 
-                for(int i = 0; i < stateCount; ++i) {
-                    int x = random.nextInt(Integer.parseInt(widthField.getText()));
-                    int y = random.nextInt(Integer.parseInt(heightField.getText()));
-                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(i));
-                    automatonAdapter.getAutomaton().syncNextBoard();
+                while(cellCount > 0) {
+                    for (int i = 0; i < stateCount; ++i) {
+                        int x = random.nextInt(Integer.parseInt(widthField.getText()));
+                        int y = random.nextInt(Integer.parseInt(heightField.getText()));
+                        automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(i));
+                        automatonAdapter.getAutomaton().syncNextBoard();
+                        --cellCount;
+                    }
                 }
 
                 automatonAdapter.refresh();
@@ -89,6 +88,24 @@ public class AutomatonController implements Observer{
 
             imageView.onDataRecived(automatonAdapter.getBoard());
         }
+    }
+
+    @FXML public void setUp2StepClicked() {
+        ((TwoStepNaiveGrainGrow)automatonAdapter.getAutomaton())
+                .getReadyToFuck(3,  Integer.parseInt(stateCountField.getText()),
+                        Integer.parseInt(cellCountField.getText()));
+        automatonAdapter.refresh();
+    }
+
+    @FXML public void showCellsBoundariesClicked() {
+        if (automatonAdapter.getBoard().isFilled())
+        {
+            List<Integer> cellsOnEdge = automatonAdapter.getBoard().edgeCells(automatonAdapter.getAutomaton()
+                    .getNeighborhood());
+            //Redrow
+
+        }
+//        automatonAdapter.refresh();
     }
 
     @FXML public void startClicked() {
@@ -212,6 +229,15 @@ public class AutomatonController implements Observer{
     private void setUpAutomaton(int width, int height, boolean afternaiveGrow){
         Neighborhood neighborhood = new MooreNeighborhood(1);
 
+        if (neighborhoodComboBox.getValue().equals("Moore"))
+            neighborhood = new MooreNeighborhood(1);
+        if (neighborhoodComboBox.getValue().equals("VonNeuman"))
+            neighborhood = new VonNeumanNeighborhood(1);
+        if (neighborhoodComboBox.getValue().equals("CornersOfMoore"))
+            neighborhood = new CornersOfMooreNeighborhood(1);
+        if (neighborhoodComboBox.getValue().equals("Circular"))
+            neighborhood = new CircleNeighborhood(6);
+
         if (automatonTypeComboBox.getValue().equals("NaiveGrainGrow")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
             Automaton automaton = new NaiveGrainGrow(board2D, neighborhood);
@@ -220,12 +246,18 @@ public class AutomatonController implements Observer{
 
         if (automatonTypeComboBox.getValue().equals("FourRulesGrainGrow")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
-            Automaton automaton = new FourRulesGrainGrow(board2D, neighborhood);
+            Automaton automaton = new FourRulesGrainGrow(board2D, new MooreNeighborhood(1));
             automatonAdapter = new AutomatonAdapter(automaton);
             if (!probability4RuleGrowField.getText().isEmpty())
                 ((FourRulesGrainGrow) automaton).setPobability(Integer.parseInt(probability4RuleGrowField.getText()));
             else
                 Platform.runLater(() -> errorLabel.setText("EMPTY PROBABILITY - SET 10%"));
+        }
+
+        if (automatonTypeComboBox.getValue().equals("2StepNaiveGrainGrow")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new TwoStepNaiveGrainGrow(board2D, neighborhood);
+            automatonAdapter = new AutomatonAdapter(automaton);
         }
 
 //        if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {

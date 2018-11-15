@@ -154,4 +154,13 @@ public class Board2D {
         precomputedCells.add(importedCell);
         setCell(x, y, importedCell);
     }
+
+    public List<Cell> popXFromPrecomputedCellsAndClean(int count) {
+        List<Cell> cells = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            cells.add(precomputedCells.get(i));
+        }
+        precomputedCells.clear();
+        return cells;
+    }
 }
