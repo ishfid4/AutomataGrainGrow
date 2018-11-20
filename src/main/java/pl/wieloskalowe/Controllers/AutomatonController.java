@@ -30,7 +30,7 @@ public class AutomatonController implements Observer{
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox;
     private int cellsWidth, cellsHeight;
     private boolean started = false;
-    private Ticker ticker;
+    private Thread tickerThread;
     private AutomatonAdapter automatonAdapter;
     private final FileChooser fileChooser = new FileChooser();
 
@@ -84,7 +84,7 @@ public class AutomatonController implements Observer{
 
             automatonAdapter.addObserver(this);
 
-            ticker = new Ticker(automatonAdapter);
+            tickerThread = new SimualtionExecutor(automatonAdapter);
 
             imageView.onDataRecived(automatonAdapter.getBoard());
         }
@@ -109,9 +109,7 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void startClicked() {
-        this.started = !this.started;
-        if (started)
-            ticker.start();
+        tickerThread.start();
     }
 
     @FXML public void iterateClicked() {
@@ -162,7 +160,7 @@ public class AutomatonController implements Observer{
         imageView.setBoardParameters(Integer.parseInt(dimensions[0]), Integer.parseInt(dimensions[1]));
         imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
         automatonAdapter.addObserver(this);
-        ticker = new Ticker(automatonAdapter);
+        tickerThread = new SimualtionExecutor(automatonAdapter);
         imageView.onDataRecived(automatonAdapter.getBoard());
 
         while (scanner.hasNext()) {
