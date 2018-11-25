@@ -17,7 +17,6 @@ public class NaiveGrainGrow extends Automaton {
         super(board2D, neighborhood, coordinatesWrapper);
     }
 
-    //TODO przenieść sprawdzanie reguły przejscia do pojedynczej komórki
     @Override
     protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours) {
         Cell initialCell = board2D.getInitialCell();

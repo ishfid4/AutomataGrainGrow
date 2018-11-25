@@ -1,128 +1,100 @@
-//package pl.wieloskalowe.automaton;
-//
-//import javafx.scene.paint.Color;
-//import pl.wieloskalowe.Board2D;
-//import pl.wieloskalowe.CoordinatesWrapper;
-//import pl.wieloskalowe.cell.Cell;
-//import pl.wieloskalowe.cell.CellCoordinates;
-//import pl.wieloskalowe.neighborhoods.Neighborhood;
-//
-//import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.List;
-//import java.util.Set;
-//import java.util.stream.Collectors;
-//
-//public class MonteCarlo extends NaiveGrainGrow {
-//    boolean afterNaiveGrow;
-//
-//    public MonteCarlo(Board2D board2D, Neighborhood neighborhood, boolean afterNaiveGrow) {
-//        super(board2D, neighborhood);
-//        this.afterNaiveGrow = afterNaiveGrow;
-//    }
-//
-//    public MonteCarlo(Board2D board2D, Neighborhood neighborhood, boolean afterNaiveGrow, CoordinatesWrapper coordinatesWrapper) {
-//        super(board2D, neighborhood, coordinatesWrapper);
-//        this.afterNaiveGrow = afterNaiveGrow;
-//    }
-//
-//    //TODO: make possible to start from naive grain grow
-//
-//    protected Cell getNextCellStateMC(Cell cell, Set<Cell> neighbours) {
-//        //TODO Broken
-////        int sameCellCount = 0, energyCurrentCell = 0, energyNewCell = 0, deltaEnergy = cell.copyGrain().getEnergy();
-//        List<Cell> neighboursCellList = new ArrayList<>();
-//        boolean onEdge = false;
-////CopyGrain -> new Cell(cell)
-//        for (Cell c : neighbours) {
-//            if (!cell.copyGrain().getColor().equals(c.copyGrain().getColor())
-//                    && !c.copyGrain().getColor().equals(Color.color(1,1,1)))
-//                onEdge = true;
-//        }
-//
-//        if (onEdge) {
-//            for (Cell c : neighbours) {
-//                if (c.isAlive())
-//                    neighboursCellList.add(c);
-//            }
-//
-////            for (Cell c : neighboursCellList) {
-////                if (c.copyGrain().getColor().equals(cell.copyGrain().getColor()))
-////                    sameCellCount++;
-////            }
-////            energyCurrentCell = neighbours.size() - sameCellCount;
-//
-//            Collections.shuffle(neighboursCellList);
-//            Cell newCellGrain = neighboursCellList.get(0).copyGrain();
-//
-////            sameCellCount = 0;
-////            for (Cell c : neighboursCellList) {
-////                if (c.copyGrain().getColor().equals(newCellGrain.copyGrain().getColor()))
-////                    sameCellCount++;
-////            }
-////            energyNewCell = neighbours.size() - sameCellCount;
-//
-////            deltaEnergy = energyNewCell - energyCurrentCell;
-//
-////            if (deltaEnergy <= 0) {
-////                newCellGrain.setOnEdge(false);
-////                return newCellGrain;
-////            } else {
-////                CellGrain cellGrain = cell.copyGrain();
-////                cellGrain.setOnEdge(false);
-////                return cellGrain;
-////            }
-//        }
-//        Cell cellGrain = cell.copyGrain();
-//        cellGrain.setOnEdge(false);
-//        return cellGrain;
-//    }
-//
-//    @Override
-//    public synchronized void oneIteration() {
-//        if (afterNaiveGrow) {
-//            super.oneIteration();
-//            boolean anyDead = isAnyCellDead();
-//
-//            if (!anyDead) {
-//                oneIterationMC();
-//            }
-//        } else {
-//            oneIterationMC();
-//        }
-//    }
-//
-//    private synchronized void oneIterationMC() {
-//        List<CellCoordinates> coordinatesList = new ArrayList<>();
-//        coordinatesList.addAll(super.board2D.getAllCoordinates());
-//        Collections.shuffle(coordinatesList);
-//
-//        Board2D nextBoard = new Board2D(super.board2D);
-//
-//        for (CellCoordinates cellCoordinates : coordinatesList) {
-//            Cell currentCell = super.board2D.getCell(cellCoordinates);
-//            Set<CellCoordinates> coordinatesNeighbours = super.neighborhood.cellNeighbors(cellCoordinates);
-//
-//            if (coordinatesWrapper != null)
-//                coordinatesNeighbours = coordinatesWrapper.wrapCellCoordinates(coordinatesNeighbours);
-//
-//            Set<Cell> neighbours = coordinatesNeighbours.stream()
-//                    .map(cord -> board2D.getCell(cord)).collect(Collectors.toSet());
-//
-//            nextBoard.setCell(cellCoordinates, getNextCellStateMC(currentCell, neighbours));
-//        }
-//
-//        super.board2D = nextBoard;
-//    }
-//
-//    private synchronized boolean isAnyCellDead(){
-//        Set<CellCoordinates> coordinatesSet = super.board2D.getAllCoordinates();
-//        boolean anyDead = false;
-//        for (CellCoordinates cellCoordinates : coordinatesSet) {
-//            Cell currentCell = super.board2D.getCell(cellCoordinates).copyGrain();
-//            if (!currentCell.isAlive())
-//                anyDead = true;
-//        }
-//        return anyDead;
-//    }
-//}
+package pl.wieloskalowe.automaton;
+
+import javafx.util.Pair;
+import pl.wieloskalowe.Board2D;
+import pl.wieloskalowe.CoordinatesWrapper;
+import pl.wieloskalowe.cell.Cell;
+import pl.wieloskalowe.neighborhoods.Neighborhood;
+
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class MonteCarlo extends Automaton {
+    double hardCodedGrainBoundaryEnergy = 0.1;
+
+    public MonteCarlo(Board2D board2D, Neighborhood neighborhood) {
+        super(board2D, neighborhood);
+    }
+
+    public MonteCarlo(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
+        super(board2D, neighborhood, coordinatesWrapper);
+    }
+
+    @Override
+    public boolean oneIteration() {
+        boardChanged = false;
+
+        List<Integer> indexesList = new ArrayList<>();
+        IntStream.range(0, board2D.width * board2D.height).forEach(indexesList::add);
+        Collections.shuffle(indexesList);
+
+        indexesList.parallelStream().forEach(idx -> {
+            List<List<Cell>> neighborhoods = new ArrayList<>();
+            int x = idx % board2D.width;
+            int y = idx / board2D.width;
+            Cell current = board2D.getCell(x, y);
+            List<Cell> neighborPos = mooreNeighPos.get(idx).parallelStream().map(coords ->
+                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+            neighborhoods.add(neighborPos);
+            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            if (current != nextCell) {
+                board2D.setCell(x, y, nextCell);
+                boardChanged = true;
+            }
+        });
+
+        return boardChanged;
+    }
+
+    @Override
+    protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours) {
+        Cell inclusionCell = board2D.getInclusionCell();
+        Cell initialCell = board2D.getInitialCell();
+        double sameCellCount, energyBefore, energyAfter, deltaEnergy;
+        Random rnd = new Random();
+
+        if(cell == inclusionCell) return cell;
+
+        if(neighbours.stream().allMatch(c -> c == cell || c == inclusionCell || c == initialCell)) {
+            return cell;
+        }
+
+        Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
+
+        for (Cell c : neighbours.get(0)) {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
+                Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
+                listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
+            }
+        }
+
+        if (listOfColors.isEmpty())
+            return cell;
+
+        if (listOfColors.get(cell) != null)
+            sameCellCount = listOfColors.get(cell).getValue();
+        else
+            sameCellCount = 0;
+        energyBefore = hardCodedGrainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+
+
+        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+        if (listOfColors.get(rndCell) != null)
+            sameCellCount = listOfColors.get(rndCell).getValue();
+        else
+            sameCellCount = 0;
+        energyAfter = hardCodedGrainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+
+        deltaEnergy = energyAfter - energyBefore;
+        if (deltaEnergy <= 0)
+            return rndCell;
+        else
+            return cell;
+    }
+
+    public void setHardCodedGrainBoundaryEnergy(double hardCodedGrainBoundaryEnergy) {
+        this.hardCodedGrainBoundaryEnergy = hardCodedGrainBoundaryEnergy;
+    }
+}

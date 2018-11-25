@@ -49,6 +49,7 @@ public class Board2D {
 
     public List<Cell> precomputeCells(int n) {
         Random random = new Random();
+        precomputedCells.clear();
 
         for(int i = 0; i < n; ++i) {
             Color randomColor = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
@@ -162,5 +163,9 @@ public class Board2D {
         }
         precomputedCells.clear();
         return cells;
+    }
+
+    public List<Cell> getPrecomputedCells() {
+        return precomputedCells;
     }
 }

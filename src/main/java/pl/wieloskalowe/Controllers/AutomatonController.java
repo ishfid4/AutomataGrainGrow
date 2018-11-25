@@ -24,13 +24,14 @@ import java.util.*;
 
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
-    @FXML private TextField widthField, heightField, cellCountField, stateCountField, inclusionsCountField, inclusionSizeField, probability4RuleGrowField;
+    @FXML private TextField widthField, heightField, cellCountField, stateCountField, inclusionsCountField,
+            inclusionSizeField, probability4RuleGrowField, grainBoundaryEnergyTextField, maxStepsTextField, uniqueStatesTextField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MImageView imageView;
     @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox;
     private int cellsWidth, cellsHeight;
     private boolean started = false;
-    private Thread tickerThread;
+    private Thread executorThread;
     private AutomatonAdapter automatonAdapter;
     private final FileChooser fileChooser = new FileChooser();
 
@@ -48,22 +49,47 @@ public class AutomatonController implements Observer{
 
             Random random = new Random();
 
-                int cellCount = Integer.parseInt(cellCountField.getText());
-                int stateCount = Integer.parseInt(stateCountField.getText());
+            int cellCount = Integer.parseInt(cellCountField.getText());
+            int stateCount = Integer.parseInt(stateCountField.getText());
 
-                List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
+            List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
 
-                while(cellCount > 0) {
-                    for (int i = 0; i < stateCount; ++i) {
-                        int x = random.nextInt(Integer.parseInt(widthField.getText()));
-                        int y = random.nextInt(Integer.parseInt(heightField.getText()));
-                        automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(i));
-                        automatonAdapter.getAutomaton().syncNextBoard();
-                        --cellCount;
-                    }
+            while(cellCount > 0) {
+                for (int i = 0; i < stateCount; ++i) {
+                    int x = random.nextInt(Integer.parseInt(widthField.getText()));
+                    int y = random.nextInt(Integer.parseInt(heightField.getText()));
+                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(i));
+                    automatonAdapter.getAutomaton().syncNextBoard();
+                    --cellCount;
                 }
+            }
 
-                automatonAdapter.refresh();
+            automatonAdapter.refresh();
+        }
+    }
+
+    @FXML public void populateBoardMCClicked() {
+        if (uniqueStatesTextField.getText().isEmpty())
+            Platform.runLater(() -> errorLabel.setText("Invalid MC states count!"));
+        else if (!automatonTypeComboBox.getValue().equals("MonteCarlo"))
+            Platform.runLater(() -> errorLabel.setText("Wrong automaton type - this is for MonteCarlo"));
+        else {
+            Platform.runLater(() -> errorLabel.setText(""));
+
+            Random random = new Random();
+
+            int stateCount = Integer.parseInt(uniqueStatesTextField.getText());
+
+            List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
+
+            for(int x = 0; x < Integer.parseInt(widthField.getText()); ++x){
+                for(int y = 0; y < Integer.parseInt(heightField.getText()); ++y){
+                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(random.nextInt(stateCount)));
+                    automatonAdapter.getAutomaton().syncNextBoard();
+                }
+            }
+
+            automatonAdapter.refresh();
         }
     }
 
@@ -84,9 +110,15 @@ public class AutomatonController implements Observer{
 
             automatonAdapter.addObserver(this);
 
-            tickerThread = new SimualtionExecutor(automatonAdapter);
-
             imageView.onDataRecived(automatonAdapter.getBoard());
+
+            //TODO move to different button function or sth || make checking for letters or customize NumberTextField
+            if (grainBoundaryEnergyTextField.getText().isEmpty())
+                Platform.runLater(() -> errorLabel.setText("EMPTY ENERGY - SET 0.2"));
+            else {
+                Platform.runLater(() -> errorLabel.setText(""));
+                ((MonteCarlo)automatonAdapter.getAutomaton()).setHardCodedGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
+            }
         }
     }
 
@@ -109,7 +141,12 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void startClicked() {
-        tickerThread.start();
+        if (maxStepsTextField.getText().isEmpty())
+            executorThread = new SimualtionExecutor(automatonAdapter);
+        else
+            executorThread = new SimualtionExecutor(automatonAdapter, Integer.parseInt(maxStepsTextField.getText()));
+
+        executorThread.start();
     }
 
     @FXML public void iterateClicked() {
@@ -160,7 +197,7 @@ public class AutomatonController implements Observer{
         imageView.setBoardParameters(Integer.parseInt(dimensions[0]), Integer.parseInt(dimensions[1]));
         imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
         automatonAdapter.addObserver(this);
-        tickerThread = new SimualtionExecutor(automatonAdapter);
+        executorThread = new SimualtionExecutor(automatonAdapter);
         imageView.onDataRecived(automatonAdapter.getBoard());
 
         while (scanner.hasNext()) {
@@ -258,11 +295,11 @@ public class AutomatonController implements Observer{
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
-//        if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {
-//            Board2D board2D = new Board2D(width, height, new CellGrain(), new CellGrain());
-//            Automaton automaton = new MonteCarlo(board2D, neighborhood, afternaiveGrow);
-//            automatonAdapter = new AutomatonAdapter(automaton);
-//        }
+        if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new MonteCarlo(board2D, neighborhood);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
 }
 
     @Override
