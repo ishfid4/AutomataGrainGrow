@@ -56,15 +56,15 @@ public abstract class Automaton {
                 return;
             }
 
-            List<Cell> neighborPos = mooreNeighPos.get(i).parallelStream().map(coords ->
+            List<Cell> neighborPos = mooreNeighPos.get(i).stream().map(coords ->
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
             // Additional two neighborhoods
             if (!vonNeumanNeighPos.isEmpty() && !cornersOfMooreNeighPos.isEmpty()) {
-                List<Cell> neighborPosVonNeuman = vonNeumanNeighPos.get(i).parallelStream().map(coords ->
+                List<Cell> neighborPosVonNeuman = vonNeumanNeighPos.get(i).stream().map(coords ->
                         board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
-                List<Cell> neighborPosCornersMoore = cornersOfMooreNeighPos.get(i).parallelStream().map(coords ->
+                List<Cell> neighborPosCornersMoore = cornersOfMooreNeighPos.get(i).stream().map(coords ->
                             board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
 
                 neighborhoods.add(neighborPosVonNeuman);

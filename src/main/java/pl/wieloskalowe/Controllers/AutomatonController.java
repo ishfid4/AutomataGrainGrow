@@ -85,10 +85,10 @@ public class AutomatonController implements Observer{
             for(int x = 0; x < Integer.parseInt(widthField.getText()); ++x){
                 for(int y = 0; y < Integer.parseInt(heightField.getText()); ++y){
                     automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(random.nextInt(stateCount)));
-                    automatonAdapter.getAutomaton().syncNextBoard();
                 }
             }
 
+            automatonAdapter.getAutomaton().syncNextBoard();
             automatonAdapter.refresh();
         }
     }
@@ -113,11 +113,13 @@ public class AutomatonController implements Observer{
             imageView.onDataRecived(automatonAdapter.getBoard());
 
             //TODO move to different button function or sth || make checking for letters or customize NumberTextField
-            if (grainBoundaryEnergyTextField.getText().isEmpty())
-                Platform.runLater(() -> errorLabel.setText("EMPTY ENERGY - SET 0.2"));
-            else {
-                Platform.runLater(() -> errorLabel.setText(""));
-                ((MonteCarlo)automatonAdapter.getAutomaton()).setHardCodedGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
+            if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {
+                if (grainBoundaryEnergyTextField.getText().isEmpty())
+                    Platform.runLater(() -> errorLabel.setText("EMPTY ENERGY - SET 0.2"));
+                else {
+                    Platform.runLater(() -> errorLabel.setText(""));
+                    ((MonteCarlo)automatonAdapter.getAutomaton()).setGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
+                }
             }
         }
     }

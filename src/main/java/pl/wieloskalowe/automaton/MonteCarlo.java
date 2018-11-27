@@ -6,13 +6,12 @@ import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MonteCarlo extends Automaton {
-    double hardCodedGrainBoundaryEnergy = 0.1;
+    private double grainBoundaryEnergy = 0.2;
 
     public MonteCarlo(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);
@@ -35,9 +34,11 @@ public class MonteCarlo extends Automaton {
             int x = idx % board2D.width;
             int y = idx / board2D.width;
             Cell current = board2D.getCell(x, y);
-            List<Cell> neighborPos = mooreNeighPos.get(idx).parallelStream().map(coords ->
+
+            List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
+
             Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
             if (current != nextCell) {
                 board2D.setCell(x, y, nextCell);
@@ -77,15 +78,16 @@ public class MonteCarlo extends Automaton {
             sameCellCount = listOfColors.get(cell).getValue();
         else
             sameCellCount = 0;
-        energyBefore = hardCodedGrainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+        energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
 
-
-        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+//        Here we can take cell randomly from all cell states or just from neighborhood
+//        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
         if (listOfColors.get(rndCell) != null)
             sameCellCount = listOfColors.get(rndCell).getValue();
         else
             sameCellCount = 0;
-        energyAfter = hardCodedGrainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+        energyAfter = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
 
         deltaEnergy = energyAfter - energyBefore;
         if (deltaEnergy <= 0)
@@ -94,7 +96,7 @@ public class MonteCarlo extends Automaton {
             return cell;
     }
 
-    public void setHardCodedGrainBoundaryEnergy(double hardCodedGrainBoundaryEnergy) {
-        this.hardCodedGrainBoundaryEnergy = hardCodedGrainBoundaryEnergy;
+    public void setGrainBoundaryEnergy(double grainBoundaryEnergy) {
+        this.grainBoundaryEnergy = grainBoundaryEnergy;
     }
 }
