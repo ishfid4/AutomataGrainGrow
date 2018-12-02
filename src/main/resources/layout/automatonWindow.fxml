@@ -50,19 +50,19 @@
                 </items>
             </ComboBox>
             <Label layoutX="104.0" layoutY="87.0" text="Automaton type" />
-            <Label layoutX="63.0" layoutY="426.0" text="Generate cells " />
-            <Button fx:id="generateButton" layoutX="3.0" layoutY="489.0" mnemonicParsing="false" onMouseClicked="#generateClicked" prefHeight="25.0" prefWidth="93.0" text="Generate Cells" />
-            <NumberTextField fx:id="cellCountField" layoutX="2.0" layoutY="460.0" prefHeight="25.0" prefWidth="87.0" text="100" />
-            <NumberTextField fx:id="stateCountField" layoutX="101.0" layoutY="460.0" prefHeight="25.0" prefWidth="93.0" text="100" />
-            <Label layoutX="2.0" layoutY="443.0" text="Cells to generate" />
+            <Label layoutX="63.0" layoutY="454.0" text="Generate cells " />
+            <Button fx:id="generateButton" layoutX="3.0" layoutY="517.0" mnemonicParsing="false" onMouseClicked="#generateClicked" prefHeight="25.0" prefWidth="93.0" text="Generate Cells" />
+            <NumberTextField fx:id="cellCountField" layoutX="2.0" layoutY="488.0" prefHeight="25.0" prefWidth="87.0" text="100" />
+            <NumberTextField fx:id="stateCountField" layoutX="101.0" layoutY="488.0" prefHeight="25.0" prefWidth="93.0" text="100" />
+            <Label layoutX="2.0" layoutY="471.0" text="Cells to generate" />
             <Label layoutX="11.0" layoutY="28.0" text="Board &amp; Automaton Type Settings" />
-            <Label layoutX="101.0" layoutY="443.0" text="States count" />
-            <Label layoutX="1.0" layoutY="540.0" text="Inclusions Count" />
-            <NumberTextField fx:id="inclusionsCountField" layoutX="2.0" layoutY="557.0" prefHeight="25.0" prefWidth="87.0" text="10" />
-            <Label layoutX="102.0" layoutY="540.0" text="Inclusion size" />
-            <NumberTextField fx:id="inclusionSizeField" layoutX="101.0" layoutY="557.0" prefHeight="25.0" prefWidth="93.0" text="6" />
-            <Button layoutX="97.0" layoutY="601.0" mnemonicParsing="false" onMouseClicked="#addInclusionsClicekd" text="Insert inclusions" />
-            <ComboBox fx:id="inclusionsComboBox" layoutX="3.0" layoutY="601.0" prefHeight="25.0" prefWidth="88.0">
+            <Label layoutX="101.0" layoutY="471.0" text="States count" />
+            <Label layoutX="1.0" layoutY="567.0" text="Inclusions Count" />
+            <NumberTextField fx:id="inclusionsCountField" layoutX="2.0" layoutY="584.0" prefHeight="25.0" prefWidth="87.0" text="10" />
+            <Label layoutX="102.0" layoutY="567.0" text="Inclusion size" />
+            <NumberTextField fx:id="inclusionSizeField" layoutX="101.0" layoutY="584.0" prefHeight="25.0" prefWidth="93.0" text="6" />
+            <Button layoutX="97.0" layoutY="628.0" mnemonicParsing="false" onMouseClicked="#addInclusionsClicekd" text="Insert inclusions" />
+            <ComboBox fx:id="inclusionsComboBox" layoutX="3.0" layoutY="628.0" prefHeight="25.0" prefWidth="88.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Square" />
@@ -70,8 +70,8 @@
                     </FXCollections>
                 </items>
             </ComboBox>
-            <Label layoutX="50.0" layoutY="523.0" text="Generate Inclusions" />
-            <Label layoutX="3.0" layoutY="584.0" text="Inclusion Type" />
+            <Label layoutX="50.0" layoutY="550.0" text="Generate Inclusions" />
+            <Label layoutX="3.0" layoutY="611.0" text="Inclusion Type" />
             <MenuBar layoutX="-3.0" prefHeight="25.0" prefWidth="216.0">
               <menus>
                 <Menu mnemonicParsing="false" text="File">
@@ -85,11 +85,11 @@
               </menus>
             </MenuBar>
             <Separator layoutY="160.0" prefHeight="3.0" prefWidth="216.0" />
-            <Separator layoutX="-1.0" layoutY="520.0" prefHeight="3.0" prefWidth="216.0" />
+            <Separator layoutX="-1.0" layoutY="547.0" prefHeight="3.0" prefWidth="216.0" />
             <Label layoutX="21.0" layoutY="163.0" text="Advanced Automaton Settings" />
             <Label layoutX="9.0" layoutY="189.0" text="Probability 4 Rule Grow" />
-            <NumberTextField fx:id="probability4RuleGrowField" layoutX="137.0" layoutY="185.0" prefHeight="25.0" prefWidth="60.0" />
-            <Separator layoutX="-4.0" layoutY="425.0" prefHeight="3.0" prefWidth="216.0" />
+            <TextField fx:id="probability4RuleGrowField" layoutX="137.0" layoutY="185.0" prefHeight="25.0" prefWidth="60.0" />
+            <Separator layoutX="-4.0" layoutY="452.0" prefHeight="3.0" prefWidth="216.0" />
             <Label layoutX="5.0" layoutY="218.0" text="Structure 2 Step Grow" />
             <ComboBox fx:id="structureType2StepGrowComboBox" layoutX="4.0" layoutY="235.0" prefHeight="25.0" prefWidth="117.0">
                 <items>
@@ -102,18 +102,20 @@
             <Label layoutX="6.0" layoutY="260.0" prefHeight="40.0" prefWidth="125.0" text="Fixed number of cell&#10;states - 2 Step Grow" />
             <Separator layoutX="-8.0" layoutY="213.0" prefHeight="3.0" prefWidth="87.0" />
             <NumberTextField fx:id="fixedNumberOfStatesField" layoutX="137.0" layoutY="268.0" prefHeight="25.0" prefWidth="60.0" />
-            <Separator layoutX="-3.0" layoutY="299.0" prefHeight="3.0" prefWidth="87.0" />
+            <Separator layoutX="-3.0" layoutY="326.0" prefHeight="3.0" prefWidth="87.0" />
             <Button fx:id="setUp2StepButton" layoutX="123.0" layoutY="235.0" mnemonicParsing="false" onMouseClicked="#setUp2StepClicked" text="Set up 2 step" />
-            <Button fx:id="showCellsBoundariesButton" layoutX="1.0" layoutY="303.0" mnemonicParsing="false" onMouseClicked="#showCellsBoundariesClicked" text="Show cellls boundaries" />
+            <Button fx:id="showCellsBoundariesButton" layoutX="1.0" layoutY="330.0" mnemonicParsing="false" onMouseClicked="#showCellsBoundariesClicked" text="Show cellls boundaries" />
             <Separator layoutX="-4.0" layoutY="331.0" prefHeight="3.0" prefWidth="88.0" />
-            <Label layoutX="3.0" layoutY="334.0" text="Additional settings for MonteCarlo" />
-            <TextField fx:id="grainBoundaryEnergyTextField" layoutX="135.0" layoutY="351.0" prefHeight="25.0" prefWidth="60.0" />
-            <Label layoutX="9.0" layoutY="355.0" text="Grain boundary energy" />
+            <Label layoutX="3.0" layoutY="361.0" text="Additional settings for MonteCarlo" />
+            <TextField fx:id="grainBoundaryEnergyTextField" layoutX="135.0" layoutY="378.0" prefHeight="25.0" prefWidth="60.0" />
+            <Label layoutX="9.0" layoutY="382.0" text="Grain boundary energy" />
             <Label layoutX="101.0" layoutY="663.0" text="Max Steps" />
             <NumberTextField fx:id="maxStepsTextField" layoutX="158.0" layoutY="659.0" prefHeight="25.0" prefWidth="51.0" />
-            <Label layoutX="9.0" layoutY="376.0" prefHeight="17.0" prefWidth="76.0" text="Unique States" />
-            <NumberTextField fx:id="uniqueStatesTextField" layoutX="9.0" layoutY="394.0" prefHeight="25.0" prefWidth="60.0" />
-            <Button fx:id="populateBoardMCButton" layoutX="86.0" layoutY="394.0" mnemonicParsing="false" onMouseClicked="#populateBoardMCClicked" text="Populate Board" />
+            <Label layoutX="9.0" layoutY="403.0" prefHeight="17.0" prefWidth="76.0" text="Unique States" />
+            <NumberTextField fx:id="uniqueStatesTextField" layoutX="9.0" layoutY="421.0" prefHeight="25.0" prefWidth="60.0" />
+            <Button fx:id="populateBoardMCButton" layoutX="86.0" layoutY="421.0" mnemonicParsing="false" onMouseClicked="#populateBoardMCClicked" text="Populate Board" />
+            <Label layoutX="7.0" layoutY="294.0" text="Cells to generate &#10;for 2nd step" />
+            <NumberTextField fx:id="cellCount2ndStepTextField" layoutX="137.0" layoutY="299.0" prefHeight="25.0" prefWidth="60.0" />
          </children>
       </AnchorPane>
     <AnchorPane fx:id="anchorPaneForCanvas" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="500.0">

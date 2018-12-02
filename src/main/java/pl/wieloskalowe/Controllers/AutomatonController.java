@@ -25,10 +25,11 @@ import java.util.*;
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
     @FXML private TextField widthField, heightField, cellCountField, stateCountField, inclusionsCountField,
-            inclusionSizeField, probability4RuleGrowField, grainBoundaryEnergyTextField, maxStepsTextField, uniqueStatesTextField;
+            inclusionSizeField, probability4RuleGrowField, grainBoundaryEnergyTextField, maxStepsTextField,
+            fixedNumberOfStatesField, uniqueStatesTextField, cellCount2ndStepTextField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MImageView imageView;
-    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox;
+    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox, structureType2StepGrowComboBox;
     private int cellsWidth, cellsHeight;
     private boolean started = false;
     private Thread executorThread;
@@ -39,6 +40,7 @@ public class AutomatonController implements Observer{
         neighborhoodComboBox.setValue(neighborhoodComboBox.getItems().get(0));
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
         inclusionsComboBox.setValue(inclusionsComboBox.getItems().get(0));
+        structureType2StepGrowComboBox.setValue(structureType2StepGrowComboBox.getItems().get(0));
     }
 
     @FXML public void generateClicked() {
@@ -55,15 +57,14 @@ public class AutomatonController implements Observer{
             List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
 
             while(cellCount > 0) {
-                for (int i = 0; i < stateCount; ++i) {
                     int x = random.nextInt(Integer.parseInt(widthField.getText()));
                     int y = random.nextInt(Integer.parseInt(heightField.getText()));
-                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(i));
-                    automatonAdapter.getAutomaton().syncNextBoard();
+                    int idx = random.nextInt(Integer.parseInt(stateCountField.getText()));
+                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(idx));
                     --cellCount;
-                }
             }
 
+            automatonAdapter.getAutomaton().syncNextBoard();
             automatonAdapter.refresh();
         }
     }
@@ -125,10 +126,25 @@ public class AutomatonController implements Observer{
     }
 
     @FXML public void setUp2StepClicked() {
-        ((TwoStepNaiveGrainGrow)automatonAdapter.getAutomaton())
-                .getReadyToFuck(3,  Integer.parseInt(stateCountField.getText()),
-                        Integer.parseInt(cellCountField.getText()));
-        automatonAdapter.refresh();
+        if (automatonTypeComboBox.getValue().equals("2StepNaiveGrainGrow")) {
+            if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
+                Platform.runLater(() -> errorLabel.setText("Fill required fields"));
+            else {
+                Platform.runLater(() -> errorLabel.setText(""));
+
+                if (structureType2StepGrowComboBox.getValue().equals("Substructure"))
+                    ((TwoStepNaiveGrainGrow) automatonAdapter.getAutomaton())
+                            .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
+                                    Integer.parseInt(cellCount2ndStepTextField.getText()), false);
+
+                if (structureType2StepGrowComboBox.getValue().equals("DualPhase"))
+                    ((TwoStepNaiveGrainGrow) automatonAdapter.getAutomaton())
+                            .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
+                                    Integer.parseInt(cellCount2ndStepTextField.getText()), true);
+
+                automatonAdapter.refresh();
+            }
+        }
     }
 
     @FXML public void showCellsBoundariesClicked() {

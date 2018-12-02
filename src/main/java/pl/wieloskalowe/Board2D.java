@@ -53,7 +53,7 @@ public class Board2D {
 
         for(int i = 0; i < n; ++i) {
             Color randomColor = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-            while(randomColor == Color.BLACK || randomColor == Color.WHITE)
+            while(randomColor == Color.BLACK || randomColor == Color.WHITE || randomColor == Color.GOLD)
                 randomColor = Color.color(random.nextFloat(), random.nextFloat(), random.nextFloat());
 
             Cell randomCell = new Cell(true, randomColor);

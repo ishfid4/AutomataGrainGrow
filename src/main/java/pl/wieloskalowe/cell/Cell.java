@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 import java.util.Objects;
 
 public class Cell  {
-    private boolean state, onEdge, inclusion;
+    private boolean state, onEdge, inclusion, fixedState;
     private Color color;
 
     public Cell() {
@@ -13,6 +13,7 @@ public class Cell  {
         this.color = Color.WHITE;
         this.onEdge = false;
         this.inclusion = false;
+        this.fixedState = false;
     }
 
     public Cell(Cell cellGrain) {
@@ -20,6 +21,7 @@ public class Cell  {
         this.color = cellGrain.color;
         this.onEdge = cellGrain.onEdge;
         this.inclusion = cellGrain.inclusion;
+        this.fixedState = cellGrain.fixedState;
     }
 
     public Cell(boolean state, Color color) {
@@ -27,6 +29,7 @@ public class Cell  {
         this.color = color;
         this.onEdge = false;
         this.inclusion = false;
+        this.fixedState = false;
     }
 
     public Cell(boolean state, Color color, boolean onEdge) {
@@ -34,12 +37,14 @@ public class Cell  {
         this.color = color;
         this.onEdge = onEdge;
         this.inclusion = false;
+        this.fixedState = false;
     }
 
     public Cell(boolean state, boolean inclusion) {
         this.state = state;
         this.color = Color.BLACK;
         this.inclusion = inclusion;
+        this.fixedState = false;
     }
 
     public boolean isAlive() {
@@ -58,6 +63,14 @@ public class Cell  {
         return onEdge;
     }
 
+    public boolean isFixedState() {
+        return fixedState;
+    }
+
+    public void setFixedState(boolean fixedState) {
+        this.fixedState = fixedState;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -66,11 +79,12 @@ public class Cell  {
         return state == cell.state &&
                 onEdge == cell.onEdge &&
                 inclusion == cell.inclusion &&
+                fixedState == cell.fixedState &&
                 Objects.equals(color, cell.color);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(state, onEdge, inclusion, color);
+        return Objects.hash(state, onEdge, inclusion, fixedState, color);
     }
 }
