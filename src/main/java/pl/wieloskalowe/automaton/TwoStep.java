@@ -12,20 +12,28 @@ import java.util.stream.IntStream;
 
 public class TwoStep extends Automaton {
     List<Cell> fixedCells;
-    boolean isNaiveGrainGrow, secondStep = false;
+    boolean isFirstStepNaiveGrainGrow, isSecondStepNaiveGrainGrow, secondStep = false;
     private double grainBoundaryEnergy = 0.2;
 
-    public TwoStep(Board2D board2D, Neighborhood neighborhood, boolean isNaiveGrainGrow) {
+    public TwoStep(Board2D board2D, Neighborhood neighborhood, boolean isFirstStepNaiveGrainGrow, boolean isSecondStepNaiveGrainGrow) {
         super(board2D, neighborhood);
         this.fixedCells = new ArrayList<>();
-        this.isNaiveGrainGrow = isNaiveGrainGrow;
+        this.isFirstStepNaiveGrainGrow = isFirstStepNaiveGrainGrow;
+        this.isSecondStepNaiveGrainGrow = isSecondStepNaiveGrainGrow;
     }
 
     @Override
     public boolean oneIteration() {
-        if (isNaiveGrainGrow)
+        if (!secondStep && isFirstStepNaiveGrainGrow)
             return oneIterationNaiveGrainGrow();
-        else
+
+        if (!secondStep && !isFirstStepNaiveGrainGrow)
+            return oneIterationMonteCarlo();
+
+        if (secondStep && isSecondStepNaiveGrainGrow)
+            return oneIterationNaiveGrainGrow();
+
+//        if (secondStep && !isSecondStepNaiveGrainGrow)
             return oneIterationMonteCarlo();
     }
 
@@ -59,7 +67,6 @@ public class TwoStep extends Automaton {
         board2D = nextBoard;
         nextBoard = swapBoardTmp;
 
-        secondStep = false;
         return boardChanged;
     }
 
@@ -87,16 +94,21 @@ public class TwoStep extends Automaton {
             }
         });
 
-        secondStep = false;
         return boardChanged;
     }
 
     @Override
     protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours) {
-        if ((secondStep && isNaiveGrainGrow) || (!secondStep && isNaiveGrainGrow))
+        if (!secondStep && isFirstStepNaiveGrainGrow)
             return  nextCellStateNaiveGrainGrow(cell, neighbours);
 
-//        if ((!secondStep && !isNaiveGrainGrow) || (secondStep && !isNaiveGrainGrow))
+        if (!secondStep && !isFirstStepNaiveGrainGrow)
+            return  nexCellStateMonteCarlo(cell, neighbours);
+
+        if (secondStep && isSecondStepNaiveGrainGrow)
+            return  nextCellStateNaiveGrainGrow(cell, neighbours);
+
+//        if (secondStep && !isSecondStepNaiveGrainGrow)
         return  nexCellStateMonteCarlo(cell, neighbours);
     }
 
@@ -174,6 +186,7 @@ public class TwoStep extends Automaton {
         return Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue)).getKey();
     }
 
+    //TODO statest to generate must be taken for MC from unique states
     public void get2ndStepReady(int fixedStateCount, int statesToGenerate, int countToGenerate, boolean isDualPhase) {
         secondStep = true;
         ArrayList<Cell> oneFixedCell = new ArrayList<>();
@@ -209,7 +222,7 @@ public class TwoStep extends Automaton {
         fixedCells.clear();
         fixedCells.addAll(oneFixedCell);
 
-        if (isNaiveGrainGrow)
+        if (isSecondStepNaiveGrainGrow)
             generationForNaiveGrainGrow(statesToGenerate, countToGenerate, precomputedCells);
         else
             generationForMonteCarlo(statesToGenerate, countToGenerate, precomputedCells);

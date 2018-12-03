@@ -135,27 +135,8 @@ public class AutomatonController implements Observer{
 
     @Deprecated
     @FXML public void setUp2StepClicked() {
-        if (automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
-            if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
-                Platform.runLater(() -> errorLabel.setText("Fill required fields"));
-            else {
-                Platform.runLater(() -> errorLabel.setText(""));
-
-                if (structureType2StepGrowComboBox.getValue().equals("Substructure"))
-                    ((TwoStep) automatonAdapter.getAutomaton())
-                            .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
-                                    Integer.parseInt(cellCount2ndStepTextField.getText()), false);
-
-                if (structureType2StepGrowComboBox.getValue().equals("DualPhase"))
-                    ((TwoStep) automatonAdapter.getAutomaton())
-                            .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
-                                    Integer.parseInt(cellCount2ndStepTextField.getText()), true);
-
-                automatonAdapter.refresh();
-            }
-        }
-
-        if (automatonTypeComboBox.getValue().equals("2StepMC-MC")) {
+        if (automatonTypeComboBox.getValue().equals("2StepMC-MC") || automatonTypeComboBox.getValue().equals("2StepMC-NGG")
+         || automatonTypeComboBox.getValue().equals("2StepNGG-NGG") || automatonTypeComboBox.getValue().equals("2StepNGG-MC")) {
             if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
                 Platform.runLater(() -> errorLabel.setText("Fill required fields"));
             else {
@@ -344,13 +325,25 @@ public class AutomatonController implements Observer{
 
         if (automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
-            Automaton automaton = new TwoStep(board2D, neighborhood, true);
+            Automaton automaton = new TwoStep(board2D, neighborhood, true, true);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
         if (automatonTypeComboBox.getValue().equals("2StepMC-MC")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
-            Automaton automaton = new TwoStep(board2D, neighborhood, false);
+            Automaton automaton = new TwoStep(board2D, neighborhood, false, false);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
+        if (automatonTypeComboBox.getValue().equals("2StepNGG-MC")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new TwoStep(board2D, neighborhood, true, false);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
+        if (automatonTypeComboBox.getValue().equals("2StepMC-NGG")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new TwoStep(board2D, neighborhood, false, true);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 }
