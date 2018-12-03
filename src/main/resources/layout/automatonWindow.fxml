@@ -46,6 +46,7 @@
                         <String fx:value="FourRulesGrainGrow" />
                         <String fx:value="2StepNaiveGrainGrow" />
                         <String fx:value="MonteCarlo" />
+                        <String fx:value="2StepMonteCarlo" />
                     </FXCollections>
                 </items>
             </ComboBox>
