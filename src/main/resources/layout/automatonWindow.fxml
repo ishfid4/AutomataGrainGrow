@@ -44,9 +44,11 @@
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="NaiveGrainGrow" />
                         <String fx:value="FourRulesGrainGrow" />
-                        <String fx:value="2StepNaiveGrainGrow" />
                         <String fx:value="MonteCarlo" />
-                        <String fx:value="2StepMonteCarlo" />
+                        <String fx:value="2StepNGG-NGG" />
+                        <String fx:value="2StepMC-MC" />
+                        <String fx:value="2StepNGG-MC" />
+                        <String fx:value="2StepMC-NGG" />
                     </FXCollections>
                 </items>
             </ComboBox>

@@ -72,7 +72,7 @@ public class AutomatonController implements Observer{
     @FXML public void populateBoardMCClicked() {
         if (uniqueStatesTextField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid MC states count!"));
-        else if (!automatonTypeComboBox.getValue().equals("MonteCarlo") && !automatonTypeComboBox.getValue().equals("2StepMonteCarlo"))
+        else if (!automatonTypeComboBox.getValue().equals("MonteCarlo") && !automatonTypeComboBox.getValue().equals("2StepMC-MC") && !automatonTypeComboBox.getValue().equals("2StepMC-NGG"))
             Platform.runLater(() -> errorLabel.setText("Wrong automaton type - this is for MonteCarlo"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
@@ -122,31 +122,32 @@ public class AutomatonController implements Observer{
                     ((MonteCarlo)automatonAdapter.getAutomaton()).setGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
                 }
             }
-            if (automatonTypeComboBox.getValue().equals("2StepMonteCarlo")) {
+            if (automatonTypeComboBox.getValue().equals("2StepMC-MC")) {
                 if (grainBoundaryEnergyTextField.getText().isEmpty())
                     Platform.runLater(() -> errorLabel.setText("EMPTY ENERGY - SET 0.2"));
                 else {
                     Platform.runLater(() -> errorLabel.setText(""));
-                    ((TwoStepMonteCarlo)automatonAdapter.getAutomaton()).setGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
+                    ((TwoStep)automatonAdapter.getAutomaton()).setGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
                 }
             }
         }
     }
 
+    @Deprecated
     @FXML public void setUp2StepClicked() {
-        if (automatonTypeComboBox.getValue().equals("2StepNaiveGrainGrow")) {
+        if (automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
             if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
                 Platform.runLater(() -> errorLabel.setText("Fill required fields"));
             else {
                 Platform.runLater(() -> errorLabel.setText(""));
 
                 if (structureType2StepGrowComboBox.getValue().equals("Substructure"))
-                    ((TwoStepNaiveGrainGrow) automatonAdapter.getAutomaton())
+                    ((TwoStep) automatonAdapter.getAutomaton())
                             .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
                                     Integer.parseInt(cellCount2ndStepTextField.getText()), false);
 
                 if (structureType2StepGrowComboBox.getValue().equals("DualPhase"))
-                    ((TwoStepNaiveGrainGrow) automatonAdapter.getAutomaton())
+                    ((TwoStep) automatonAdapter.getAutomaton())
                             .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
                                     Integer.parseInt(cellCount2ndStepTextField.getText()), true);
 
@@ -154,19 +155,19 @@ public class AutomatonController implements Observer{
             }
         }
 
-        if (automatonTypeComboBox.getValue().equals("2StepMonteCarlo")) {
+        if (automatonTypeComboBox.getValue().equals("2StepMC-MC")) {
             if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
                 Platform.runLater(() -> errorLabel.setText("Fill required fields"));
             else {
                 Platform.runLater(() -> errorLabel.setText(""));
 
                 if (structureType2StepGrowComboBox.getValue().equals("Substructure"))
-                    ((TwoStepMonteCarlo) automatonAdapter.getAutomaton())
+                    ((TwoStep) automatonAdapter.getAutomaton())
                             .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
                                     Integer.parseInt(cellCount2ndStepTextField.getText()), false);
 
                 if (structureType2StepGrowComboBox.getValue().equals("DualPhase"))
-                    ((TwoStepMonteCarlo) automatonAdapter.getAutomaton())
+                    ((TwoStep) automatonAdapter.getAutomaton())
                             .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
                                     Integer.parseInt(cellCount2ndStepTextField.getText()), true);
 
@@ -335,21 +336,21 @@ public class AutomatonController implements Observer{
                 Platform.runLater(() -> errorLabel.setText("EMPTY PROBABILITY - SET 10%"));
         }
 
-        if (automatonTypeComboBox.getValue().equals("2StepNaiveGrainGrow")) {
-            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
-            Automaton automaton = new TwoStepNaiveGrainGrow(board2D, neighborhood);
-            automatonAdapter = new AutomatonAdapter(automaton);
-        }
-
         if (automatonTypeComboBox.getValue().equals("MonteCarlo")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
             Automaton automaton = new MonteCarlo(board2D, neighborhood);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
-        if (automatonTypeComboBox.getValue().equals("2StepMonteCarlo")) {
+        if (automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
-            Automaton automaton = new TwoStepMonteCarlo(board2D, neighborhood);
+            Automaton automaton = new TwoStep(board2D, neighborhood, true);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
+        if (automatonTypeComboBox.getValue().equals("2StepMC-MC")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new TwoStep(board2D, neighborhood, false);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 }
