@@ -57,15 +57,16 @@ public class MonteCarlo extends Automaton {
         Random rnd = new Random();
 
         if(cell == inclusionCell) return cell;
+        if(cell.isFixedState()) return cell;
 
-        if(neighbours.stream().allMatch(c -> c == cell || c == inclusionCell || c == initialCell)) {
+        if(neighbours.get(0).stream().allMatch(c -> c == cell || c == inclusionCell || c == initialCell || c.isFixedState())) {
             return cell;
         }
 
         Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
 
         for (Cell c : neighbours.get(0)) {
-            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell() && !c.isFixedState()) {
                 Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
                 listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
             }
@@ -81,8 +82,8 @@ public class MonteCarlo extends Automaton {
         energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
 
 //        Here we can take cell randomly from all cell states or just from neighborhood
-//        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
-        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
+        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+//        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
         if (listOfColors.get(rndCell) != null)
             sameCellCount = listOfColors.get(rndCell).getValue();
         else

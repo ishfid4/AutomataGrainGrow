@@ -24,15 +24,16 @@ public class NaiveGrainGrow extends Automaton {
 
         if(cell == inclusionCell) return cell;
         if(cell != initialCell) return cell;
+        if(cell.isFixedState()) return cell;
 
-        if(neighbours.stream().allMatch(c -> c == initialCell || c == inclusionCell)) {
+        if(neighbours.get(0).stream().allMatch(c -> c == initialCell || c == inclusionCell || c.isFixedState())) {
             return cell;
         }
 
         Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
 
         for (Cell c : neighbours.get(0)) {
-            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell()) {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell() && !c.isFixedState()) {
                 Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
                 listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
             }

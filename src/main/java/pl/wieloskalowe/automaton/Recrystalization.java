@@ -10,12 +10,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class TwoStep extends Automaton {
+public class Recrystalization extends Automaton {
     List<Cell> fixedCells;
     boolean isFirstStepNaiveGrainGrow, isSecondStepNaiveGrainGrow, secondStep = false;
     private double grainBoundaryEnergy = 0.2;
 
-    public TwoStep(Board2D board2D, Neighborhood neighborhood, boolean isFirstStepNaiveGrainGrow, boolean isSecondStepNaiveGrainGrow) {
+    public Recrystalization(Board2D board2D, Neighborhood neighborhood, boolean isFirstStepNaiveGrainGrow) {
         super(board2D, neighborhood);
         this.fixedCells = new ArrayList<>();
         this.isFirstStepNaiveGrainGrow = isFirstStepNaiveGrainGrow;
@@ -30,11 +30,8 @@ public class TwoStep extends Automaton {
         if (!secondStep && !isFirstStepNaiveGrainGrow)
             return oneIterationMonteCarlo();
 
-        if (secondStep && isSecondStepNaiveGrainGrow)
-            return oneIterationNaiveGrainGrow();
-
-//        if (secondStep && !isSecondStepNaiveGrainGrow)
-            return oneIterationMonteCarlo();
+//        if (secondStep)
+        return oneIterationMonteCarlo();
     }
 
     private boolean oneIterationNaiveGrainGrow() {
@@ -105,11 +102,55 @@ public class TwoStep extends Automaton {
         if (!secondStep && !isFirstStepNaiveGrainGrow)
             return  nexCellStateMonteCarlo(cell, neighbours);
 
-        if (secondStep && isSecondStepNaiveGrainGrow)
-            return  nextCellStateNaiveGrainGrow(cell, neighbours);
+//        if (secondStep)
+        return  nexCellStateMonteCarloRecryst(cell, neighbours);
+    }
 
-//        if (secondStep && !isSecondStepNaiveGrainGrow)
-        return  nexCellStateMonteCarlo(cell, neighbours);
+    private Cell nexCellStateMonteCarloRecryst(Cell cell, List<List<Cell>> neighbours) {
+        Cell inclusionCell = board2D.getInclusionCell();
+        Cell initialCell = board2D.getInitialCell();
+        double sameCellCount, energyBefore, energyAfter, deltaEnergy;
+        Random rnd = new Random();
+
+        if(cell.isFixedState()) return cell;
+        if(cell == inclusionCell) return cell;
+
+        if(neighbours.get(0).stream().allMatch(c -> c == cell || c == inclusionCell || c == initialCell || c.isFixedState())) {
+            return cell;
+        }
+
+        Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
+
+        for (Cell c : neighbours.get(0)) {
+            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell() && !c.isFixedState()) {
+                Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
+                listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
+            }
+        }
+
+        if (listOfColors.isEmpty())
+            return cell;
+
+        if (listOfColors.get(cell) != null)
+            sameCellCount = listOfColors.get(cell).getValue();
+        else
+            sameCellCount = 0;
+        energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+
+//        Here we can take cell randomly from all cell states or just from neighborhood
+//        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
+        if (listOfColors.get(rndCell) != null)
+            sameCellCount = listOfColors.get(rndCell).getValue();
+        else
+            sameCellCount = 0;
+        energyAfter = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+
+        deltaEnergy = energyAfter - energyBefore;
+        if (deltaEnergy <= 0)
+            return rndCell;
+        else
+            return cell;
     }
 
     private Cell nexCellStateMonteCarlo(Cell cell, List<List<Cell>> neighbours) {
@@ -144,8 +185,8 @@ public class TwoStep extends Automaton {
         energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
 
 //        Here we can take cell randomly from all cell states or just from neighborhood
-        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
-//        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
+//        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
         if (listOfColors.get(rndCell) != null)
             sameCellCount = listOfColors.get(rndCell).getValue();
         else
@@ -187,45 +228,59 @@ public class TwoStep extends Automaton {
     }
 
     //TODO statest to generate must be taken for MC from unique states
-    public void get2ndStepReady(int fixedStateCount, int statesToGenerate, int countToGenerate, boolean isDualPhase) {
-        secondStep = true;
-        ArrayList<Cell> oneFixedCell = new ArrayList<>();
-        this.fixedCells.clear();
-        fixedCells.addAll(board2D.popXFromPrecomputedCellsAndClean(fixedStateCount));
-        List<Cell> precomputedCells = board2D.precomputeCells(statesToGenerate);
-        if (isDualPhase) {
-            oneFixedCell.add(new Cell(true, Color.GOLD));
-            oneFixedCell.get(0).setFixedState(true);
+    public void get2ndStepReady(int nucleationCountOrRate, boolean isNucleationRate, boolean isHeterogenous) {
+        List<Double> cellsEnergyList = new ArrayList<>();
+        System.out.println("KURWA");
+        if (isHeterogenous){
+            IntStream.range(0, board2D.width * board2D.height).forEach(value -> cellsEnergyList.add(value, 2.0));
         } else {
-            for (Cell c: fixedCells) {
-                c.setFixedState(true);
-            }
+            IntStream.range(0, board2D.width * board2D.height).forEach(value -> cellsEnergyList.add(value, 5.0));
         }
 
-        IntStream.range(0, board2D.width * board2D.height).forEach(i -> {
-            int x = i % board2D.width;
-            int y = i / board2D.width;
-            boolean needChange = true;
-            Cell current = board2D.getCell(x, y);
-            for (Cell cell : fixedCells) {
-                if ((cell == current) && isDualPhase && !oneFixedCell.isEmpty()) {
-                    board2D.setCell(x, y, oneFixedCell.get(0));
-                }
-                if (cell == current) {
-                    needChange = false;
-                }
-            }
+        if (board2D.isFilled() && isHeterogenous) {
+            List<Integer> cellsOnEdge = board2D.edgeCells(neighborhood);
+            cellsOnEdge.forEach(integer -> cellsEnergyList.set(integer, 7.0));
+        }
 
-            if (needChange)
-                board2D.setCell(x, y, board2D.getInitialCell());
-        });
-        fixedCells.clear();
-        fixedCells.addAll(oneFixedCell);
-
-        if (isSecondStepNaiveGrainGrow)
-            generationForNaiveGrainGrow(statesToGenerate, countToGenerate, precomputedCells);
-        else
-            generationForMonteCarlo(statesToGenerate, countToGenerate, precomputedCells);
+        board2D.setCellsEnergy(cellsEnergyList);
+//        secondStep = true;
+//        ArrayList<Cell> oneFixedCell = new ArrayList<>();
+//        this.fixedCells.clear();
+//        fixedCells.addAll(board2D.popXFromPrecomputedCellsAndClean(fixedStateCount));
+//        List<Cell> precomputedCells = board2D.precomputeCells(statesToGenerate);
+//        if (isHeterogenous) {
+//            oneFixedCell.add(new Cell(true, Color.GOLD));
+//            oneFixedCell.get(0).setFixedState(true);
+//        } else {
+//            for (Cell c: fixedCells) {
+//                c.setFixedState(true);
+//            }
+//        }
+//
+//        IntStream.range(0, board2D.width * board2D.height).forEach(i -> {
+//            int x = i % board2D.width;
+//            int y = i / board2D.width;
+//            boolean needChange = true;
+//            Cell current = board2D.getCell(x, y);
+//            for (Cell cell : fixedCells) {
+//                if ((cell == current) && isHeterogenous && !oneFixedCell.isEmpty()) {
+//                    board2D.setCell(x, y, oneFixedCell.get(0));
+//                }
+//                if (cell == current) {
+//                    needChange = false;
+//                }
+//            }
+//
+//            if (needChange)
+//                board2D.setCell(x, y, board2D.getInitialCell());
+//        });
+//        fixedCells.clear();
+//        fixedCells.addAll(oneFixedCell);
+//
+//        if (isSecondStepNaiveGrainGrow)
+//            generationForNaiveGrainGrow(statesToGenerate, countToGenerate, precomputedCells);
+//        else
+//            generationForMonteCarlo(statesToGenerate, countToGenerate, precomputedCells);
 
         syncNextBoard();
     }

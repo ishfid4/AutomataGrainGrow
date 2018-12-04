@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="ishfid_main" target="1.8" />
       <module name="ishfid_test" target="1.8" />
+      <module name="pl.wieloskalowe.ishfid.main" target="1.8" />
+      <module name="pl.wieloskalowe.ishfid.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

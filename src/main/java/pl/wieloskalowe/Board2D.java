@@ -5,6 +5,7 @@ import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -17,7 +18,14 @@ public class Board2D {
     private Cell initialCell;
     private Cell inclusionCell;
 
+    List<Double> cellsEnergy;
     List<Cell> precomputedCells;
+    List<Color> energyColor = Arrays.asList(Color.color(0.0,0.0,1.0),
+            Color.color(0.0,0.25,1.0),
+            Color.color(0.0,0.5,0.75),
+            Color.color(0.0,0.75,0.75),
+            Color.color(0.0,0.75,0.25),
+            Color.color(0.0,1.0,0.0));
 
     public Board2D(int width, int height, Cell outerCell, Cell initialCell) {
         this.width = width;
@@ -27,6 +35,7 @@ public class Board2D {
         this.initialCell = initialCell;
         this.inclusionCell = new Cell(true, Color.BLACK);
         this.precomputedCells = new ArrayList<>();
+        this.cellsEnergy = new ArrayList<>();
 
         if (initialCell != null) {
             for (int x = 0; x < width; ++x) {
@@ -45,6 +54,7 @@ public class Board2D {
         this.initialCell = board2D.initialCell;
         this.inclusionCell = board2D.inclusionCell;
         this.precomputedCells = board2D.precomputedCells;
+        this.cellsEnergy = board2D.cellsEnergy;
     }
 
     public List<Cell> precomputeCells(int n) {
@@ -85,6 +95,32 @@ public class Board2D {
         }
 
         return initialCell;
+    }
+
+    public Double getCellEnergy(int x, int y) {
+        if (x >=0 && x < width && y >=0 && y < height) {
+            Double energy = cellsEnergy.get(x * width + y); //TODO swap x with y
+            return energy;
+        }
+
+        return -1.0;
+    }
+
+    public void setCellsEnergy(List<Double> cellsEnergy) {
+        this.cellsEnergy = cellsEnergy;
+    }
+
+    public void setCellEnergy(int x, int y, double en) {
+        //Neighborhood returns offset to specific cell so it can be out of bounds
+        if (x >=0 && x < width && y >=0 && y < height)
+            cellsEnergy.set(x * width + y, en); //TODO swap x with y
+    }
+    public void setCellEnergy(int idx, double en) {
+        cellsEnergy.set(idx, en);
+    }
+
+    public List<Color> getEnergyColor() {
+        return energyColor;
     }
 
     public Cell getCell(int i) {

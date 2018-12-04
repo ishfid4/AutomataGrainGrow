@@ -4,6 +4,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import pl.wieloskalowe.Board2D;
+import pl.wieloskalowe.automaton.Recrystalization;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.cell.CellDrawer;
 
@@ -12,7 +13,7 @@ import java.awt.image.BufferedImage;
 public class MImageView extends ImageView {
     private int cellsWidth, cellsHeight;
     private double viewWidth, viewHeight;
-    private String automatonType;
+    private String drawingType;
     private static BufferedImage buffImg;
 
     public void setBoardParameters (int cellsWidth, int cellsHeight) {
@@ -38,24 +39,48 @@ public class MImageView extends ImageView {
         this.cellsHeight = cellsHeight;
     }
 
-    public void setAutomatonType(String automatonType) {
-        this.automatonType = automatonType;
+    public void setDrawingType(String drawingType) {
+        this.drawingType = drawingType;
     }
 
     private final CellDrawer redrawTask = new CellDrawer(this) {
         @Override
-        protected void redraw(ImageView imageView, Board2D board2D, String automatonType,
+        protected void redraw(ImageView imageView, Board2D board2D, String drawingType,
                               int cellsWidth, int cellsHeight) {
             setCellsHeight(cellsHeight);
             setCellsWidth(cellsWidth);
+            Color color;
+            if (drawingType.equals("Energy")){
+                for (int y = 0; y < cellsHeight; y++) { //TODO showing energy
+                    for (int x = 0; x < cellsWidth; x++) {
+                        Cell cell = board2D.getCell(x, y);
+                        double energy = board2D.getCellEnergy(x, y);
+                        if (energy > 0 && energy <= 2)
+                            color = board2D.getEnergyColor().get(0);
+                        else if (energy > 2 && energy <= 3)
+                            color = board2D.getEnergyColor().get(1);
+                        else if (energy > 3 && energy <= 4)
+                            color = board2D.getEnergyColor().get(2);
+                        else if (energy > 4 && energy <= 5)
+                            color = board2D.getEnergyColor().get(3);
+                        else if (energy > 5 && energy <= 6)
+                            color = board2D.getEnergyColor().get(4);
+                        else if (energy > 6)
+                            color = board2D.getEnergyColor().get(5);
+                        else
+                            color = cell.getColor();
 
-            for (int y = 0; y < cellsHeight; y++){
-                for (int x = 0; x < cellsWidth; x++) {
-                    Cell cell =  board2D.getCell(x,y);
-                    drawGrainCell(buffImg, x, y, cell.isAlive(), cell.getColor(), cell.isOnEdge());
+                        drawGrainCell(buffImg, x, y, cell.isAlive(), color, cell.isOnEdge());
+                    }
+                }
+            } else {
+                for (int y = 0; y < cellsHeight; y++) {
+                    for (int x = 0; x < cellsWidth; x++) {
+                        Cell cell = board2D.getCell(x, y);
+                        drawGrainCell(buffImg, x, y, cell.isAlive(), cell.getColor(), cell.isOnEdge());
+                    }
                 }
             }
-
             imageView.setImage(SwingFXUtils.toFXImage(buffImg, null));
             imageView.setFitHeight(viewHeight);
             imageView.setPreserveRatio(true);
@@ -81,7 +106,7 @@ public class MImageView extends ImageView {
     }
 
     public void onDataRecived(Board2D board2D) {
-        redrawTask.setUpData(cellsWidth,cellsHeight,automatonType);
+        redrawTask.setUpData(cellsWidth,cellsHeight, drawingType);
         redrawTask.requestRedraw(board2D);
     }
 

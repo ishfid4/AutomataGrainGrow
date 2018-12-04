@@ -3,13 +3,20 @@ package pl.wieloskalowe.Controllers;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.automaton.*;
 import pl.wieloskalowe.cell.Cell;
@@ -26,11 +33,13 @@ public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
     @FXML private TextField widthField, heightField, cellCountField, stateCountField, inclusionsCountField,
             inclusionSizeField, probability4RuleGrowField, grainBoundaryEnergyTextField, maxStepsTextField,
-            fixedNumberOfStatesField, uniqueStatesTextField, cellCount2ndStepTextField;
+            fixedNumberOfStatesField, uniqueStatesTextField, cellCount2ndStepTextField, nucleationsCountTextField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MImageView imageView;
-    @FXML private ComboBox neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox, structureType2StepGrowComboBox;
+    @FXML private ComboBox energyDistributionComboBox, neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox, structureType2StepGrowComboBox;
+    @FXML private CheckBox isNuclationRateCheckBox;
     private int cellsWidth, cellsHeight;
+    private MImageView imageEnergyView;
     private boolean started = false;
     private Thread executorThread;
     private AutomatonAdapter automatonAdapter;
@@ -41,6 +50,7 @@ public class AutomatonController implements Observer{
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
         inclusionsComboBox.setValue(inclusionsComboBox.getItems().get(0));
         structureType2StepGrowComboBox.setValue(structureType2StepGrowComboBox.getItems().get(0));
+//        uniqueStatesTextField.setVisible(false);
     }
 
     @FXML public void generateClicked() {
@@ -72,7 +82,7 @@ public class AutomatonController implements Observer{
     @FXML public void populateBoardMCClicked() {
         if (uniqueStatesTextField.getText().isEmpty())
             Platform.runLater(() -> errorLabel.setText("Invalid MC states count!"));
-        else if (!automatonTypeComboBox.getValue().equals("MonteCarlo") && !automatonTypeComboBox.getValue().equals("2StepMC-MC") && !automatonTypeComboBox.getValue().equals("2StepMC-NGG"))
+        else if (!automatonTypeComboBox.getValue().equals("MonteCarlo") && !automatonTypeComboBox.getValue().equals("2StepMC-MC") && !automatonTypeComboBox.getValue().equals("2StepMC-NGG") && !automatonTypeComboBox.getValue().equals("RecrystalizationMC") && !automatonTypeComboBox.getValue().equals("RecrystalizationNGG"))
             Platform.runLater(() -> errorLabel.setText("Wrong automaton type - this is for MonteCarlo"));
         else {
             Platform.runLater(() -> errorLabel.setText(""));
@@ -103,7 +113,7 @@ public class AutomatonController implements Observer{
             Platform.runLater(() -> errorLabel.setText(""));
             cellsHeight = Integer.parseInt(heightField.getText());
             cellsWidth = Integer.parseInt(widthField.getText());
-            imageView.setAutomatonType(automatonTypeComboBox.getValue().toString());
+            imageView.setDrawingType(automatonTypeComboBox.getValue().toString());
             imageView.setBoardParameters(cellsWidth, cellsHeight);
             imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
 
@@ -130,13 +140,40 @@ public class AutomatonController implements Observer{
                     ((TwoStep)automatonAdapter.getAutomaton()).setGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
                 }
             }
+            if (automatonTypeComboBox.getValue().equals("2StepNGG-MC")) {
+                if (grainBoundaryEnergyTextField.getText().isEmpty())
+                    Platform.runLater(() -> errorLabel.setText("EMPTY ENERGY - SET 0.2"));
+                else {
+                    Platform.runLater(() -> errorLabel.setText(""));
+                    ((TwoStep)automatonAdapter.getAutomaton()).setGrainBoundaryEnergy(Double.parseDouble(grainBoundaryEnergyTextField.getText()));
+                }
+            }
         }
+    }
+
+    @FXML public void showEnergyClicked() {
+        Platform.runLater(() -> {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setMinHeight(300+50);
+            dialogStage.setMinWidth(300+50);
+            imageEnergyView = new MImageView();
+            VBox vbox = new VBox(imageEnergyView);
+            vbox.setAlignment(Pos.CENTER);
+            vbox.setPadding(new Insets(5));
+
+            imageEnergyView.setDrawingType("Energy");
+            imageEnergyView.setBoardParameters(300,300);
+            imageEnergyView.onDataRecived(automatonAdapter.getBoard());
+
+            dialogStage.setScene(new Scene(vbox));
+            dialogStage.show();
+        });
     }
 
     @Deprecated
     @FXML public void setUp2StepClicked() {
-        if (automatonTypeComboBox.getValue().equals("2StepMC-MC") || automatonTypeComboBox.getValue().equals("2StepMC-NGG")
-         || automatonTypeComboBox.getValue().equals("2StepNGG-NGG") || automatonTypeComboBox.getValue().equals("2StepNGG-MC")) {
+        if (automatonTypeComboBox.getValue().equals("2StepMC-NGG") || automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
             if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
                 Platform.runLater(() -> errorLabel.setText("Fill required fields"));
             else {
@@ -151,6 +188,46 @@ public class AutomatonController implements Observer{
                     ((TwoStep) automatonAdapter.getAutomaton())
                             .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(stateCountField.getText()),
                                     Integer.parseInt(cellCount2ndStepTextField.getText()), true);
+
+                automatonAdapter.refresh();
+            }
+        }
+
+        if (automatonTypeComboBox.getValue().equals("2StepMC-MC") || automatonTypeComboBox.getValue().equals("2StepNGG-MC")) {
+            if (fixedNumberOfStatesField.getText().isEmpty() || stateCountField.getText().isEmpty() || cellCount2ndStepTextField.getText().isEmpty())
+                Platform.runLater(() -> errorLabel.setText("Fill required fields"));
+            else {
+                Platform.runLater(() -> errorLabel.setText(""));
+
+                if (structureType2StepGrowComboBox.getValue().equals("Substructure"))
+                    ((TwoStep) automatonAdapter.getAutomaton())
+                            .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(uniqueStatesTextField.getText()),
+                                    Integer.parseInt(cellCount2ndStepTextField.getText()), false);
+
+                if (structureType2StepGrowComboBox.getValue().equals("DualPhase"))
+                    ((TwoStep) automatonAdapter.getAutomaton())
+                            .get2ndStepReady(Integer.parseInt(fixedNumberOfStatesField.getText()), Integer.parseInt(uniqueStatesTextField.getText()),
+                                    Integer.parseInt(cellCount2ndStepTextField.getText()), true);
+
+                automatonAdapter.refresh();
+            }
+        }
+    }
+
+    @FXML public void setUpRecrystalizationButton(){
+        if (automatonTypeComboBox.getValue().equals("RecrystalizationMC") || automatonTypeComboBox.getValue().equals("RecrystalizationNGG")) {
+            if (false) //TODO checking values for recryst
+                Platform.runLater(() -> errorLabel.setText("Fill required fields"));
+            else {
+                Platform.runLater(() -> errorLabel.setText(""));
+
+                if (energyDistributionComboBox.getValue().equals("Homogenous"))
+                    ((Recrystalization) automatonAdapter.getAutomaton())
+                            .get2ndStepReady(Integer.parseInt(nucleationsCountTextField.getText()), isNuclationRateCheckBox.isSelected(), false);
+
+                if (energyDistributionComboBox.getValue().equals("Heterogenous"))
+                    ((Recrystalization) automatonAdapter.getAutomaton())
+                            .get2ndStepReady(Integer.parseInt(nucleationsCountTextField.getText()), isNuclationRateCheckBox.isSelected(), true);
 
                 automatonAdapter.refresh();
             }
@@ -221,7 +298,7 @@ public class AutomatonController implements Observer{
         String[] dimensions = scanner.nextLine().split(" ");
         setUpAutomaton(Integer.parseInt(dimensions[0]),Integer.parseInt(dimensions[1]), false);
 
-        imageView.setAutomatonType(automatonTypeComboBox.getValue().toString());
+        imageView.setDrawingType(automatonTypeComboBox.getValue().toString());
         imageView.setBoardParameters(Integer.parseInt(dimensions[0]), Integer.parseInt(dimensions[1]));
         imageView.setViewDimentions(anchorPaneForCanvas.getWidth(), anchorPaneForCanvas.getHeight());
         automatonAdapter.addObserver(this);
@@ -323,9 +400,15 @@ public class AutomatonController implements Observer{
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
-        if (automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
+        if (automatonTypeComboBox.getValue().equals("RecrystalizationMC")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
-            Automaton automaton = new TwoStep(board2D, neighborhood, true, true);
+            Automaton automaton = new Recrystalization(board2D, neighborhood, false);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
+        if (automatonTypeComboBox.getValue().equals("RecrystalizationNGG")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new Recrystalization(board2D, neighborhood, true);
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
