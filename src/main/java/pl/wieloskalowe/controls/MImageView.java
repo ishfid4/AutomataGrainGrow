@@ -51,22 +51,24 @@ public class MImageView extends ImageView {
             setCellsWidth(cellsWidth);
             Color color;
             if (drawingType.equals("Energy")){
-                for (int y = 0; y < cellsHeight; y++) { //TODO showing energy
+                for (int y = 0; y < cellsHeight; y++) {
                     for (int x = 0; x < cellsWidth; x++) {
                         Cell cell = board2D.getCell(x, y);
-                        double energy = board2D.getCellEnergy(x, y);
-                        if (energy > 0 && energy <= 2)
+                        Double energy = board2D.getCellEnergy(x, y);
+                        if (energy >= 0.0 && energy <= 1.0)
                             color = board2D.getEnergyColor().get(0);
-                        else if (energy > 2 && energy <= 3)
+                        else if (energy > 1.0 && energy <= 2.0)
                             color = board2D.getEnergyColor().get(1);
-                        else if (energy > 3 && energy <= 4)
+                        else if (energy > 2.0 && energy <= 3.0)
                             color = board2D.getEnergyColor().get(2);
-                        else if (energy > 4 && energy <= 5)
+                        else if (energy > 3.0 && energy <= 4.0)
                             color = board2D.getEnergyColor().get(3);
-                        else if (energy > 5 && energy <= 6)
+                        else if (energy > 4.0 && energy <= 5.0)
                             color = board2D.getEnergyColor().get(4);
-                        else if (energy > 6)
+                        else if (energy > 5.0 && energy <= 6.0)
                             color = board2D.getEnergyColor().get(5);
+                        else if (energy > 6.0)
+                            color = board2D.getEnergyColor().get(6);
                         else
                             color = cell.getColor();
 

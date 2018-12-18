@@ -20,12 +20,14 @@ public class Board2D {
 
     List<Double> cellsEnergy;
     List<Cell> precomputedCells;
+    List<Cell> precomputedRecrystalizedCells;
     List<Color> energyColor = Arrays.asList(Color.color(0.0,0.0,1.0),
-            Color.color(0.0,0.25,1.0),
-            Color.color(0.0,0.5,0.75),
-            Color.color(0.0,0.75,0.75),
-            Color.color(0.0,0.75,0.25),
-            Color.color(0.0,1.0,0.0));
+            Color.color(0.1,0.15, 1.0),
+            Color.color(0.1,0.30,1.0),
+            Color.color(0.0,0.45,1.00),
+            Color.color(0.0,0.70,1.00),
+            Color.color(0.0,1.00,1.00),
+            Color.color(0.5,1.00,1.00));
 
     public Board2D(int width, int height, Cell outerCell, Cell initialCell) {
         this.width = width;
@@ -35,6 +37,7 @@ public class Board2D {
         this.initialCell = initialCell;
         this.inclusionCell = new Cell(true, Color.BLACK);
         this.precomputedCells = new ArrayList<>();
+        this.precomputedRecrystalizedCells = new ArrayList<>();
         this.cellsEnergy = new ArrayList<>();
 
         if (initialCell != null) {
@@ -54,6 +57,7 @@ public class Board2D {
         this.initialCell = board2D.initialCell;
         this.inclusionCell = board2D.inclusionCell;
         this.precomputedCells = board2D.precomputedCells;
+        this.precomputedRecrystalizedCells = board2D.precomputedRecrystalizedCells;
         this.cellsEnergy = board2D.cellsEnergy;
     }
 
@@ -71,6 +75,23 @@ public class Board2D {
         }
 
         return precomputedCells;
+    }
+
+    public List<Cell> precomuteRecrystalizedCells(int n) {
+        Random random = new Random();
+        precomputedRecrystalizedCells.clear();
+
+        for(int i = 0; i < n; ++i) {
+            Color randomColor = Color.color(random.nextFloat(), 0.0, 0.0);
+            while(randomColor == Color.BLACK || randomColor == Color.WHITE || randomColor == Color.GOLD)
+                randomColor = Color.color(random.nextFloat(), 0.0, 0.0);
+
+            Cell randomCell = new Cell(true, randomColor);
+            randomCell.setRecrystalized(true);
+            precomputedRecrystalizedCells.add(randomCell);
+        }
+
+        return precomputedRecrystalizedCells;
     }
 
     public int getWidth() {
@@ -110,12 +131,12 @@ public class Board2D {
         this.cellsEnergy = cellsEnergy;
     }
 
-    public void setCellEnergy(int x, int y, double en) {
+    public void setCellEnergy(int x, int y, Double en) {
         //Neighborhood returns offset to specific cell so it can be out of bounds
         if (x >=0 && x < width && y >=0 && y < height)
             cellsEnergy.set(x * width + y, en); //TODO swap x with y
     }
-    public void setCellEnergy(int idx, double en) {
+    public void setCellEnergy(int idx, Double en) {
         cellsEnergy.set(idx, en);
     }
 
@@ -152,7 +173,7 @@ public class Board2D {
 
             long colouredNeigs = neighborhood.cellNeighbors(x, y).stream()
                     .map(c -> getCell(c[1], c[0]))
-                    .filter(cell -> cell != initialCell && cell != inclusionCell)
+                    .filter(cell -> cell != initialCell && cell != inclusionCell) //TODO add != isRecrystalized
                     .distinct()
                     .count();
 
@@ -199,6 +220,10 @@ public class Board2D {
         }
         precomputedCells.clear();
         return cells;
+    }
+
+    public List<Cell> getPrecomputedRecrystalizedCells() {
+        return precomputedRecrystalizedCells;
     }
 
     public List<Cell> getPrecomputedCells() {

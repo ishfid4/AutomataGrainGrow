@@ -36,7 +36,7 @@ public class AutomatonController implements Observer{
             fixedNumberOfStatesField, uniqueStatesTextField, cellCount2ndStepTextField, nucleationsCountTextField;
     @FXML private AnchorPane anchorPaneForCanvas;
     @FXML private MImageView imageView;
-    @FXML private ComboBox energyDistributionComboBox, neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox, structureType2StepGrowComboBox;
+    @FXML private ComboBox nucleonsDistributionComboBox, energyDistributionComboBox, neighborhoodComboBox, automatonTypeComboBox, inclusionsComboBox, structureType2StepGrowComboBox;
     @FXML private CheckBox isNuclationRateCheckBox;
     private int cellsWidth, cellsHeight;
     private MImageView imageEnergyView;
@@ -50,6 +50,7 @@ public class AutomatonController implements Observer{
         automatonTypeComboBox.setValue(automatonTypeComboBox.getItems().get(0));
         inclusionsComboBox.setValue(inclusionsComboBox.getItems().get(0));
         structureType2StepGrowComboBox.setValue(structureType2StepGrowComboBox.getItems().get(0));
+
 //        uniqueStatesTextField.setVisible(false);
     }
 
@@ -220,14 +221,20 @@ public class AutomatonController implements Observer{
                 Platform.runLater(() -> errorLabel.setText("Fill required fields"));
             else {
                 Platform.runLater(() -> errorLabel.setText(""));
+                boolean isRandomDistribution = false, isHeterogenous = false;
 
-                if (energyDistributionComboBox.getValue().equals("Homogenous"))
-                    ((Recrystalization) automatonAdapter.getAutomaton())
-                            .get2ndStepReady(Integer.parseInt(nucleationsCountTextField.getText()), isNuclationRateCheckBox.isSelected(), false);
-
+                if (nucleonsDistributionComboBox.getValue().equals("Random"))
+                    isRandomDistribution = true;
+                if (nucleonsDistributionComboBox.getValue().equals("GrainBoundaries"))
+                    isRandomDistribution = false;
                 if (energyDistributionComboBox.getValue().equals("Heterogenous"))
-                    ((Recrystalization) automatonAdapter.getAutomaton())
-                            .get2ndStepReady(Integer.parseInt(nucleationsCountTextField.getText()), isNuclationRateCheckBox.isSelected(), true);
+                    isHeterogenous = true;
+                if (energyDistributionComboBox.getValue().equals("Homogenous"))
+                    isHeterogenous = false;
+
+                ((Recrystalization) automatonAdapter.getAutomaton())
+                        .get2ndStepReady(Integer.parseInt(nucleationsCountTextField.getText()),
+                                isNuclationRateCheckBox.isSelected(), isHeterogenous, isRandomDistribution);
 
                 automatonAdapter.refresh();
             }

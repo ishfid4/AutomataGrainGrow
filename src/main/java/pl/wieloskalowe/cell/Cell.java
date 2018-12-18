@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 import java.util.Objects;
 
 public class Cell  {
-    private boolean state, onEdge, inclusion, fixedState;
+    private boolean state, onEdge, inclusion, fixedState, recrystalized;
     private Color color;
 
     public Cell() {
@@ -14,6 +14,7 @@ public class Cell  {
         this.onEdge = false;
         this.inclusion = false;
         this.fixedState = false;
+        this.recrystalized = false;
     }
 
     public Cell(Cell cellGrain) {
@@ -22,6 +23,7 @@ public class Cell  {
         this.onEdge = cellGrain.onEdge;
         this.inclusion = cellGrain.inclusion;
         this.fixedState = cellGrain.fixedState;
+        this.recrystalized = cellGrain.recrystalized;
     }
 
     public Cell(boolean state, Color color) {
@@ -30,6 +32,7 @@ public class Cell  {
         this.onEdge = false;
         this.inclusion = false;
         this.fixedState = false;
+        this.recrystalized = false;
     }
 
     public Cell(boolean state, Color color, boolean onEdge) {
@@ -38,6 +41,7 @@ public class Cell  {
         this.onEdge = onEdge;
         this.inclusion = false;
         this.fixedState = false;
+        this.recrystalized = false;
     }
 
     public Cell(boolean state, boolean inclusion) {
@@ -45,6 +49,7 @@ public class Cell  {
         this.color = Color.BLACK;
         this.inclusion = inclusion;
         this.fixedState = false;
+        this.recrystalized = false;
     }
 
     public boolean isAlive() {
@@ -71,6 +76,14 @@ public class Cell  {
         this.fixedState = fixedState;
     }
 
+    public boolean isRecrystalized() {
+        return recrystalized;
+    }
+
+    public void setRecrystalized(boolean recrystalized) {
+        this.recrystalized = recrystalized;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -80,11 +93,12 @@ public class Cell  {
                 onEdge == cell.onEdge &&
                 inclusion == cell.inclusion &&
                 fixedState == cell.fixedState &&
+                recrystalized == cell.recrystalized &&
                 Objects.equals(color, cell.color);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(state, onEdge, inclusion, fixedState, color);
+        return Objects.hash(state, onEdge, inclusion, fixedState, recrystalized, color);
     }
 }
