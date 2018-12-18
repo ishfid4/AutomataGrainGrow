@@ -21,13 +21,13 @@ public class Board2D {
     List<Double> cellsEnergy;
     List<Cell> precomputedCells;
     List<Cell> precomputedRecrystalizedCells;
-    List<Color> energyColor = Arrays.asList(Color.color(0.0,0.0,1.0),
-            Color.color(0.1,0.15, 1.0),
-            Color.color(0.1,0.30,1.0),
-            Color.color(0.0,0.45,1.00),
-            Color.color(0.0,0.70,1.00),
-            Color.color(0.0,1.00,1.00),
-            Color.color(0.5,1.00,1.00));
+    List<Color> energyColor = Arrays.asList(Color.color(0.0,0.0,0.0),
+            Color.color(0.0,0.00, 0.4),
+            Color.color(0.0,0.00,0.6),
+            Color.color(0.0,0.00,0.8),
+            Color.color(0.0,0.00,1.0),
+            Color.color(0.0,0.4,1.00),
+            Color.color(0.05, 0.6,1.00));
 
     public Board2D(int width, int height, Cell outerCell, Cell initialCell) {
         this.width = width;
@@ -138,6 +138,10 @@ public class Board2D {
     }
     public void setCellEnergy(int idx, Double en) {
         cellsEnergy.set(idx, en);
+    }
+
+    public List<Double> getCellsEnergy() {
+        return cellsEnergy;
     }
 
     public List<Color> getEnergyColor() {

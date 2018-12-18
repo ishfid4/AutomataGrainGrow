@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 
 public class Recrystalization extends Automaton {
     List<Cell> fixedCells;
+    List<Double> cellsEnergryCopy = null;
     boolean isFirstStepNaiveGrainGrow, isNucleationRate, isHeterogenous, isRandomDistribution, secondStep = false;
     private double grainBoundaryEnergy = 0.2;
     int nucleationCountOrRate;
@@ -31,9 +32,10 @@ public class Recrystalization extends Automaton {
             return oneIterationMonteCarlo();
 
 //        if (secondStep)
+        this.cellsEnergryCopy = board2D.getCellsEnergy();
         if (isNucleationRate)
             generateNecluation(board2D.getPrecomputedRecrystalizedCells());
-        return oneIterationMonteCarlo();
+        return oneIterationMonteCarloRecryst();
     }
 
     private boolean oneIterationNaiveGrainGrow() {
@@ -86,12 +88,47 @@ public class Recrystalization extends Automaton {
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods); //TODO tu dodać przekazywanie indexu od energii
             if (current != nextCell) {
                 board2D.setCell(x, y, nextCell);
                 boardChanged = true;
             }
         });
+
+        return boardChanged;
+    }
+
+ private boolean oneIterationMonteCarloRecryst() {
+        boardChanged = false;
+
+        List<Integer> indexesList = new ArrayList<>();
+        IntStream.range(0, board2D.width * board2D.height).forEach(indexesList::add);
+        Collections.shuffle(indexesList);
+
+        indexesList.parallelStream().forEach(idx -> {
+            List<List<Cell>> neighborhoods = new ArrayList<>();
+            int x = idx % board2D.width;
+            int y = idx / board2D.width;
+            Cell current = board2D.getCell(x, y);
+
+            List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
+                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+            neighborhoods.add(neighborPos);
+
+            Cell nextCell;
+            if (cellsEnergryCopy != null)
+                 nextCell = getNextCellStateRecryst(board2D.getCell(x, y), neighborhoods, idx); //TODO tu dodać przekazywanie indexu od energii
+            else
+                nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            if (current != nextCell) {
+                board2D.setCell(x, y, nextCell);
+                boardChanged = true;
+            }
+        });
+
+        //TO RECRYSTALIZATION
+        if (cellsEnergryCopy != null)
+            board2D.setCellsEnergy(cellsEnergryCopy);
 
         return boardChanged;
     }
@@ -105,20 +142,27 @@ public class Recrystalization extends Automaton {
             return  nexCellStateMonteCarlo(cell, neighbours);
 
 //        if (secondStep)
-        return  nexCellStateMonteCarloRecryst(cell, neighbours);
+        return null;
     }
 
-    private Cell nexCellStateMonteCarloRecryst(Cell cell, List<List<Cell>> neighbours) {
+    protected Cell getNextCellStateRecryst(Cell cell, List<List<Cell>> neighbours, int cellEnergyIdx) {
+        return  nexCellStateMonteCarloRecryst(cell, neighbours, cellEnergyIdx);
+    }
+
+    private Cell nexCellStateMonteCarloRecryst(Cell cell, List<List<Cell>> neighbours, int cellEnergyIdx) {
         Cell inclusionCell = board2D.getInclusionCell();
         Cell initialCell = board2D.getInitialCell();
         double sameCellCount, energyBefore, energyAfter, deltaEnergy;
         Random rnd = new Random();
 
-        if(cell.isRecrystalized()) return cell;
+        if(cell.isRecrystalized()) {
+            cellsEnergryCopy.set(cellEnergyIdx, 0.0);
+            return cell;
+        }
         if(cell.isFixedState()) return cell;
         if(cell == inclusionCell) return cell;
 
-        if(neighbours.get(0).stream().allMatch(c -> c == cell || c == inclusionCell || c == initialCell || c.isFixedState() || c.isRecrystalized())) {
+        if(neighbours.get(0).stream().allMatch(c -> c == cell || c == inclusionCell || c == initialCell || c.isFixedState())) {
             return cell;
         }
 
@@ -134,27 +178,28 @@ public class Recrystalization extends Automaton {
         if (listOfColors.isEmpty())
             return cell;
 
-//        Here we can take cell randomly from all cell states or just from neighborhood
-//        Cell rndCell = board2D.getPrecomputedRecrystalizedCells().get(rnd.nextInt(board2D.getPrecomputedRecrystalizedCells().size()));
-        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
-        if(!rndCell.isRecrystalized())
-            return cell;
-
-        if (listOfColors.get(rndCell) != null)
-            sameCellCount = listOfColors.get(rndCell).getValue();
-        else
-            sameCellCount = 0;
-        energyAfter = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
-
         if (listOfColors.get(cell) != null)
             sameCellCount = listOfColors.get(cell).getValue();
         else
             sameCellCount = 0;
-        energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount) + 2.0;
+        energyBefore = (neighbours.get(0).size() - sameCellCount) + cellsEnergryCopy.get(cellEnergyIdx);
+
+
+//        Here we can take cell randomly from all cell states or just from neighborhood
+        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
+        if(!rndCell.isRecrystalized())
+            return cell;
+        if (listOfColors.get(rndCell) != null)
+            sameCellCount = listOfColors.get(rndCell).getValue();
+        else
+            sameCellCount = 0;
+        energyAfter = (neighbours.get(0).size() - sameCellCount);
 
         deltaEnergy =  energyBefore - energyAfter;
-        if (deltaEnergy > 0)
-            return rndCell; // nucleons h =0
+        if (deltaEnergy > 0) {
+            cellsEnergryCopy.set(cellEnergyIdx, 0.0);
+            return rndCell;
+        }
         else
             return cell;
     }
