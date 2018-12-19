@@ -42,12 +42,10 @@ public class TwoStep extends Automaton {
 
         IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = i % board2D.width;
-            int y = i / board2D.width;
 
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(i);
             if(current != board2D.getInitialCell()) {
-                nextBoard.setCell(x, y, current);
+                nextBoard.setCell(i, current);
                 return;
             }
 
@@ -55,9 +53,9 @@ public class TwoStep extends Automaton {
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
             if(current != nextCell) {
-                nextBoard.setCell(x, y, nextCell);
+                nextBoard.setCell(i, nextCell);
                 boardChanged = true;
             }
         });
@@ -79,17 +77,15 @@ public class TwoStep extends Automaton {
 
         indexesList.parallelStream().forEach(idx -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = idx % board2D.width;
-            int y = idx / board2D.width;
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(idx);
 
             List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellState(board2D.getCell(idx), neighborhoods);
             if (current != nextCell) {
-                board2D.setCell(x, y, nextCell);
+                board2D.setCell(idx, nextCell);
                 boardChanged = true;
             }
         });
@@ -203,13 +199,11 @@ public class TwoStep extends Automaton {
         }
 
         IntStream.range(0, board2D.width * board2D.height).forEach(i -> {
-            int x = i % board2D.width;
-            int y = i / board2D.width;
             boolean needChange = true;
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(i);
             for (Cell cell : fixedCells) {
                 if ((cell == current) && isDualPhase && !oneFixedCell.isEmpty()) {
-                    board2D.setCell(x, y, oneFixedCell.get(0));
+                    board2D.setCell(i, oneFixedCell.get(0));
                 }
                 if (cell == current) {
                     needChange = false;
@@ -217,7 +211,7 @@ public class TwoStep extends Automaton {
             }
 
             if (needChange)
-                board2D.setCell(x, y, board2D.getInitialCell());
+                board2D.setCell(i, board2D.getInitialCell());
         });
         fixedCells.clear();
         fixedCells.addAll(oneFixedCell);

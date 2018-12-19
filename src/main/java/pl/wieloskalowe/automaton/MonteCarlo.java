@@ -31,17 +31,15 @@ public class MonteCarlo extends Automaton {
 
         indexesList.parallelStream().forEach(idx -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = idx % board2D.width;
-            int y = idx / board2D.width;
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(idx);
 
             List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
                     board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellState(board2D.getCell(idx), neighborhoods);
             if (current != nextCell) {
-                board2D.setCell(x, y, nextCell);
+                board2D.setCell(idx, nextCell);
                 boardChanged = true;
             }
         });

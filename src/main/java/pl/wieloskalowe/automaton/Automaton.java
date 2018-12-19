@@ -33,8 +33,8 @@ public abstract class Automaton {
         vonNeumanNeighPos = new ArrayList<>();
         cornersOfMooreNeighPos = new ArrayList<>();
 
-        for(int y = 0; y < board2D.height; ++y) {
-            for(int x = 0; x < board2D.width; ++x) {
+        for(int x = 0; x < board2D.height; ++x) {
+            for(int y = 0; y < board2D.width; ++y) {
                 mooreNeighPos.add(neighborhood.cellNeighbors(x, y));
             }
         }
@@ -47,12 +47,10 @@ public abstract class Automaton {
 
         IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = i % board2D.width;
-            int y = i / board2D.width;
 
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(i);
             if(current != board2D.getInitialCell()) {
-                nextBoard.setCell(x, y, current);
+                nextBoard.setCell(i, current);
                 return;
             }
 
@@ -71,9 +69,9 @@ public abstract class Automaton {
                 neighborhoods.add(neighborPosCornersMoore);
             }
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
             if(current != nextCell) {
-                nextBoard.setCell(x, y, nextCell);
+                nextBoard.setCell(i, nextCell);
                 boardChanged = true;
             }
         });

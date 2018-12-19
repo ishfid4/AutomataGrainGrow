@@ -51,8 +51,8 @@ public class MImageView extends ImageView {
             setCellsWidth(cellsWidth);
             Color color;
             if (drawingType.equals("Energy")){
-                for (int y = 0; y < cellsHeight; y++) {
-                    for (int x = 0; x < cellsWidth; x++) {
+                for (int x = 0; x < cellsHeight; x++) {
+                    for (int y = 0; y < cellsWidth; y++) {
                         Cell cell = board2D.getCell(x, y);
                         Double energy = board2D.getCellEnergy(x, y);
                         if (energy >= 0.0 && energy <= 1.0)
@@ -76,8 +76,8 @@ public class MImageView extends ImageView {
                     }
                 }
             } else {
-                for (int y = 0; y < cellsHeight; y++) {
-                    for (int x = 0; x < cellsWidth; x++) {
+                for (int x = 0; x < cellsHeight; x++) {
+                    for (int y = 0; y < cellsWidth; y++) {
                         Cell cell = board2D.getCell(x, y);
                         drawGrainCell(buffImg, x, y, cell.isAlive(), cell.getColor(), cell.isOnEdge());
                     }

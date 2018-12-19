@@ -16,8 +16,8 @@ public class FourRulesGrainGrow extends Automaton {
         this.pobability = 10;
         VonNeumanNeighborhood vonNeumanNeighborhood = new VonNeumanNeighborhood(1);
         CornersOfMooreNeighborhood cornersOfMooreNeighborhood = new CornersOfMooreNeighborhood(1);
-        for(int y = 0; y < board2D.height; ++y) {
-            for(int x = 0; x < board2D.width; ++x) {
+        for(int x = 0; x < board2D.height; ++x) {
+            for(int y = 0; y < board2D.width; ++y) {
                 vonNeumanNeighPos.add(vonNeumanNeighborhood.cellNeighbors(x, y));
                 cornersOfMooreNeighPos.add(cornersOfMooreNeighborhood.cellNeighbors(x, y));
             }

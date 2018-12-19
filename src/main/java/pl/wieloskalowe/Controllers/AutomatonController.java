@@ -431,6 +431,12 @@ public class AutomatonController implements Observer{
             automatonAdapter = new AutomatonAdapter(automaton);
         }
 
+        if (automatonTypeComboBox.getValue().equals("2StepNGG-NGG")) {
+            Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
+            Automaton automaton = new TwoStep(board2D, neighborhood, true, true);
+            automatonAdapter = new AutomatonAdapter(automaton);
+        }
+
         if (automatonTypeComboBox.getValue().equals("2StepMC-NGG")) {
             Board2D board2D = new Board2D(width, height, new Cell(), new Cell());
             Automaton automaton = new TwoStep(board2D, neighborhood, false, true);
