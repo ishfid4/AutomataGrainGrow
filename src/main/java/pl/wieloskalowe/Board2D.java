@@ -18,10 +18,10 @@ public class Board2D {
     private Cell initialCell;
     private Cell inclusionCell;
 
-    List<Double> cellsEnergy;
-    List<Cell> precomputedCells;
-    List<Cell> precomputedRecrystalizedCells;
-    List<Color> energyColor = Arrays.asList(Color.color(0.0,0.0,0.0),
+    private List<Double> cellsEnergy;
+    private List<Cell> precomputedCells;
+    private List<Cell> precomputedRecrystalizedCells;
+    private List<Color> energyColor = Arrays.asList(Color.color(0.0,0.0,0.0),
             Color.color(0.0,0.00, 0.4),
             Color.color(0.0,0.00,0.6),
             Color.color(0.0,0.00,0.8),
@@ -40,13 +40,7 @@ public class Board2D {
         this.precomputedRecrystalizedCells = new ArrayList<>();
         this.cellsEnergy = new ArrayList<>();
 
-        if (initialCell != null) {
-            for (int x = 0; x < width; ++x) {
-                for (int y = 0; y < height; ++y) {
-                    this.cellBoard2D.add(initialCell);
-                }
-            }
-        }
+        IntStream.range(0, width * height).forEach(value -> this.cellBoard2D.add(initialCell));
     }
 
     public Board2D(Board2D board2D) {
@@ -102,33 +96,13 @@ public class Board2D {
         return height;
     }
 
-    @Deprecated
-    public void setCell(int x, int y, Cell cell){
-        //Neighborhood returns offset to specific cell so it can be out of bounds
-        if (x >=0 && x < width && y >=0 && y < height)
-            cellBoard2D.set(x * width + y, cell); //TODO swap x with y
-    }
-
     public void setCell(int idx, Cell cell){
         cellBoard2D.set(idx, cell);
     }
 
-    @Deprecated
-    public Cell getCell(int x, int y) {
-        //Neighborhood returns offset to specific cell so it can be out of bounds
-        if (x >=0 && x < width && y >=0 && y < height) {
-            Cell cell = cellBoard2D.get(x * width + y); //TODO swap x with y
-            return cell;
-        }
-
-        return initialCell;
-    }
-
-    @Deprecated
-    public Double getCellEnergy(int x, int y) {
-        if (x >=0 && x < width && y >=0 && y < height) {
-            Double energy = cellsEnergy.get(x * width + y); //TODO swap x with y
-            return energy;
+     public Double getCellEnergy(int idx) {
+        if (idx >= 0 && idx < width * height) {
+            return cellsEnergy.get(idx);
         }
 
         return -1.0;
@@ -136,13 +110,6 @@ public class Board2D {
 
     public void setCellsEnergy(List<Double> cellsEnergy) {
         this.cellsEnergy = cellsEnergy;
-    }
-
-    @Deprecated
-    public void setCellEnergy(int x, int y, Double en) {
-        //Neighborhood returns offset to specific cell so it can be out of bounds
-        if (x >=0 && x < width && y >=0 && y < height)
-            cellsEnergy.set(x * width + y, en); //TODO swap x with y
     }
 
     public void setCellEnergy(int idx, Double en) {
@@ -158,10 +125,20 @@ public class Board2D {
     }
 
     public Cell getCell(int i) {
-        return cellBoard2D.get(i);
+        if (i >= 0 && i < width * height)
+            return cellBoard2D.get(i);
+
+        return initialCell;
     }
 
-    @Deprecated
+    public int coordsToIdx(int x, int y) {
+        int idx = x * width + y;
+        if (idx >= 0 && idx < width * height)
+            return idx;
+
+        return -1;
+    }
+
     public void setInclusion(int i) {
         //Neighborhood returns offset to specific cell so it can be out of bounds
         if (i >= 0 && i < width * height)
@@ -182,11 +159,11 @@ public class Board2D {
 
     public List<Integer> edgeCells(Neighborhood neighborhood) {
         return IntStream.range(0, width * height).parallel().filter(i -> {
-            int x = i % width;
-            int y = i / width;
+            int y = i % width;
+            int x = i / width;
 
             long colouredNeigs = neighborhood.cellNeighbors(x, y).stream()
-                    .map(c -> getCell(c[1], c[0]))
+                    .map(c -> getCell(c[0] * width + c[1]))
                     .filter(cell -> cell != initialCell && cell != inclusionCell && !cell.isRecrystalized())
                     .distinct()
                     .count();
@@ -195,36 +172,37 @@ public class Board2D {
         }).boxed().collect(Collectors.toList());
     }
 
+    @Deprecated
     public void setInclusions(List<Integer> cells, Neighborhood neighborhood) {
         cells.forEach(integer -> {
-            int x = integer % width;
-            int y = integer / width;
+            int y = integer % width;
+            int x = integer / width;
 
             setInclusion(integer);
-            neighborhood.cellNeighbors(x, y).forEach(c -> setInclusion(c[1] * width + c[0]));
+            neighborhood.cellNeighbors(x, y).forEach(c -> setInclusion(c[0] * width + c[1]));
         });
     }
 
     public void importCell(int x, int y, Color color) {
         if (color.equals(Color.BLACK)) {
-            setCell(x, y, inclusionCell);
+            setCell(x *width + y, inclusionCell);
             return;
         }
         if (color.equals(Color.WHITE)) {
-            setCell(x, y, initialCell);
+            setCell(x * width + y, initialCell);
             return;
         }
 
         for (Cell cell : precomputedCells) {
             if (cell.getColor().equals(color)) {
-                setCell(x, y, cell);
+                setCell(x * width + y, cell);
                 return;
             }
         }
 
         Cell importedCell = new Cell(true, color);
         precomputedCells.add(importedCell);
-        setCell(x, y, importedCell);
+        setCell(x * width + y, importedCell);
     }
 
     public List<Cell> popXFromPrecomputedCellsAndClean(int count) {

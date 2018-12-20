@@ -50,7 +50,7 @@ public class TwoStep extends Automaton {
             }
 
             List<Cell> neighborPos = mooreNeighPos.get(i).stream().map(coords ->
-                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
             Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
@@ -80,7 +80,7 @@ public class TwoStep extends Automaton {
             Cell current = board2D.getCell(idx);
 
             List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
-                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
             Cell nextCell = getNextCellState(board2D.getCell(idx), neighborhoods);
@@ -182,7 +182,7 @@ public class TwoStep extends Automaton {
         return Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue)).getKey();
     }
 
-    //TODO statest to generate must be taken for MC from unique states
+    //Statest to generate must be taken for MC from unique states
     public void get2ndStepReady(int fixedStateCount, int statesToGenerate, int countToGenerate, boolean isDualPhase) {
         secondStep = true;
         ArrayList<Cell> oneFixedCell = new ArrayList<>();
@@ -224,35 +224,32 @@ public class TwoStep extends Automaton {
         syncNextBoard();
     }
 
-
     private void generationForMonteCarlo(int statesToGenerate, int countToGenerate, List<Cell> precomputedCells) {
         Random random = new Random();
-        for(int x = 0; x < board2D.getWidth(); ++x){
-            for(int y = 0; y < board2D.getHeight(); ++y){
-                if (board2D.getCell(x, y) == board2D.getInitialCell())
-                    board2D.setCell(x, y, precomputedCells.get(random.nextInt(statesToGenerate)));
-            }
-        }
+        IntStream.range(0, board2D.width * board2D.height).forEach(value -> {
+            if (board2D.getCell(value) == board2D.getInitialCell())
+                board2D.setCell(value, precomputedCells.get(random.nextInt(statesToGenerate)));
+        });
     }
 
     private void generationForNaiveGrainGrow(int statesToGenerate, int countToGenerate, List<Cell> precomputedCells) {
         secondStep = true;
-        Random random = new Random();
-        boolean isInitialCell;
+        List<Integer> indexesCellList = new ArrayList<>();
+        IntStream.range(0, board2D.width * board2D.height).forEach(indexesCellList::add);
+        Collections.shuffle(indexesCellList);
+        int idx = 0, precomputedIdx = 0;
         while(countToGenerate > 0) {
-            for (int i = 0; i < statesToGenerate; ++i) {
-                isInitialCell = false;
-                int x = 0, y = 0;
-                while(!isInitialCell) {
-                    x = random.nextInt(board2D.getWidth());
-                    y = random.nextInt(board2D.height);
-                    if (board2D.getCell(x, y) == board2D.getInitialCell())
-                        isInitialCell = true;
-                }
+            if (idx > indexesCellList.size())
+                idx = 0;
+            if (precomputedIdx > statesToGenerate - 1)
+                precomputedIdx = 0;
 
-                board2D.setCell(x, y, precomputedCells.get(i));
+            if (board2D.getCell(indexesCellList.get(idx)) == board2D.getInitialCell()) {
+                board2D.setCell(indexesCellList.get(idx), precomputedCells.get(precomputedIdx));
                 --countToGenerate;
+                ++precomputedIdx;
             }
+            ++idx;
         }
     }
 

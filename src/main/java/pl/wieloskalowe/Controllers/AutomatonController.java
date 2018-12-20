@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class AutomatonController implements Observer{
     @FXML private Label errorLabel;
@@ -40,7 +41,6 @@ public class AutomatonController implements Observer{
     @FXML private CheckBox isNuclationRateCheckBox;
     private int cellsWidth, cellsHeight;
     private MImageView imageEnergyView;
-    private boolean started = false;
     private Thread executorThread;
     private AutomatonAdapter automatonAdapter;
     private final FileChooser fileChooser = new FileChooser();
@@ -67,11 +67,12 @@ public class AutomatonController implements Observer{
 
             List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
 
+            List<Integer> indexesList = new ArrayList<>();
+            IntStream.range(0, Integer.parseInt(widthField.getText()) * Integer.parseInt(heightField.getText())).forEach(indexesList::add);
+            Collections.shuffle(indexesList);
             while(cellCount > 0) {
-                    int x = random.nextInt(Integer.parseInt(widthField.getText()));
-                    int y = random.nextInt(Integer.parseInt(heightField.getText()));
                     int idx = random.nextInt(Integer.parseInt(stateCountField.getText()));
-                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(idx));
+                    automatonAdapter.getBoard().setCell(indexesList.get(cellCount), precomputedCells.get(idx));
                     --cellCount;
             }
 
@@ -94,11 +95,8 @@ public class AutomatonController implements Observer{
 
             List<Cell> precomputedCells = automatonAdapter.getBoard().precomputeCells(stateCount);
 
-            for(int x = 0; x < Integer.parseInt(widthField.getText()); ++x){
-                for(int y = 0; y < Integer.parseInt(heightField.getText()); ++y){
-                    automatonAdapter.getBoard().setCell(x, y, precomputedCells.get(random.nextInt(stateCount)));
-                }
-            }
+            IntStream.range(0, Integer.parseInt(widthField.getText()) * Integer.parseInt(heightField.getText()))
+                    .forEach(idx -> automatonAdapter.getBoard().setCell(idx, precomputedCells.get(random.nextInt(stateCount))));
 
             automatonAdapter.getAutomaton().syncNextBoard();
             automatonAdapter.refresh();
@@ -289,7 +287,7 @@ public class AutomatonController implements Observer{
         writer.write(cellsWidth + " " + cellsHeight + "\n");
         for (int x = 0; x < board2D.getWidth(); x++) {
             for (int y = 0; y < board2D.getHeight(); y++) {
-                Cell cell = board2D.getCell(x, y);
+                Cell cell = board2D.getCell(x * board2D.width + y);
                 writer.write(x + " " + y + " " + cell.isAlive() + " " + cell.getColor() + "\n");
             }
         }

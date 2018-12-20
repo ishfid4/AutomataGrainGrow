@@ -32,9 +32,11 @@ public class Recrystalization extends Automaton {
             return oneIterationMonteCarlo();
 
 //        if (secondStep)
-        this.cellsEnergryCopy = board2D.getCellsEnergy();
-        if (isNucleationRate)
+        if (isNucleationRate) {
             generateNecluation(board2D.getPrecomputedRecrystalizedCells());
+        }
+        syncNextBoard();
+        this.cellsEnergryCopy = board2D.getCellsEnergy();
         return oneIterationMonteCarloRecryst();
     }
 
@@ -43,22 +45,20 @@ public class Recrystalization extends Automaton {
 
         IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = i % board2D.width;
-            int y = i / board2D.width;
 
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(i);
             if(current != board2D.getInitialCell()) {
-                nextBoard.setCell(x, y, current);
+                nextBoard.setCell(i, current);
                 return;
             }
 
             List<Cell> neighborPos = mooreNeighPos.get(i).stream().map(coords ->
-                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
             if(current != nextCell) {
-                nextBoard.setCell(x, y, nextCell);
+                nextBoard.setCell(i, nextCell);
                 boardChanged = true;
             }
         });
@@ -80,17 +80,15 @@ public class Recrystalization extends Automaton {
 
         indexesList.parallelStream().forEach(idx -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = idx % board2D.width;
-            int y = idx / board2D.width;
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(idx);
 
             List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
-                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0]* board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
-            Cell nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods); //TODO tu dodać przekazywanie indexu od energii
+            Cell nextCell = getNextCellState(board2D.getCell(idx), neighborhoods);
             if (current != nextCell) {
-                board2D.setCell(x, y, nextCell);
+                board2D.setCell(idx, nextCell);
                 boardChanged = true;
             }
         });
@@ -107,28 +105,20 @@ public class Recrystalization extends Automaton {
 
         indexesList.parallelStream().forEach(idx -> {
             List<List<Cell>> neighborhoods = new ArrayList<>();
-            int x = idx % board2D.width;
-            int y = idx / board2D.width;
-            Cell current = board2D.getCell(x, y);
+            Cell current = board2D.getCell(idx);
 
             List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
-                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new)); //TODO sprawdzic czy czasem to ułożenie indexow nie jest zjebane
             neighborhoods.add(neighborPos);
 
-            Cell nextCell;
-            if (cellsEnergryCopy != null)
-                 nextCell = getNextCellStateRecryst(board2D.getCell(x, y), neighborhoods, idx); //TODO tu dodać przekazywanie indexu od energii
-            else
-                nextCell = getNextCellState(board2D.getCell(x, y), neighborhoods);
+            Cell nextCell = getNextCellStateRecryst(board2D.getCell(idx), neighborhoods, idx);
             if (current != nextCell) {
-                board2D.setCell(x, y, nextCell);
+                board2D.setCell(idx, nextCell);
                 boardChanged = true;
             }
         });
 
-        //TO RECRYSTALIZATION
-        if (cellsEnergryCopy != null)
-            board2D.setCellsEnergy(cellsEnergryCopy);
+        board2D.setCellsEnergy(cellsEnergryCopy);
 
         return boardChanged;
     }
@@ -236,8 +226,8 @@ public class Recrystalization extends Automaton {
         energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
 
 //        Here we can take cell randomly from all cell states or just from neighborhood
-//        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
-        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
+        Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
+//        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
         if (listOfColors.get(rndCell) != null)
             sameCellCount = listOfColors.get(rndCell).getValue();
         else
@@ -278,7 +268,7 @@ public class Recrystalization extends Automaton {
         return Collections.max(listOfColors.values(), Comparator.comparingInt(Pair::getValue)).getKey();
     }
 
-    //TODO statest to generate must be taken for MC from unique states
+    //Statest to generate must be taken for MC from unique states
     public void get2ndStepReady(int nucleationCountOrRate, boolean isNucleationRate, boolean isHeterogenous, boolean isRandomDistribution) {
         List<Double> cellsEnergyList = new ArrayList<>();
         secondStep = true;
@@ -307,51 +297,42 @@ public class Recrystalization extends Automaton {
     }
 
     private void generateNecluation(List<Cell> precomputedRecrystalizedCells) {
-        if (!isRandomDistribution) {
-            List<Integer> cellsOnEdge = board2D.edgeCells(neighborhood);
-            Collections.shuffle(cellsOnEdge);
-            int countToGenerate = nucleationCountOrRate;
-            boolean brakeAloop;
-            int cellsOnEdgeIdx = 0;
-            while (countToGenerate > 0) {
-                for (int i = 0; i < 100 && countToGenerate > 0; ++i) {
-                    if (cellsOnEdgeIdx > cellsOnEdge.size())
-                        cellsOnEdgeIdx = 0;
-                    brakeAloop = false;
-                    int x = 0, y = 0;
-                    while (!brakeAloop) {
-                        x = cellsOnEdge.get(cellsOnEdgeIdx) % board2D.getWidth();
-                        y = cellsOnEdge.get(cellsOnEdgeIdx) / board2D.getWidth();
-                        if (!board2D.getCell(y, x).isRecrystalized()){
-                            brakeAloop = !board2D.getCell(y, x).isRecrystalized();
-                            cellsOnEdgeIdx++;
-                        }
-                    }
+        int idx = 0, recrystalizedCellIdx = 99;
+        int countToGenerate = nucleationCountOrRate;
 
-                    board2D.setCell(y, x, precomputedRecrystalizedCells.get(i));
-                    board2D.setCellEnergy(cellsOnEdge.get(cellsOnEdgeIdx), 0.0);
+        if (!isRandomDistribution) {
+            List<Integer> indexesCellList = board2D.edgeCells(neighborhood);
+            Collections.shuffle(indexesCellList);
+            while (countToGenerate > 0 && idx < indexesCellList.size()) {
+                if (recrystalizedCellIdx < 0)
+                    recrystalizedCellIdx = 99;
+
+                if (!board2D.getCell(indexesCellList.get(idx)).isRecrystalized()){
+                    board2D.setCell(indexesCellList.get(idx), precomputedRecrystalizedCells.get(recrystalizedCellIdx));
+                    board2D.setCellEnergy(indexesCellList.get(idx), 0.0);
                     --countToGenerate;
+                    --recrystalizedCellIdx;
                 }
+                ++idx;
             }
         } else {
-            int countToGenerate = nucleationCountOrRate;
-            boolean brakeAloop;
-            Random random = new Random();
-            while (countToGenerate > 0) {
-                for (int i = 0; i < 100 && countToGenerate > 0; ++i) {
-                    brakeAloop = false;
-                    int x = 0, y = 0;
-                    while (!brakeAloop) {
-                        x = random.nextInt(board2D.getWidth());
-                        y = random.nextInt(board2D.height);
-                        brakeAloop = !board2D.getCell(x, y).isRecrystalized();
-                    }
+            List<Integer> indexesCellList = new ArrayList<>();
+            IntStream.range(0, board2D.width * board2D.height).forEach(indexesCellList::add);
+            Collections.shuffle(indexesCellList);
+            while (countToGenerate > 0 && idx < indexesCellList.size()) {
+                if (recrystalizedCellIdx < 0)
+                    recrystalizedCellIdx = 99;
 
-                    board2D.setCell(x, y, precomputedRecrystalizedCells.get(i));
-                    board2D.setCellEnergy(x, y, 0.0);
+                if (!board2D.getCell(indexesCellList.get(idx)).isRecrystalized()){
+                    board2D.setCell(indexesCellList.get(idx), precomputedRecrystalizedCells.get(recrystalizedCellIdx));
+                    board2D.setCellEnergy(indexesCellList.get(idx), 0.0);
                     --countToGenerate;
+                    --recrystalizedCellIdx;
                 }
+                ++idx;
             }
         }
+
+        syncNextBoard();
     }
 }

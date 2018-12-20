@@ -8,6 +8,8 @@ import pl.wieloskalowe.neighborhoods.Neighborhood;
 import pl.wieloskalowe.neighborhoods.VonNeumanNeighborhood;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FourRulesGrainGrow extends Automaton {
     private int pobability;
@@ -22,6 +24,45 @@ public class FourRulesGrainGrow extends Automaton {
                 cornersOfMooreNeighPos.add(cornersOfMooreNeighborhood.cellNeighbors(x, y));
             }
         }
+    }
+
+    @Override
+    public synchronized boolean oneIteration() {
+        boardChanged = false;
+
+        IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
+            List<List<Cell>> neighborhoods = new ArrayList<>();
+
+            Cell current = board2D.getCell(i);
+            if(current != board2D.getInitialCell()) {
+                nextBoard.setCell(i, current);
+                return;
+            }
+
+            List<Cell> neighborPosMoore = mooreNeighPos.get(i).stream().map(coords ->
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
+            List<Cell> neighborPosVonNeuman = vonNeumanNeighPos.get(i).stream().map(coords ->
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
+            List<Cell> neighborPosCornersMoore = cornersOfMooreNeighPos.get(i).stream().map(coords ->
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
+
+            neighborhoods.add(neighborPosMoore);
+            neighborhoods.add(neighborPosVonNeuman);
+            neighborhoods.add(neighborPosCornersMoore);
+
+            Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
+            if(current != nextCell) {
+                nextBoard.setCell(i, nextCell);
+                boardChanged = true;
+            }
+        });
+
+        Board2D swapBoardTmp = board2D;
+
+        board2D = nextBoard;
+        nextBoard = swapBoardTmp;
+
+        return boardChanged;
     }
 
     @Override

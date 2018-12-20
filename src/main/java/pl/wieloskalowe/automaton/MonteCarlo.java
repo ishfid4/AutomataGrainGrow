@@ -34,7 +34,7 @@ public class MonteCarlo extends Automaton {
             Cell current = board2D.getCell(idx);
 
             List<Cell> neighborPos = mooreNeighPos.get(idx).stream().map(coords ->
-                    board2D.getCell(coords[0], coords[1])).collect(Collectors.toCollection(ArrayList::new));
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
             neighborhoods.add(neighborPos);
 
             Cell nextCell = getNextCellState(board2D.getCell(idx), neighborhoods);
