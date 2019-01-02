@@ -207,7 +207,8 @@ public class Board2D {
 
     public List<Cell> popXFromPrecomputedCellsAndClean(int count) {
         List<Cell> cells = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
+        int maxIdx = precomputedCells.size();
+        for (int i = 0; i < count && i < maxIdx; i++) {
             cells.add(precomputedCells.get(i));
         }
         precomputedCells.clear();

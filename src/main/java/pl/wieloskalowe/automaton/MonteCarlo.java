@@ -1,6 +1,5 @@
 package pl.wieloskalowe.automaton;
 
-import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
 import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.cell.Cell;
@@ -51,7 +50,7 @@ public class MonteCarlo extends Automaton {
     protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours) {
         Cell inclusionCell = board2D.getInclusionCell();
         Cell initialCell = board2D.getInitialCell();
-        double sameCellCount, energyBefore, energyAfter, deltaEnergy;
+        double energyBefore, energyAfter, deltaEnergy;
         Random rnd = new Random();
 
         if(cell == inclusionCell) return cell;
@@ -61,38 +60,22 @@ public class MonteCarlo extends Automaton {
             return cell;
         }
 
-        Map<Cell, Pair<Cell, Integer>> listOfColors = new HashMap<>();
-
-        for (Cell c : neighbours.get(0)) {
-            if (c != board2D.getInitialCell() && c != board2D.getInclusionCell() && !c.isFixedState()) {
-                Pair<Cell, Integer> currentCount = listOfColors.getOrDefault(c, new Pair<>(cell, 0));
-                listOfColors.put(c, new Pair<>(c, currentCount.getValue() + 1));
-            }
-        }
-
-        if (listOfColors.isEmpty())
-            return cell;
-
-        if (listOfColors.get(cell) != null)
-            sameCellCount = listOfColors.get(cell).getValue();
-        else
-            sameCellCount = 0;
-        energyBefore = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+        energyBefore = grainBoundaryEnergy * getCellEnergy(cell, neighbours.get(0));
 
 //        Here we can take cell randomly from all cell states or just from neighborhood
         Cell rndCell = board2D.getPrecomputedCells().get(rnd.nextInt(board2D.getPrecomputedCells().size()));
 //        Cell rndCell = neighbours.get(0).get(rnd.nextInt(neighbours.get(0).size()));
-        if (listOfColors.get(rndCell) != null)
-            sameCellCount = listOfColors.get(rndCell).getValue();
-        else
-            sameCellCount = 0;
-        energyAfter = grainBoundaryEnergy * (neighbours.get(0).size() - sameCellCount);
+        energyAfter = grainBoundaryEnergy * getCellEnergy(rndCell, neighbours.get(0));
 
         deltaEnergy = energyAfter - energyBefore;
         if (deltaEnergy <= 0)
             return rndCell;
         else
             return cell;
+    }
+
+    private long getCellEnergy(Cell currentCell, List<Cell> neighbours) {
+        return neighbours.stream().filter(cell -> cell != currentCell).count();
     }
 
     public void setGrainBoundaryEnergy(double grainBoundaryEnergy) {

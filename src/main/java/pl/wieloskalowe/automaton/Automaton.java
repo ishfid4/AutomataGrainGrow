@@ -7,8 +7,6 @@ import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public abstract class Automaton {
     protected Board2D board2D;
@@ -42,36 +40,7 @@ public abstract class Automaton {
 
     abstract protected Cell getNextCellState(Cell cell, List<List<Cell>> neighbours);
 
-    public synchronized boolean oneIteration() {
-        boardChanged = false;
-
-        IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
-            List<List<Cell>> neighborhoods = new ArrayList<>();
-
-            Cell current = board2D.getCell(i);
-            if(current != board2D.getInitialCell()) {
-                nextBoard.setCell(i, current);
-                return;
-            }
-
-            List<Cell> neighborPos = mooreNeighPos.get(i).stream().map(coords ->
-                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
-            neighborhoods.add(neighborPos);
-
-            Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
-            if(current != nextCell) {
-                nextBoard.setCell(i, nextCell);
-                boardChanged = true;
-            }
-        });
-
-        Board2D swapBoardTmp = board2D;
-
-        board2D = nextBoard;
-        nextBoard = swapBoardTmp;
-
-        return boardChanged;
-    }
+    abstract public boolean oneIteration();
 
     Board2D getBoard() {
         return board2D;
@@ -83,5 +52,10 @@ public abstract class Automaton {
 
     public Neighborhood getNeighborhood() {
         return neighborhood;
+    }
+
+    public void syncBoards(Board2D board2D) {
+        this.board2D = new Board2D(board2D);
+        syncNextBoard();
     }
 }

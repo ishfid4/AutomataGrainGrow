@@ -7,6 +7,8 @@ import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class NaiveGrainGrow extends Automaton {
     public NaiveGrainGrow(Board2D board2D, Neighborhood neighborhood) {
@@ -15,6 +17,38 @@ public class NaiveGrainGrow extends Automaton {
 
     public NaiveGrainGrow(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
         super(board2D, neighborhood, coordinatesWrapper);
+    }
+
+    @Override
+    public synchronized boolean oneIteration() {
+        boardChanged = false;
+
+        IntStream.range(0, board2D.width * board2D.height).parallel().forEach(i -> {
+            List<List<Cell>> neighborhoods = new ArrayList<>();
+
+            Cell current = board2D.getCell(i);
+            if(current != board2D.getInitialCell()) {
+                nextBoard.setCell(i, current);
+                return;
+            }
+
+            List<Cell> neighborPos = mooreNeighPos.get(i).stream().map(coords ->
+                    board2D.getCell(coords[0] * board2D.width + coords[1])).collect(Collectors.toCollection(ArrayList::new));
+            neighborhoods.add(neighborPos);
+
+            Cell nextCell = getNextCellState(board2D.getCell(i), neighborhoods);
+            if(current != nextCell) {
+                nextBoard.setCell(i, nextCell);
+                boardChanged = true;
+            }
+        });
+
+        Board2D swapBoardTmp = board2D;
+
+        board2D = nextBoard;
+        nextBoard = swapBoardTmp;
+
+        return boardChanged;
     }
 
     @Override
