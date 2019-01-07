@@ -113,7 +113,7 @@ public class Recrystalization extends Automaton {
         energyAfter = getCellEnergy(rndCell, neighbours.get(0));
 
         deltaEnergy =  energyAfter - energyBefore;
-        if (deltaEnergy < 0) {
+        if (deltaEnergy < 0 || (isRandomDistribution && deltaEnergy >= 0)) {
             cellsEnergryCopy.set(cellEnergyIdx, 0.0);
             return rndCell;
         }

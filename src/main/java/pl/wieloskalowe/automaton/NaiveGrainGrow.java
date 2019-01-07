@@ -2,7 +2,6 @@ package pl.wieloskalowe.automaton;
 
 import javafx.util.Pair;
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
@@ -13,10 +12,6 @@ import java.util.stream.IntStream;
 public class NaiveGrainGrow extends Automaton {
     public NaiveGrainGrow(Board2D board2D, Neighborhood neighborhood) {
         super(board2D, neighborhood);
-    }
-
-    public NaiveGrainGrow(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
-        super(board2D, neighborhood, coordinatesWrapper);
     }
 
     @Override

@@ -4,7 +4,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.automaton.Recrystalization;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.cell.CellDrawer;
 

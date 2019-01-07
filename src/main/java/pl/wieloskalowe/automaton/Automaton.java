@@ -1,7 +1,6 @@
 package pl.wieloskalowe.automaton;
 
 import pl.wieloskalowe.Board2D;
-import pl.wieloskalowe.CoordinatesWrapper;
 import pl.wieloskalowe.cell.Cell;
 import pl.wieloskalowe.neighborhoods.Neighborhood;
 
@@ -11,7 +10,6 @@ import java.util.List;
 public abstract class Automaton {
     protected Board2D board2D;
     protected Neighborhood neighborhood;
-    protected CoordinatesWrapper coordinatesWrapper = null;
     protected boolean boardChanged = true;
     Board2D nextBoard;
     List<List<int[]>> mooreNeighPos;
@@ -19,13 +17,8 @@ public abstract class Automaton {
     List<List<int[]>> cornersOfMooreNeighPos;
 
     public Automaton(Board2D board2D, Neighborhood neighborhood) {
-        this(board2D, neighborhood, null);
-    }
-
-    public Automaton(Board2D board2D, Neighborhood neighborhood, CoordinatesWrapper coordinatesWrapper) {
         this.board2D = board2D;
         this.neighborhood = neighborhood;
-        this.coordinatesWrapper = coordinatesWrapper;
         nextBoard = new Board2D(board2D);
         mooreNeighPos = new ArrayList<>();
         vonNeumanNeighPos = new ArrayList<>();

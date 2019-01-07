@@ -72,7 +72,8 @@ public class AutomatonController implements Observer{
             Collections.shuffle(indexesList);
             while(cellCount > 0) {
                     int idx = random.nextInt(Integer.parseInt(stateCountField.getText()));
-                    automatonAdapter.getBoard().setCell(indexesList.get(cellCount), precomputedCells.get(idx));
+                    if (cellCount < indexesList.size())
+                        automatonAdapter.getBoard().setCell(indexesList.get(cellCount), precomputedCells.get(idx));
                     --cellCount;
             }
 
