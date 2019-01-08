@@ -92,10 +92,7 @@ public class Recrystalization extends Automaton {
         double energyBefore, energyAfter, deltaEnergy;
         Random rnd = new Random();
 
-        if(cell.isRecrystalized()) {
-            cellsEnergryCopy.set(cellEnergyIdx, 0.0);
-            return cell;
-        }
+
         if(cell.isFixedState()) return cell;
         if(cell == inclusionCell) return cell;
 
